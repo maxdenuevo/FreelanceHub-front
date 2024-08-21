@@ -1,42 +1,217 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.titulo-encabezado h1 {
+  color: #138086;
+  font-size: 60px;
+}
+
+.titulo-encabezado h1 {
+  color: #138086;
+  font-size: 60px;
+}
+
+.logo-titulo {
+  width: 120px;
+}
+
+.encabezado-container {
+  background-image: url(assets/images/backimg.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #138086;
+  display: flex;
+  padding: 50px;
+  justify-content: space-around;
+}
+
+p { 
+  text-align: justify;
+  color: #138086;
+}
+
+h4 {
+  color: #138086;
+}
+
+#imghome {
+  width: 600px;
+  height: 500px;
+}
+
+#navprincipal {
+  background-color: #138086bc;
+}
+
+.GrupoText {
+  margin-left: 50px;
+  margin-top: 100px;
+  width: 600px;
+}
+
+.encabezado-container .btn {
+  color: #f6f4f3;
+  background-color: #DC8665;
+  width: 150px;
+}
+.encabezado-container .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+.titulo-servicios {
+  margin-top: 60px;
+  color: #138086;
   text-align: center;
+  border-bottom: 2px solid #DC8665;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.img-servicios {
+  width: 400px;
+  height: 250px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.img-servicios2 {
+  width: 400px;
+  height: 250px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.herramientas-home {
+  width: 45%;
+  display: flex;
+  margin-left: 200px;
 }
 
-.card {
-  padding: 2em;
+.herramientas-home h4{
+  border-bottom: 2px solid #DC8665;
+  color: #138086;
 }
 
-.read-the-docs {
-  color: #888;
+.herramientas-home2 {
+  width: 45%;
+  display: flex;
+  margin-left: 650px;
+}
+
+.herramientas-home2 h4{
+  border-bottom: 2px solid #DC8665;
+  color: #138086;
+}
+
+#piedepagina {
+  background-color: #13808698;
+  height: 130px;
+  display: flex;
+  margin-top: 100px;
+  justify-content: space-around;
+}
+
+#piedepagina h6 {
+  align-self: center;
+  color: white;
+}
+
+.formulario {
+  width: 400px;
+  margin: auto;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-label {
+  font-weight: bold;
+  color: #138086;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.formulario .btn {
+  background-color: #DC8665;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.formulario .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+.form-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #138086;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #dc876599;
+  padding-bottom: 0.5rem;
+}
+
+.forgot-password-link {
+  color: #138086;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.terms-link {
+  color: #138086;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.Nuevoproyecto-btns .btn{
+  width: 10%;
+}
+
+#nuevoCliente-btn {
+  width: 15%;
+}
+
+#nuevoproyecto-btn {
+  background-color: #13808698  !important;
+  color: white !important;
+}
+
+#nuevoproyecto-btn:hover {
+  background-color: #13808650  !important;
+}
+
+#v-pills-tab {
+  background-color: #f8f9fa;
+  border-radius: 1px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  height: 500px;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #13808698 !important;
+  color: white !important;
+}
+
+.nav-pills .nav-link {
+  color: #138086;
+  border-radius: 1px;
+  transition: background-color 0.3s, color 0.3s;
+  
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #13808650;
+  color: white;
 }
