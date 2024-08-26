@@ -1,4 +1,6 @@
 import React from 'react';
+import Menu from '../images/menu.png'
+
 
 
 function Navbar() {
@@ -14,7 +16,7 @@ function Navbar() {
       </div>
     </div>
     <div className="dropdown d-lg-none ms-auto">
-      <button className="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><img src="src/assets/images/lista.png" alt="" /></button>
+      <button className="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><img src={Menu} alt="" /></button>
       <ul className="dropdown-menu dropdown-menu-end">
         <li><a className="dropdown-item" href="/">Inicio</a></li>
         <li><a className="dropdown-item" href="/login">Tu Portal de Proyectos</a></li>

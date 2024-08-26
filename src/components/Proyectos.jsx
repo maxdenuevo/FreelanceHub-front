@@ -72,7 +72,7 @@ function Proyectos() {
                   </tr>
                 </tbody>
               </table>
-              <button id="add-task-btn" className="btn btn-primary my-3"><img src="src/assets/images/mas.png" alt="" /></button>
+              <button id="add-task-btn" className="btn btn-primary my-3">Agregar tarea</button>
             </div>
             <div className="Contenido-pagos">
               <h2>Pagos del Proyecto</h2>

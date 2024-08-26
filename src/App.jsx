@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import Navbar from './assets/components/Navbar';
-import HomePage from './assets/pages/Homepage';
-import Login from './assets/pages/Login';
-import Registro from './assets/pages/Registro';
-import Nuevoproyecto from './assets/pages/Nuevoproyecto';
-import Nuevocliente from './assets/pages/Nuevocliente';
-import Dashboardpage from './assets/pages/Dashboardpage';
-import Contactanos from './assets/pages/Contactanos';
+import Navbar from './components/Navbar';
+import HomePage from './pages/Homepage';
+import Login from './pages/Login';
+import Registro from './pages/Registro';
+import Nuevoproyecto from './pages/Nuevoproyecto';
+import Nuevocliente from './pages/Nuevocliente';
+import Dashboardpage from './pages/Dashboardpage';
+import Contactanos from './pages/Contactanos';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import Img from '../images/imagen-principal.png'
 
 function Encabezado() {
   return (
@@ -12,7 +13,7 @@ function Encabezado() {
     </div>
     </div>
     <div>
-    <img id='imghome' src="src/assets/images/imagen principal.png" alt=""/>
+    <img id='imghome' src={Img} alt=""/>
     </div>
     </div>
   );
