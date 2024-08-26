@@ -28,10 +28,6 @@ p {
   color: #138086;
 }
 
-h4 {
-  color: #138086;
-}
-
 #imghome {
   width: 600px;
   height: 500px;
@@ -55,6 +51,28 @@ h4 {
 .encabezado-container .btn:hover {
   background-color: #dc876599;
   color: white;
+}
+
+.contacto {
+  margin: auto;
+  background-image: url(assets/images/backimg.png);
+  background-size: cover;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contacto .btn {
+  color: #f6f4f3;
+  background-color: #DC8665;
+  width: 100%;
+}
+
+.contacto .btn:hover {
+  background-color: #dc876599;
+  color: white;
+  width: 100%;
 }
 
 .titulo-servicios {
@@ -176,6 +194,7 @@ h4 {
 
 .Nuevoproyecto-btns .btn{
   width: 10%;
+  height: 20%;
 }
 
 #nuevoCliente-btn {
@@ -191,8 +210,8 @@ h4 {
   background-color: #13808650  !important;
 }
 
-#v-pills-tab {
-  background-color: #f8f9fa;
+.sidebar {
+  background-color: #138086bc;
   border-radius: 1px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   padding: 20px;
@@ -200,18 +219,167 @@ h4 {
 }
 
 .nav-pills .nav-link.active {
-  background-color: #13808698 !important;
-  color: white !important;
+  background-color: white !important;
+  color: #138086 !important;
 }
 
 .nav-pills .nav-link {
-  color: #138086;
+  color: white;
+  width: 100%;
+  margin-top: 20px;
   border-radius: 1px;
-  transition: background-color 0.3s, color 0.3s;
-  
 }
 
 .nav-pills .nav-link:hover {
+  background-color: #ffffff50;
+  color: white;
+}
+
+
+.sidebar h1 {
+  color: white;
+  font-size: 30px;
+  text-align: center;
+}
+
+.sidebar h5 {
+  color: white;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.sidebar h6 {
+  color: white;
+  text-align: center;
+}
+
+#btn-modal {
+  color: white;
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 1px;
+}
+
+#btn-modal:hover {
+  background-color: #ffffff50;
+  color: white;
+}
+
+.tab-content h1 {
+  color: #138086;
+  border-bottom: 2px solid #dc876599;
+}
+
+.contenido-tareas {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  margin: auto;
+}
+
+.contenido-tareas h2 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #138086;
+  text-align: center;
+  margin-bottom: 50px;
+  padding-bottom: 0.5rem;
+}
+
+.Contenido-pagos {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  margin: auto;
+}
+
+.Contenido-pagos h2 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #138086;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.seccion-proyectos button {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.seccion-proyectos button:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+.card {
+  width: 300px;
+}
+
+.modal-footer .btn {
+  background-color: #13808698;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+} 
+
+.modal-footer .btn:hover {
   background-color: #13808650;
   color: white;
 }
+
+.modal-title {
+  color: #138086;
+  border-bottom: 2px solid #DC8665;
+}
+
+#v-pills-contratos {
+  width: 1300px;
+}
+
+.btns-contractosform .btn {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btns-contractosform .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+.card-body a {
+  color: #138086;
+}
+
+.card-footer .btn {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.card-body h4 {
+  color: #138086;
+}
+
+.card-footer .btn:hover{
+  background-color: #dc876599;
+  color: white;
+}
+
+
+
+
+
+

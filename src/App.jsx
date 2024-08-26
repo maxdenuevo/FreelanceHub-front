@@ -8,6 +8,7 @@ import Registro from './assets/pages/Registro';
 import Nuevoproyecto from './assets/pages/Nuevoproyecto';
 import Nuevocliente from './assets/pages/Nuevocliente';
 import Dashboardpage from './assets/pages/Dashboardpage';
+import Contactanos from './assets/pages/Contactanos';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -23,9 +24,11 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/nuevoproyecto" element={<Nuevoproyecto />} />
         <Route path="/nuevoproyecto/nuevocliente" element={<Nuevocliente />} />
-        <Route path="/Dashboardpage" element={<Dashboardpage />} />
+        <Route path="/dashboardpage" element={<Dashboardpage />} />
+        <Route path="/contactanos" element={<Contactanos />} />
       </Routes>
     </Router>
+    
   );
 }
 
