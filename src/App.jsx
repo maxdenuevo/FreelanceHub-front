@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
@@ -11,8 +12,6 @@ import Dashboardpage from './pages/Dashboardpage';
 import Contactanos from './pages/Contactanos';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
 
 function App() {
   return (
@@ -28,7 +27,6 @@ function App() {
         <Route path="/contactanos" element={<Contactanos />} />
       </Routes>
     </Router>
-    
   );
 }
 
