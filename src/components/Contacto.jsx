@@ -14,7 +14,7 @@ function Contacto() {
                     <p><a href="tel:+56931798920">+56 9 3179 8920</a></p>
                     <p><a href="tel:+56991536865">+56 9 9153 6865</a></p>
                     <p><a href="tel:+56994770080">+56 9 9477 0080</a></p>
-                    <a href="/" class="btn">Atrás</a>
+                    <a href="/" className="btn">Atrás</a>
                     </div>
                 </div>
             </div>

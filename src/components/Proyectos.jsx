@@ -3,10 +3,6 @@ import React, { useState, useEffect } from 'react';
 
 function Proyectos() {
 
-  useEffect(() => {
-  
-  }, []);
-
   let [proyectoSeleccionado, setProyectoSeleccionado] = useState('');
   let [pagos, setPagos] = useState([]);
   let [tareas, setTareas] = useState([]);
@@ -21,7 +17,8 @@ function Proyectos() {
   let [recordatorioTarea, setRecordatorioTarea] = useState('');
 
   useEffect(() => {
-  
+    // Esto se va a activar despúes que se muestre el componente por pantalla
+    console.log(0)
   }, []);
 
   let presupuesto = 50000;
