@@ -17,8 +17,14 @@ function Proyectos() {
   let [recordatorioTarea, setRecordatorioTarea] = useState('');
 
   useEffect(() => {
-    // Esto se va a activar despúes que se muestre el componente por pantalla
-    console.log(0)
+    fetch("https://api-freelancehub.vercel.app/tareas")
+      .then(response => {
+        return response.json()
+      }).then(responseConverted => {
+        setTareas(responseConverted.tareas);
+      }).catch(error =>{
+        console.log(error);
+      })
   }, []);
 
   let presupuesto = 50000;
@@ -89,19 +95,18 @@ function Proyectos() {
                     <th scope="col">Tarea</th>
                     <th scope="col">Descripción</th>
                     <th scope="col">Fecha Límite</th>
-                    <th scope="col">Recordatorio</th>
+                   
                     <th scope="col">Completada</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tareas.map((tarea, index) => (
+                  {tareas.length > 0 && tareas.map((tarea, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{tarea.tarea}</td>
-                      <td>{tarea.descripcion}</td>
-                      <td>{tarea.fechaLimite}</td>
-                      <td>{tarea.recordatorioTarea}</td>
+                      <td>{tarea.tarea_nombre}</td>
+                      <td>{tarea.tarea_descripcion}</td>
+                      <td>{tarea.tarea_fecha}</td>
                       <td>
                         <input type="checkbox" checked={tarea.completada} onChange={() => toggleCompletada(index)} />
                       </td>
@@ -110,27 +115,7 @@ function Proyectos() {
                       </td>
                     </tr>
                   ))}
-                  <tr>
-                    <td>{tareas.length + 1}</td>
-                    <td>
-                      <input type="text" className="form-control" placeholder="Tarea" value={tarea} onChange={(e) => setTarea(e.target.value)} />
-                    </td>
-                    <td>
-                      <input type="text" className="form-control" placeholder="Descripción" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-                    </td>
-                    <td>
-                      <input type="date" className="form-control" value={fechaLimite} onChange={(e) => setFechaLimite(e.target.value)} />
-                    </td>
-                    <td>
-                      <input type="date" className="form-control" value={recordatorioTarea} onChange={(e) => setRecordatorioTarea(e.target.value)} />
-                    </td>
-                    <td>
-                      <input type="checkbox" disabled />
-                    </td>
-                    <td>
-                      <button className="btn btn-primary btn-sm" onClick={agregarTarea}>Agregar</button>
-                    </td>
-                  </tr>
+                  
                 </tbody>
               </table>
             </div>
