@@ -286,7 +286,7 @@ p {
   padding-bottom: 0.5rem;
 }
 
-.Contenido-pagos {
+.contenido-pagos {
   background-color: #f8f9fa;
   padding: 20px;
   border-radius: 10px;
@@ -295,12 +295,12 @@ p {
   margin: auto;
 }
 
-.Contenido-pagos h2 {
+.contenido-pagos h2 {
   font-size: 30px;
   font-weight: bold;
   color: #138086;
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 
 .seccion-proyectos button {
@@ -342,7 +342,22 @@ p {
   width: 1300px;
 }
 
-.btns-contractosform .btn {
+#contratos-div {
+  width: 1319px;
+}
+
+#titulo-contratos {
+  display: flex;
+  justify-content: center;
+}
+
+#titulo-contratos h1{
+  width: 500px;
+  color: #138086;
+  border-bottom: 2px solid #DC8665;
+}
+
+.btns-contratosform .btn {
   background-color: #DC8665;
   color: white;
   border: none;
@@ -350,7 +365,7 @@ p {
   cursor: pointer;
 }
 
-.btns-contractosform .btn:hover {
+.btns-contratosform .btn:hover {
   background-color: #dc876599;
   color: white;
 }
@@ -394,6 +409,12 @@ p {
 .card-body-text {
   width: 300px;
   padding: 10px;
+}
+
+.card-body-text h1{
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
 }
 
 .img-home {

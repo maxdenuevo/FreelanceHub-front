@@ -6,24 +6,24 @@ function Formularioregistro() {
   const [usuarioEmail, setUsuarioEmail] = useState('');
   const [usuarioPassword, setUsuarioPassword] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
+  const [registroExitoso, setRegistroExitoso] = useState(false);
   const navigate = useNavigate();
 
-  function cambiarUsuarioRut(e){
+  function cambiarUsuarioRut(e) {
     setUsuarioRut(e.target.value);
   }
 
-  function cambiarUsuarioEmail(e){
+  function cambiarUsuarioEmail(e) {
     setUsuarioEmail(e.target.value);
   }
 
-  function cambiarUsuarioPassword(e){
+  function cambiarUsuarioPassword(e) {
     setUsuarioPassword(e.target.value);
   }
 
-  function registrarUsuario(e){
+  function registrarUsuario(e) {
     e.preventDefault();
     console.log('Datos preparados para el registro 👨');
-    console.log(usuarioRut, usuarioEmail, usuarioPassword);
 
     fetch("https://api-freelancehub.vercel.app/register-usuario", {
       method: 'POST',
@@ -33,7 +33,7 @@ function Formularioregistro() {
       body: JSON.stringify({
         usuario_rut: usuarioRut,
         usuario_email: usuarioEmail,
-        usuario_password: usuarioPassword
+        usuario_password: usuarioPassword,
       })
     })
       .then(response => {
@@ -42,11 +42,14 @@ function Formularioregistro() {
       .then(responseConverted => {
         console.log("El usuario se ha registrado correctamente! 👨‍🚀");
         console.log(responseConverted);
-        navigate('/login');
+        setRegistroExitoso(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000); //
       })
       .catch(error => {
         console.log(error)
-        //NOTA: Se debe mostrar un mensaje de error al usuaro
+        setErrorMensaje('No se pudo registrar el usuario. Verifica la informacion.');
       })
   }
 
@@ -66,28 +69,19 @@ function Formularioregistro() {
   return (
     <form className='formulario mt-5 mb-5'>
       <h2 className="form-title">Regístrate</h2>
+      {registroExitoso && <div className="alert alert-success mt-3">¡Te has registrado correctamente! Redirigiendo al inicio de sesión...</div>}
       <div className="mb-3">
         <label htmlFor="inputRUT" className="form-label">RUT</label>
-        <input type="text" className="form-control" id="inputRUT" 
-        onChange={cambiarUsuarioRut}
-        />
+        <input type="text" className="form-control" id="inputRUT" onChange={cambiarUsuarioRut}/>
       </div>
       <div className="mb-3">
         <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
-        <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" 
-        onChange={cambiarUsuarioEmail}
-        />
+        <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={cambiarUsuarioEmail}/>
         <div id="emailHelp" className="form-text">Nunca compartiremos tu email con nadie.</div>
       </div>
       <div className="mb-3">
         <label htmlFor="exampleInputPassword1" className="form-label">Contraseña</label>
-        <input 
-          type="password" 
-          className="form-control" 
-          id="exampleInputPassword1" 
-          onInput={validarContraseña} 
-          onChange={cambiarUsuarioPassword}
-        />
+        <input type="password" className="form-control" id="exampleInputPassword1" onInput={validarContraseña} onChange={cambiarUsuarioPassword}/>
         <div id="passwordHelp" className="form-text" style={{ color: passwordMessage === "La contraseña es válida." ? "blue" : "red" }}>
           {passwordMessage}
         </div>
@@ -98,9 +92,7 @@ function Formularioregistro() {
           Acepto los <a href="#" className="terms-link">términos y condiciones</a>
         </label>
       </div>
-      <button type="button" className="btn" 
-      onClick={registrarUsuario}
-      >Registrar</button>
+      <button type="button" className="btn" onClick={registrarUsuario}>Registrar</button>
     </form>
   );
 }

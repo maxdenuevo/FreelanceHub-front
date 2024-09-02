@@ -1,12 +1,14 @@
 import React from 'react';
-import Dashboard from '../components/Dashboard';
-
-
+import { Outlet } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 
 function Dashboardpage() {
   return (
-    <div>
-    <Dashboard />
+    <div className="dashboard-container d-flex">
+      <Sidebar />
+      <div className="content mt-5">
+        <Outlet />
+      </div>
     </div>
   );
 }
