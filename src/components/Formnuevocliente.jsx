@@ -14,14 +14,15 @@ function Formnuevocliente() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://api-freelancehub.vercel.app/usuarios")
+    const userId = localStorage.getItem('usuario_id');
+    fetch("https://api-freelancehub.vercel.app/get-usuario/" + userId)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
         return response.json();
       })
-      .then(data => setUserId(data.user_id))
+      .then(data => setUserId(data.usuario.usuario_id))
       .catch(error => {
         console.error('Error al obtener user_id:', error);
         setErrorMensaje('No se pudo obtener la información del usuario.');
@@ -75,19 +76,19 @@ function Formnuevocliente() {
 
   function agregarClienteNuevo(e) {
     e.preventDefault();
-
+    console.log(userId);
     const clienteData = esClienteNuevo ? {
-      user_id: userId,
+      usuario_id: userId,
       cliente_nombre: nombreCliente,
       cliente_email: emailCliente,
       cliente_tel: telefonoCliente,
       cliente_rut: rutCliente,
     } : {
-      user_id: userId,
+      usuario_id: userId,
       cliente_id: clienteSeleccionado,
     };
 
-    fetch('https://api-freelancehub.vercel.app/clientes', {
+    fetch('https://api-freelancehub.vercel.app/create-cliente', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

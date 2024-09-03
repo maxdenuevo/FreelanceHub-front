@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 
 function Formularioinicio() {
 
@@ -39,7 +40,11 @@ function Formularioinicio() {
       })
       .then(responseConverted => {
         console.log("El usuario se ha autenticado correctamente! 👨‍🚀");
-        console.log(responseConverted);
+        const token = responseConverted.token;
+        const decoded = jwtDecode(token);
+        localStorage.setItem('usuario_email', decoded.usuario_email);
+        localStorage.setItem('usuario_id', decoded.usuario_id);
+        // localStorage.clear(); Este código lo deben usar cuando hacen el logout
         navigate('/dashboardpage');
       })
       .catch(error => {

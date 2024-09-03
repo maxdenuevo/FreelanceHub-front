@@ -21,7 +21,8 @@ function Proyectos() {
   const [mostrarAgregarPago, setMostrarAgregarPago] = useState(false);
 
   useEffect(() => {
-    fetch('https://api-freelancehub.vercel.app/proyectos')
+    const userId = localStorage.getItem('usuario_id')
+    fetch('https://api-freelancehub.vercel.app/proyectos/' + userId)
       .then(response => response.json())
       .then(responseConverted => {
         setProyectos(responseConverted.proyectos);

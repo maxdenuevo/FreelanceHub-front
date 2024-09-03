@@ -60,21 +60,21 @@ function Formnuevoproyecto() {
 
   const AgregarProyecto = (e) => {
     e.preventDefault();
-
-    fetch("https://api-freelancehub.vercel.app/proyectos", {
+    let userId = localStorage.getItem('usuario_id');
+    fetch("https://api-freelancehub.vercel.app/create-proyecto", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        user_id: 'USER_ID',
+        usuario_id: userId,
         proyecto_nombre: nombre,
         proyecto_presupuesto: Number(presupuesto),
         proyecto_inicio: fechaInicio,
         proyecto_termino: fechaTermino,
         proyecto_descripcion: descripcion,
         proyecto_tipo: tipo,
-        client_id: clientId,
+        cliente_id: clientId,
       })
     })
     .then(response => response.json())
