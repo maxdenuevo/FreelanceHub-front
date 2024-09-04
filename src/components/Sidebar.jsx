@@ -1,8 +1,15 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 
 function Sidebar() {
     const location = useLocation();
+    const navigate = useNavigate();
+
+    function cerrarSesion() {
+      localStorage.clear();
+      navigate('/login', { state: { message: 'Sesión cerrada correctamente' } });
+    }
 
 return (
     <div className="Dashboard d-flex">
@@ -32,7 +39,7 @@ return (
             </div>
             <div className="modal-footer">
               <button type="button" className="btn" data-bs-dismiss="modal">Cancelar</button>
-              <a className="btn" href="/login" role="button">Cerrar Sesión</a>
+              <button className="btn" role="button" onClick={cerrarSesion}>Cerrar Sesión</button>
             </div>
           </div>
           </div>

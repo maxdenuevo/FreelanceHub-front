@@ -7,6 +7,8 @@ function Formularioregistro() {
   const [usuarioPassword, setUsuarioPassword] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
   const [registroExitoso, setRegistroExitoso] = useState(false);
+  const [errorMensaje, setErrorMensaje] = useState('');
+  const [terminosAceptados, setTerminosAceptados] = useState(false);
   const navigate = useNavigate();
 
   function cambiarUsuarioRut(e) {
@@ -21,9 +23,17 @@ function Formularioregistro() {
     setUsuarioPassword(e.target.value);
   }
 
+  function aceptarTerminos(e) {
+    setTerminosAceptados(e.target.checked);
+  }
+
   function registrarUsuario(e) {
     e.preventDefault();
-    console.log('Datos preparados para el registro 👨');
+
+    if (!terminosAceptados) {
+      setErrorMensaje('Debes aceptar los términos y condiciones.');
+      return;
+    }
 
     fetch("https://api-freelancehub.vercel.app/register-usuario", {
       method: 'POST',
@@ -87,7 +97,7 @@ function Formularioregistro() {
         </div>
       </div>
       <div className="mb-3 form-check">
-        <input type="checkbox" className="form-check-input" id="termsCheck" />
+        <input type="checkbox" className="form-check-input" id="termsCheck" onChange={aceptarTerminos}/>
         <label className="form-check-label" htmlFor="termsCheck">
           Acepto los <a href="#" className="terms-link">términos y condiciones</a>
         </label>

@@ -13,8 +13,10 @@ import Dashboardpage from './pages/Dashboardpage';
 import Dashhome from './pages/Dashhome';
 import Dashproyectos from './pages/Dashproyectos';
 import Dashcontratos from './pages/Dashcontratos';
+import Perfil from './pages/Perfil';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
   return (
@@ -31,6 +33,7 @@ function App() {
           <Route index element={<Dashhome />} />
           <Route path="/dashboardpage/proyectos" element={<Dashproyectos />} />
           <Route path="/dashboardpage/contratos" element={<Dashcontratos />} />
+          <Route path="/dashboardpage/perfil" element={<Perfil />} />
         </Route>
       </Routes>
     </Router>

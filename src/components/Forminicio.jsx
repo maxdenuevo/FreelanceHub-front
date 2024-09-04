@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 
 function Formularioinicio() {
@@ -7,7 +7,9 @@ function Formularioinicio() {
   const [usuarioEmail, setUsuarioEmail] = useState('');
   const [usuarioPassword, setUsuarioPassword] = useState('');
   const [errorMensaje, setErrorMensaje] = useState('');
+  const location = useLocation();
   const navigate = useNavigate();
+  
 
   function cambiarUsuarioEmail(e){
     setUsuarioEmail(e.target.value);
@@ -44,7 +46,6 @@ function Formularioinicio() {
         const decoded = jwtDecode(token);
         localStorage.setItem('usuario_email', decoded.usuario_email);
         localStorage.setItem('usuario_id', decoded.usuario_id);
-        // localStorage.clear(); Este código lo deben usar cuando hacen el logout
         navigate('/dashboardpage');
       })
       .catch(error => {
@@ -56,6 +57,11 @@ function Formularioinicio() {
   return (
     <form className='formulario mt-5'>
         <h2 className="form-title">Inicio de Sesión</h2>
+        {location.state?.message && (
+        <div className="alert alert-success" role="alert">
+          {location.state.message}
+        </div>
+      )}
         {errorMensaje && <div className="alert alert-danger">{errorMensaje}</div>}
         <div className="mb-3">
             <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
@@ -67,7 +73,7 @@ function Formularioinicio() {
             <input onChange={cambiarUsuarioPassword} type="password" className="form-control" id="exampleInputPassword1" required></input>
         </div>
         <div className="mb-3">
-            <a href="#" className="forgot-password-link">¿olvidaste tu contraseña?</a>
+            <a href="/recuperarcontrasena" className="forgot-password-link">¿olvidaste tu contraseña?</a>
         </div>
         <button type="submit" onClick={ingresarUsuario} className="btn" required>Ingresar</button>
     </form>

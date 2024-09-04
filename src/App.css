@@ -370,7 +370,14 @@ p {
   color: white;
 }
 
-.card-body a {
+.card-body h2 {
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
+  margin-bottom: 20px;
+}
+
+.card-body h5 {
   color: #138086;
 }
 
@@ -446,12 +453,55 @@ p {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin: auto;
 }
 
 .card-home .btn:hover {
   background-color: #dc876599;
   color: white;
 }
+
+.perfil-usuario {
+  width: 100%;
+  margin-left: 150px;
+  margin-top: 60px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.perfil-datos {
+  width: 300px;
+  margin: auto;
+}
+
+.perfil-datos h2 {
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
+}
+
+.perfil-usuario .btn {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.perfil-usuario .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+#img-perfil {
+  width: 550px;
+  height: 450px;
+}
+
+
+
+
 
 
 

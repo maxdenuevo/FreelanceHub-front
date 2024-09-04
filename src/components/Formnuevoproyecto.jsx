@@ -13,6 +13,10 @@ function Formnuevoproyecto() {
   const [errorMensaje, setErrorMensaje] = useState('');
   const navigate = useNavigate();
 
+  function ClickAtras() {
+    navigate(-1);
+}
+
   useEffect(() => {
     fetch("https://api-freelancehub.vercel.app/clientes")
       .then(response => response.json())
@@ -58,7 +62,7 @@ function Formnuevoproyecto() {
     setClientId(e.target.value);
   }
 
-  const AgregarProyecto = (e) => {
+  const agregarProyecto = (e) => {
     e.preventDefault();
     let userId = localStorage.getItem('usuario_id');
     fetch("https://api-freelancehub.vercel.app/create-proyecto", {
@@ -77,6 +81,14 @@ function Formnuevoproyecto() {
         cliente_id: clientId,
       })
     })
+    
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error al agregar el proyecto.');
+      }
+      return response.json();
+    })
+
     .then(response => response.json())
     .then(responseConverted => {
       console.log("¡El proyecto se ha registrado correctamente!");
@@ -141,8 +153,8 @@ function Formnuevoproyecto() {
           </div>
         )}
         <div className="Nuevoproyecto-btns d-flex justify-content-around">
-          <button type="button" className="btn m-4">Atrás</button>
-          <button type="button" className="btn m-4" onClick={AgregarProyecto}>Siguiente</button>
+          <button type="button" className="btn m-4" onClick={ClickAtras}>Atrás</button>
+          <button type="button" className="btn m-4" onClick={agregarProyecto}>Siguiente</button>
         </div>
       </form>
     </div>
