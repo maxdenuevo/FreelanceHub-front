@@ -316,6 +316,19 @@ p {
   color: white;
 }
 
+#btn-proyecto-nuevo {
+  background-color: #13808698;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#btn-proyecto-nuevo:hover {
+  background-color: #13808650;
+  color: white;
+}
+
 .card {
   width: 300px;
 }
@@ -499,8 +512,121 @@ p {
   height: 450px;
 }
 
+#correo-form {
+  width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 100px;
+}
 
+#correo-form h2 {
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
+}
 
+#correo-form .btn {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 35%;
+  margin-top: 10px;
+}
+
+#correo-form .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+#codigo-form {
+  width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 100px;
+}
+
+#codigo-form h2 {
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
+}
+
+#codigo-form a {
+  color: #138086;
+}
+
+#codigo-form .btn {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 35%;
+  margin-top: 10px;
+}
+
+#codigo-form .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+#contraseña-form {
+  width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 100px;
+}
+
+#contraseña-form h2 {
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
+}
+
+#contraseña-form .btn{
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 35%;
+  margin-top: 10px;
+}
+
+#contraseña-form .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
+
+#clientes-tabla {
+  width: 1220px;
+  margin: 50px;
+  padding: 50px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#clientes-tabla h2 {
+  color: #138086;
+  text-align: center;
+  border-bottom: 2px solid #DC8665;
+}
+
+#clientes-tabla .btn {
+  background-color: #DC8665;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#clientes-tabla .btn:hover {
+  background-color: #dc876599;
+  color: white;
+}
 
 
 

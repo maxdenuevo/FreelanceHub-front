@@ -6,10 +6,14 @@ function Formularioinicio() {
 
   const [usuarioEmail, setUsuarioEmail] = useState('');
   const [usuarioPassword, setUsuarioPassword] = useState('');
+  const [inicioExitoso, setInicioExitoso] = useState('');
   const [errorMensaje, setErrorMensaje] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-  
+
+  const irACorreo = () => {
+    navigate('/ingresarcorreo');
+  };
 
   function cambiarUsuarioEmail(e){
     setUsuarioEmail(e.target.value);
@@ -22,6 +26,7 @@ function Formularioinicio() {
   function ingresarUsuario(e){
     e.preventDefault();
     setErrorMensaje('');
+    setInicioExitoso('');
     console.log('Datos preparados para el ingreso 👨');
 
     fetch("https://api-freelancehub.vercel.app/login-usuario", {
@@ -46,7 +51,10 @@ function Formularioinicio() {
         const decoded = jwtDecode(token);
         localStorage.setItem('usuario_email', decoded.usuario_email);
         localStorage.setItem('usuario_id', decoded.usuario_id);
-        navigate('/dashboardpage');
+        setInicioExitoso('¡Inicio de sesión exitoso! Redirigiendo a tu portal...');
+        setTimeout(() => {
+          navigate('/dashboardpage');
+        }, 2000);
       })
       .catch(error => {
         console.log(error);
@@ -62,7 +70,8 @@ function Formularioinicio() {
           {location.state.message}
         </div>
       )}
-        {errorMensaje && <div className="alert alert-danger">{errorMensaje}</div>}
+      {inicioExitoso && <div className="alert alert-success">{inicioExitoso}</div>}
+      {errorMensaje && <div className="alert alert-danger">{errorMensaje}</div>}
         <div className="mb-3">
             <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
             <input onChange={cambiarUsuarioEmail} type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required></input>
@@ -73,7 +82,7 @@ function Formularioinicio() {
             <input onChange={cambiarUsuarioPassword} type="password" className="form-control" id="exampleInputPassword1" required></input>
         </div>
         <div className="mb-3">
-            <a href="/recuperarcontrasena" className="forgot-password-link">¿olvidaste tu contraseña?</a>
+            <a href="" className="forgot-password-link" onClick={irACorreo}>¿olvidaste tu contraseña?</a>
         </div>
         <button type="submit" onClick={ingresarUsuario} className="btn" required>Ingresar</button>
     </form>

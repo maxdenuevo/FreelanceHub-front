@@ -15,12 +15,13 @@ function Formnuevoproyecto() {
 
   function ClickAtras() {
     navigate(-1);
-}
+  }
 
   useEffect(() => {
     fetch("https://api-freelancehub.vercel.app/clientes")
       .then(response => response.json())
       .then(data => {
+        console.log(data);
         if (Array.isArray(data.clientes)) {
           setClientes(data.clientes);
         } else {
@@ -81,15 +82,12 @@ function Formnuevoproyecto() {
         cliente_id: clientId,
       })
     })
-    
     .then(response => {
       if (!response.ok) {
         throw new Error('Error al agregar el proyecto.');
       }
       return response.json();
     })
-
-    .then(response => response.json())
     .then(responseConverted => {
       console.log("¡El proyecto se ha registrado correctamente!");
       console.log(responseConverted);

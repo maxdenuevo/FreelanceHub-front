@@ -55,7 +55,7 @@ function Formularioregistro() {
         setRegistroExitoso(true);
         setTimeout(() => {
           navigate('/login');
-        }, 2000); //
+        }, 3000);
       })
       .catch(error => {
         console.log(error)
@@ -80,6 +80,7 @@ function Formularioregistro() {
     <form className='formulario mt-5 mb-5'>
       <h2 className="form-title">Regístrate</h2>
       {registroExitoso && <div className="alert alert-success mt-3">¡Te has registrado correctamente! Redirigiendo al inicio de sesión...</div>}
+      {errorMensaje && <div className="alert alert-danger mt-3">{errorMensaje}</div>}
       <div className="mb-3">
         <label htmlFor="inputRUT" className="form-label">RUT</label>
         <input type="text" className="form-control" id="inputRUT" onChange={cambiarUsuarioRut}/>

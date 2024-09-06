@@ -7,7 +7,8 @@ function Sidebar() {
     const navigate = useNavigate();
 
     function cerrarSesion() {
-      localStorage.clear();
+      localStorage.removeItem('usuario_email');
+    localStorage.removeItem('usuario_id');
       navigate('/login', { state: { message: 'Sesión cerrada correctamente' } });
     }
 
@@ -23,6 +24,10 @@ return (
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-kanban pe-2 pb-1" viewBox="0 0 16 16">
           <path d="M13.5 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm-11-1a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
           <path d="M6.5 3a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1zm-4 0a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1zm8 0a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1z"/></svg>Proyectos</Link>
+          <Link to="/dashboardpage/clientes" className={`nav-link ${location.pathname === '/dashboardpage/clientes' ? 'active' : ''}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-file-earmark-person pe-2 pb-1" viewBox="0 0 16 16">
+          <path d="M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2v9.255S12 12 8 12s-5 1.755-5 1.755V2a1 1 0 0 1 1-1h5.5z"/></svg>Clientes</Link>
           <Link to="/dashboardpage/contratos" className={`nav-link ${location.pathname === '/dashboardpage/contratos' ? 'active' : ''}`}>
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-file-earmark-text pe-2 pb-1" viewBox="0 0 16 16">
           <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
@@ -39,7 +44,7 @@ return (
             </div>
             <div className="modal-footer">
               <button type="button" className="btn" data-bs-dismiss="modal">Cancelar</button>
-              <button className="btn" role="button" onClick={cerrarSesion}>Cerrar Sesión</button>
+              <button className="btn" role="button" data-bs-dismiss="modal" onClick={cerrarSesion}>Cerrar Sesión</button>
             </div>
           </div>
           </div>

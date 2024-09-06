@@ -4,27 +4,27 @@ import Perfil from '../images/Perfil.png';
 function Perfilusuario() {
 
   
-  // const [usuario, setUsuario] = useState(null);
-  //const [errorMensaje, setErrorMensaje] = useState('');
+ const [usuario, setUsuario] = useState(null);
+ const [errorMensaje, setErrorMensaje] = useState('');
 
-  //useEffect(() => {
-    //const userId = localStorage.getItem('usuario_id');
+  useEffect(() => {
+   const userId = localStorage.getItem('usuario_id');
 
-    //fetch("https://api-freelancehub.vercel.app/get-usuario/" + userId)
-      //.then(response => {
-       // if (!response.ok) {
-          //throw new Error('Error al obtener los datos del usuario.');
-        //}
-       // return response.json();
-      //})
-      //.then(data => {
-       // setUsuario(data.usuario);
-      //})
-      //.catch(error => {
-        //console.error('Error al obtener el usuario:', error);
-        //setErrorMensaje('No se pudo obtener la información del usuario.');
-      //});
-  //}, []);
+   fetch("https://api-freelancehub.vercel.app/get-usuario/" + userId)
+    .then(response => {
+     if (!response.ok) {
+     throw new Error('Error al obtener los datos del usuario.');
+     }
+     return response.json();
+     })
+     .then(data => {
+      setUsuario(data.usuario);
+      })
+      .catch(error => {
+       console.error('Error al obtener el usuario:', error);
+       setErrorMensaje('No se pudo obtener la información del usuario.');
+      });
+  }, []);
 
   return (
     <div className="perfil-usuario">
@@ -32,24 +32,30 @@ function Perfilusuario() {
       <img id='img-perfil' src={Perfil} alt="" />
       <div className='perfil-datos'>
       <h2 className="perfil-titulo">Nombre de usuario</h2>
+      {errorMensaje && (
         <div className="alert alert-danger" role="alert">
+          {errorMensaje}
         </div>
+      )}
+       {usuario ? (
         <div className="perfil-detalles">
           <div className="mb-3">
             <label className="form-label">Tu correo electrónico</label>
-            <input type="email" className="form-control"/>
+            <input type="email" className="form-control" value={usuario.usuario_email} readOnly/>
           </div>
           <div className="mb-3">
             <label className="form-label">Tu RUT</label>
-            <input type="text" className="form-control"/>
+            <input type="text" className="form-control" value={usuario.usuario_rut} readOnly/>
           </div>
+          <div className='d-flex justify-content-center'>
+        <button type="button" className="btn me-2">Cambiar contraseña</button>
         </div>
+        </div>
+        ) : (
         <div className="text-center">
           <p>Cargando la información...</p>
         </div>
-        <div className='d-flex justify-content-center'>
-        <button type="button" className="btn me-2">Cambiar contraseña</button>
-        </div>
+        )}
       </div>
       </div>
     </div>
