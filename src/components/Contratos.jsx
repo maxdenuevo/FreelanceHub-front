@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ContractVariablesDropdown from './ContractVariablesDropdown';
 
 const Contratos = ({ contratoId }) => {
   const [datosContrato, setDatosContrato] = useState({
@@ -19,32 +18,42 @@ const Contratos = ({ contratoId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedVariable, setSelectedVariable] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const variables = [
+    { key: 'nombreFreelance', label: 'Nombre del Freelance' },
+    { key: 'nombreCliente', label: 'Nombre del Cliente' },
+    { key: 'fechaInicio', label: 'Fecha de Inicio' },
+    { key: 'servicios', label: 'Servicios' },
+    { key: 'precio', label: 'Precio' },
+    { key: 'metodoPago', label: 'Método de Pago' },
+    { key: 'fechaPagoFinal', label: 'Fecha de Pago Final' },
+    { key: 'entregables', label: 'Entregables' },
+    { key: 'periodoAviso', label: 'Periodo de Aviso' },
+    { key: 'nombreProyecto', label: 'Nombre del Proyecto' },
+    { key: 'cliente', label: 'ID del Cliente' },
+    { key: 'plantilla', label: 'ID de la Plantilla' },
+  ];
 
   useEffect(() => {
     const fetchContractData = async () => {
       try {
-
-        // Fetch contract data
         const contratoRes = await fetch(`https://api-freelancehub.vercel.app/contrato/${contratoId}`);
         const contratoData = await contratoRes.json();
         const contrato = contratoData.contrato;
 
-        // Fetch related project data
         const proyectoRes = await fetch(`https://api-freelancehub.vercel.app/proyecto/${contrato.proyecto_id}`);
         const proyectoData = await proyectoRes.json();
         const proyecto = proyectoData.proyecto;
 
-        // Fetch client data
         const clienteRes = await fetch(`https://api-freelancehub.vercel.app/cliente/${contrato.cliente_id}`);
         const clienteData = await clienteRes.json();
         const cliente = clienteData.cliente;
 
-        // Fetch freelancer (user) data
         const usuarioRes = await fetch(`https://api-freelancehub.vercel.app/get-usuario/${proyecto.usuario_id}`);
         const usuarioData = await usuarioRes.json();
         const usuario = usuarioData.usuario;
 
-        // Fetch tasks for the project
         const tareasRes = await fetch(`https://api-freelancehub.vercel.app/tareas/${contrato.proyecto_id}`);
         const tareasData = await tareasRes.json();
         const tareas = tareasData.tareas;
@@ -55,10 +64,10 @@ const Contratos = ({ contratoId }) => {
           fechaInicio: proyecto.proyecto_inicio,
           servicios: proyecto.proyecto_descripcion,
           precio: proyecto.proyecto_presupuesto,
-          metodoPago: 'transferencia bancaria', // You might want to add this to your database
+          metodoPago: 'transferencia bancaria', 
           fechaPagoFinal: proyecto.proyecto_termino,
           entregables: tareas.slice(0, 4).map(tarea => tarea.tarea_nombre),
-          periodoAviso: '15', // You might want to add this to your database
+          periodoAviso: '15', 
           nombreProyecto: proyecto.proyecto_nombre,
           cliente: cliente.cliente_id,
           plantilla: contrato.plantilla_id,
@@ -75,21 +84,45 @@ const Contratos = ({ contratoId }) => {
 
   const handleVariableSelect = (key, value) => {
     setSelectedVariable({ key, value });
+    setIsDropdownOpen(false);
   };
 
-  if (loading) return <div>Cargando...</div>;
-  if (error) return <div>{error}</div>;
-
-  // Format date
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
 
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <div className="contract-template">
       <div className="mb-4">
-        <ContractVariablesDropdown datosContrato={datosContrato} onSelect={handleVariableSelect} />
+        <div className="dropdown">
+          <button 
+            className="btn btn-secondary dropdown-toggle" 
+            type="button" 
+            id="dropdownMenuButton" 
+            data-toggle="dropdown" 
+            aria-haspopup="true" 
+            aria-expanded={isDropdownOpen}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            Seleccionar Variable
+          </button>
+          <div className={`dropdown-menu${isDropdownOpen ? ' show' : ''}`} aria-labelledby="dropdownMenuButton">
+            {variables.map((variable) => (
+              <a 
+                key={variable.key} 
+                className="dropdown-item" 
+                href="#" 
+                onClick={() => handleVariableSelect(variable.key, datosContrato[variable.key])}
+              >
+                {variable.label}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
       
       {selectedVariable && (
