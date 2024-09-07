@@ -2,112 +2,206 @@ import React, { useState, useEffect } from 'react';
 
 const Contratos = ({ contratoId }) => {
   const [datosContrato, setDatosContrato] = useState({
-    nombreFreelance: '{{nombreFreelance}}',
-    nombreCliente: '{{nombreCliente}}',
-    fechaInicio: '{{fechaInicio}}',
-    servicios: '{{servicios}}',
-    precio: '{{precio}}',
-    metodoPago: '{{metodoPago}}',
-    fechaPagoFinal: '{{fechaPagoFinal}}',
-    entregables: ['{{entregable1}}', '{{entregable2}}', '{{entregable3}}', '{{entregable4}}'],
-    periodoAviso: '{{periodoAviso}}',
-    nombreProyecto: '{{nombreProyecto}}',
-    cliente: '{{cliente}}',
-    plantilla: '{{plantilla}}',
+    nombreFreelance: '',
+    nombreCliente: '',
+    fechaInicio: '',
+    servicios: '',
+    precio: '',
+    metodoPago: '',
+    fechaPagoFinal: '',
+    entregables: ['', '', '', ''],
+    periodoAviso: '',
+    nombreProyecto: '',
+    cliente: '',
+    plantilla: '',
   });
-  const [apiData, setApiData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchContractData = async () => {
-      try {
-        const contratoRes = await fetch(`https://api-freelancehub.vercel.app/contrato/${contratoId}`);
-        const contratoData = await contratoRes.json();
-        const contrato = contratoData.contrato;
-
-        const proyectoRes = await fetch(`https://api-freelancehub.vercel.app/proyecto/${contrato.proyecto_id}`);
-        const proyectoData = await proyectoRes.json();
-        const proyecto = proyectoData.proyecto;
-
-        const clienteRes = await fetch(`https://api-freelancehub.vercel.app/cliente/${contrato.cliente_id}`);
-        const clienteData = await clienteRes.json();
-        const cliente = clienteData.cliente;
-
-        const usuarioRes = await fetch(`https://api-freelancehub.vercel.app/get-usuario/${proyecto.usuario_id}`);
-        const usuarioData = await usuarioRes.json();
-        const usuario = usuarioData.usuario;
-
-        const tareasRes = await fetch(`https://api-freelancehub.vercel.app/tareas/${contrato.proyecto_id}`);
-        const tareasData = await tareasRes.json();
-        const tareas = tareasData.tareas;
-
-        setApiData({
-          nombreFreelance: usuario?.usuario_email || '',
-          nombreCliente: cliente?.cliente_nombre || '',
-          fechaInicio: proyecto?.proyecto_inicio || '',
-          servicios: proyecto?.proyecto_descripcion || '',
-          precio: proyecto?.proyecto_presupuesto || '',
-          metodoPago: 'transferencia bancaria', 
-          fechaPagoFinal: proyecto?.proyecto_termino || '',
-          entregables: tareas?.slice(0, 4).map(tarea => tarea.tarea_nombre) || ['', '', '', ''],
-          periodoAviso: '15', 
-          nombreProyecto: proyecto?.proyecto_nombre || '',
-          cliente: cliente?.cliente_id || '',
-          plantilla: contrato?.plantilla_id || '',
-        });
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setError('Error al cargar los datos del contrato');
-        setLoading(false);
-      }
-    };
-
-    fetchContractData();
+    if (contratoId) {
+      fetchContractData();
+    }
   }, [contratoId]);
 
-  const handleVariableSelect = (key, value) => {
-    setDatosContrato(prevState => ({
-      ...prevState,
-      [key]: value
-    }));
+  const fetchContractData = async () => {
+    setLoading(true);
+    try {
+      const contratoRes = await fetch(`https://api-freelancehub.vercel.app/contrato/${contratoId}`);
+      if (!contratoRes.ok) throw new Error(`HTTP error! status: ${contratoRes.status}`);
+      const contratoData = await contratoRes.json();
+      const contrato = contratoData.contrato;
+
+      const proyectoRes = await fetch(`https://api-freelancehub.vercel.app/proyecto/${contrato.proyecto_id}`);
+      if (!proyectoRes.ok) throw new Error(`HTTP error! status: ${proyectoRes.status}`);
+      const proyectoData = await proyectoRes.json();
+      const proyecto = proyectoData.proyecto;
+
+      const clienteRes = await fetch(`https://api-freelancehub.vercel.app/cliente/${contrato.cliente_id}`);
+      if (!clienteRes.ok) throw new Error(`HTTP error! status: ${clienteRes.status}`);
+      const clienteData = await clienteRes.json();
+      const cliente = clienteData.cliente;
+
+      const usuarioRes = await fetch(`https://api-freelancehub.vercel.app/get-usuario/${proyecto.usuario_id}`);
+      if (!usuarioRes.ok) throw new Error(`HTTP error! status: ${usuarioRes.status}`);
+      const usuarioData = await usuarioRes.json();
+      const usuario = usuarioData.usuario;
+
+      const tareasRes = await fetch(`https://api-freelancehub.vercel.app/tareas/${contrato.proyecto_id}`);
+      if (!tareasRes.ok) throw new Error(`HTTP error! status: ${tareasRes.status}`);
+      const tareasData = await tareasRes.json();
+      const tareas = tareasData.tareas;
+
+      setDatosContrato({
+        nombreFreelance: usuario?.usuario_email || '',
+        nombreCliente: cliente?.cliente_nombre || '',
+        fechaInicio: proyecto?.proyecto_inicio || '',
+        servicios: proyecto?.proyecto_descripcion || '',
+        precio: proyecto?.proyecto_presupuesto || '',
+        metodoPago: 'transferencia bancaria', 
+        fechaPagoFinal: proyecto?.proyecto_termino || '',
+        entregables: tareas?.slice(0, 4).map(tarea => tarea.tarea_nombre) || ['', '', '', ''],
+        periodoAviso: '15', 
+        nombreProyecto: proyecto?.proyecto_nombre || '',
+        cliente: cliente?.cliente_id || '',
+        plantilla: contrato?.plantilla_id || '',
+      });
+    } catch (err) {
+      console.error('Error fetching contract data:', err);
+      setError(`Error al cargar los datos del contrato: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e, index = null) => {
+    const { name, value } = e.target;
+    if (index !== null) {
+      setDatosContrato(prev => ({
+        ...prev,
+        entregables: prev.entregables.map((item, i) => i === index ? value : item)
+      }));
+    } else {
+      setDatosContrato(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString || dateString.startsWith('{{')) return dateString;
+    if (!dateString) return '';
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
 
   if (loading) return <div>Cargando...</div>;
-  if (error) return <div>{error}</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="contract-template container">
       <h2 className="mb-4">Contrato de prestación de servicios freelance</h2>
       
-      {apiData && (
-        <div className="mb-4">
-          <h3>Datos de la API</h3>
-          {Object.entries(apiData).map(([key, value]) => (
-            <div key={key} className="mb-2">
-              <label className="form-label">{key}:</label>
-              <select 
-                className="form-select" 
-                onChange={(e) => handleVariableSelect(key, e.target.value)}
-              >
-                <option value={datosContrato[key]}>{datosContrato[key]}</option>
-                <option value={Array.isArray(value) ? value.join(', ') : value}>
-                  {Array.isArray(value) ? value.join(', ') : value}
-                </option>
-              </select>
-            </div>
+      <div className="mb-4">
+        <h3>Datos del Contrato</h3>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Nombre del Freelance:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="nombreFreelance"
+              value={datosContrato.nombreFreelance}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Nombre del Cliente:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="nombreCliente"
+              value={datosContrato.nombreCliente}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Fecha de Inicio:</label>
+            <input
+              type="date"
+              className="form-control"
+              name="fechaInicio"
+              value={datosContrato.fechaInicio}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Fecha de Pago Final:</label>
+            <input
+              type="date"
+              className="form-control"
+              name="fechaPagoFinal"
+              value={datosContrato.fechaPagoFinal}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Servicios:</label>
+          <textarea
+            className="form-control"
+            name="servicios"
+            value={datosContrato.servicios}
+            onChange={handleInputChange}
+          ></textarea>
+        </div>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Precio:</label>
+            <input
+              type="number"
+              className="form-control"
+              name="precio"
+              value={datosContrato.precio}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Método de Pago:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="metodoPago"
+              value={datosContrato.metodoPago}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Entregables:</label>
+          {datosContrato.entregables.map((entregable, index) => (
+            <input
+              key={index}
+              type="text"
+              className="form-control mb-2"
+              value={entregable}
+              onChange={(e) => handleInputChange(e, index)}
+            />
           ))}
         </div>
-      )}
+        <div className="mb-3">
+          <label className="form-label">Periodo de Aviso (días):</label>
+          <input
+            type="number"
+            className="form-control"
+            name="periodoAviso"
+            value={datosContrato.periodoAviso}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
 
       <div className="contract-preview">
+        <h3>Vista Previa del Contrato</h3>
         <p><strong>{datosContrato.nombreFreelance}</strong> (en adelante "CONTRATISTA") se
         obliga para con <strong>{datosContrato.nombreCliente}</strong> (en adelante
         "CONTRATANTE") a ejecutar los trabajos y actividades propias del
