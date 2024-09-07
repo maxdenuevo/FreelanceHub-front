@@ -357,8 +357,23 @@ p {
   background-color: white;
   padding: 20px;
   border-radius: 4px;
-  max-width: 500px;
+  max-width: 80%;
   width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-scroll {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 15px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 #v-pills-contratos {

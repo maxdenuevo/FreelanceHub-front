@@ -22,8 +22,8 @@ const Contratos = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false); // modal
-  const [saveSuccess, setSaveSuccess] = useState(false); // modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
 
   const fetchProyectos = useCallback(async () => {
@@ -113,8 +113,8 @@ const Contratos = () => {
 
   const handleSaveContract = async () => {
     try {
-      // Here you would typically send the data to your backend
-      // For this example, we'll just simulate a successful save
+      // RUTA RUTA RUTA
+      // Max tienes que crear esta ruta en el backend
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSaveSuccess(true);
     } catch (error) {
@@ -125,7 +125,6 @@ const Contratos = () => {
   const generatePDF = () => {
     const doc = new jsPDF();
     
-    // Add content to the PDF
     doc.setFontSize(18);
     doc.text('Contrato de prestación de servicios freelance', 10, 10);
     
@@ -157,8 +156,89 @@ const Contratos = () => {
   }, []);
 
   const renderPlaceholder = useMemo(() => (text) => {
-    return text ? text : <span style={{ color: '#DC8665' }}>[Por completar]</span>;
+    return text ? text : <span style={{ color: '#DC8665' }}>[POR COMPLETAR]</span>;
   }, []);
+
+  const ContractPreview = () => (
+    <div className="contract-preview">
+      <h3>Vista Previa del Contrato</h3>
+      <p><strong>{renderPlaceholder(datosContrato.nombreFreelance)}</strong> (en adelante "CONTRATISTA") se
+      obliga para con <strong>{renderPlaceholder(datosContrato.nombreCliente)}</strong> (en adelante
+      "CONTRATANTE") a ejecutar los trabajos y actividades propias del
+      servicio contratado, el cual se debe realizar de acuerdo a las
+      condiciones y cláusulas del presente documento y que se detallan a
+      continuación. Ambas partes acuerdan celebrar el presente CONTRATO DE
+      PRESTACIÓN DE SERVICIOS FREELANCE, a {renderPlaceholder(formatDate(datosContrato.fechaInicio))}.</p>
+
+      <h4>PRIMERA.- OBJETO:</h4>
+      <p>El CONTRATISTA realizará {renderPlaceholder(datosContrato.servicios)}, sin que exista
+      relación de dependencia, ni horario determinado.</p>
+
+      <h4>SEGUNDA.- PRECIO:</h4>
+      <p>El CONTRATANTE pagará la suma de ${renderPlaceholder(datosContrato.precio)} al CONTRATISTA
+      a través de {renderPlaceholder(datosContrato.metodoPago)} según lo acordado por ambas
+      partes, a más tardar {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} del cronograma de
+      pagos acordado, por el trabajo entregado y aceptado por el Cliente.</p>
+
+      <h4>TERCERO.- FORMA DE PAGO:</h4>
+      <p>El valor del contrato se pagará por {renderPlaceholder(datosContrato.metodoPago)} a más
+      tardar el {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} de acuerdo al cronograma de
+      entregas y pagos acordado y aceptado por el CONTRATANTE detallado a
+      continuación:</p>
+
+      <ul>
+        {datosContrato.entregables.map((entregable, index) => (
+          <li key={index}>{renderPlaceholder(entregable)}</li>
+        ))}
+      </ul>
+
+      <h4>CUARTA.- DURACIÓN O PLAZO:</h4>
+      <p>El CONTRATISTA se compromete a prestar los servicios hasta que el
+      contrato haya finalizado en la fecha acordada ({renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))}).</p>
+
+      <h4>QUINTA.- OBLIGACIONES:</h4>
+      <p>El CONTRATANTE deberá facilitar acceso a la información y elementos que
+      sean necesarios, de manera oportuna, para la debida ejecución del objeto
+      del contrato, y, estará obligado a cumplir con lo estipulado en las
+      demás cláusulas y condiciones previstas en este documento. El
+      CONTRATISTA deberá cumplir en forma eficiente y oportuna los trabajos
+      encomendados y aquellas obligaciones que se generen de acuerdo con la
+      naturaleza del servicio.</p>
+
+      <h4>SEXTA.- TERMINACIÓN</h4>
+      <p>Este acuerdo puede ser terminado con un aviso por escrito de
+      {renderPlaceholder(datosContrato.periodoAviso)} por cualquiera de las partes.</p>
+
+      <h4>SEPTIMA.-INDEPENDENCIA:</h4>
+      <p>El CONTRATISTA actuará por su cuenta, con autonomía y sin que exista
+      relación laboral, ni subordinación con El CONTRATANTE. Sus derechos se
+      limitarán por la naturaleza del contrato, a exigir el cumplimiento de
+      las obligaciones del CONTRATANTE y el pago oportuno de su remuneración
+      fijada en este documento.</p>
+
+      <h4>OCTAVA.- DERECHOS</h4>
+      <p>El CONTRATANTE será propietario de los derechos de autor de todo el
+      material creado bajo este acuerdo una vez se haya completado el pago
+      íntegro. El CONTRATISTA puede exhibir obras de muestra de este proyecto
+      como piezas de su portafolio sólo con el consentimiento y la aprobación
+      del CONTRATANTE.</p>
+
+      <div className="signatures mt-5">
+        <div className="row">
+          <div className="col-md-6">
+            <p><strong>El CONTRATANTE acepta los términos mencionados anteriormente:</strong></p>
+            <p>{renderPlaceholder(datosContrato.nombreCliente)}</p>
+            <p>Fecha: ____________________</p>
+          </div>
+          <div className="col-md-6">
+            <p><strong>El CONTRATISTA acepta los términos mencionados anteriormente:</strong></p>
+            <p>{renderPlaceholder(datosContrato.nombreFreelance)}</p>
+            <p>Fecha: ____________________</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading) return <div className="alert alert-info">Cargando...</div>;
   if (error) return <div className="alert alert-danger">Error: {error}</div>;
@@ -403,11 +483,8 @@ const Contratos = () => {
 
 {selectedProyecto && (
         <div className="mt-4">
-          <button className="btn btn-primary me-2" onClick={() => setIsModalOpen(true)}>
-            Guardar Contrato
-          </button>
-          <button className="btn btn-secondary" onClick={generatePDF}>
-            Generar PDF
+          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+            Vista Previa y Exportar Contrato
           </button>
         </div>
       )}
@@ -415,23 +492,24 @@ const Contratos = () => {
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
-        contentLabel="Guardar Contrato"
+        contentLabel="Vista Previa del Contrato"
         className="modal-content"
         overlayClassName="modal-overlay"
       >
-        <h2>Guardar Contrato</h2>
-        {saveSuccess ? (
-          <div>
-            <p className="text-success">¡El contrato se ha guardado exitosamente!</p>
-            <button className="btn btn-primary" onClick={() => setIsModalOpen(false)}>Cerrar</button>
+        <div className="modal-scroll">
+          <ContractPreview />
+          <div className="modal-actions mt-4">
+            <button className="btn btn-primary me-2" onClick={handleSaveContract}>
+              {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
+            </button>
+            <button className="btn btn-secondary me-2" onClick={generatePDF}>
+              Exportar como PDF
+            </button>
+            <button className="btn btn-outline-secondary" onClick={() => setIsModalOpen(false)}>
+              Cerrar
+            </button>
           </div>
-        ) : (
-          <div>
-            <p>¿Estás seguro de que deseas guardar este contrato?</p>
-            <button className="btn btn-primary me-2" onClick={handleSaveContract}>Guardar</button>
-            <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>Cancelar</button>
-          </div>
-        )}
+        </div>
       </Modal>
     </div>
   );
