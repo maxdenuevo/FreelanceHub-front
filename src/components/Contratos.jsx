@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react';
 
 const Contratos = ({ contratoId }) => {
   const [datosContrato, setDatosContrato] = useState({
-    nombreFreelance: '',
-    nombreCliente: '',
-    fechaInicio: '',
-    servicios: '',
-    precio: '',
-    metodoPago: '',
-    fechaPagoFinal: '',
-    entregables: ['', '', '', ''],
-    periodoAviso: '',
-    nombreProyecto: '',
-    cliente: '',
-    plantilla: '',
+    nombreFreelance: '{{nombreFreelance}}',
+    nombreCliente: '{{nombreCliente}}',
+    fechaInicio: '{{fechaInicio}}',
+    servicios: '{{servicios}}',
+    precio: '{{precio}}',
+    metodoPago: '{{metodoPago}}',
+    fechaPagoFinal: '{{fechaPagoFinal}}',
+    entregables: ['{{entregable1}}', '{{entregable2}}', '{{entregable3}}', '{{entregable4}}'],
+    periodoAviso: '{{periodoAviso}}',
+    nombreProyecto: '{{nombreProyecto}}',
+    cliente: '{{cliente}}',
+    plantilla: '{{plantilla}}',
   });
+  const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -41,7 +42,7 @@ const Contratos = ({ contratoId }) => {
         const tareasData = await tareasRes.json();
         const tareas = tareasData.tareas;
 
-        setDatosContrato({
+        setApiData({
           nombreFreelance: usuario?.usuario_email || '',
           nombreCliente: cliente?.cliente_nombre || '',
           fechaInicio: proyecto?.proyecto_inicio || '',
@@ -66,25 +67,15 @@ const Contratos = ({ contratoId }) => {
     fetchContractData();
   }, [contratoId]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleVariableSelect = (key, value) => {
     setDatosContrato(prevState => ({
       ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleEntregableChange = (index, value) => {
-    const newEntregables = [...datosContrato.entregables];
-    newEntregables[index] = value;
-    setDatosContrato(prevState => ({
-      ...prevState,
-      entregables: newEntregables
+      [key]: value
     }));
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString || dateString.startsWith('{{')) return dateString;
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
@@ -96,119 +87,25 @@ const Contratos = ({ contratoId }) => {
     <div className="contract-template container">
       <h2 className="mb-4">Contrato de prestación de servicios freelance</h2>
       
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label htmlFor="nombreFreelance" className="form-label">Nombre del Freelance:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="nombreFreelance"
-            name="nombreFreelance"
-            value={datosContrato.nombreFreelance}
-            onChange={handleInputChange}
-          />
+      {apiData && (
+        <div className="mb-4">
+          <h3>Datos de la API</h3>
+          {Object.entries(apiData).map(([key, value]) => (
+            <div key={key} className="mb-2">
+              <label className="form-label">{key}:</label>
+              <select 
+                className="form-select" 
+                onChange={(e) => handleVariableSelect(key, e.target.value)}
+              >
+                <option value={datosContrato[key]}>{datosContrato[key]}</option>
+                <option value={Array.isArray(value) ? value.join(', ') : value}>
+                  {Array.isArray(value) ? value.join(', ') : value}
+                </option>
+              </select>
+            </div>
+          ))}
         </div>
-        <div className="col-md-6">
-          <label htmlFor="nombreCliente" className="form-label">Nombre del Cliente:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="nombreCliente"
-            name="nombreCliente"
-            value={datosContrato.nombreCliente}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
-
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label htmlFor="fechaInicio" className="form-label">Fecha de Inicio:</label>
-          <input
-            type="date"
-            className="form-control"
-            id="fechaInicio"
-            name="fechaInicio"
-            value={datosContrato.fechaInicio}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="col-md-6">
-          <label htmlFor="fechaPagoFinal" className="form-label">Fecha de Pago Final:</label>
-          <input
-            type="date"
-            className="form-control"
-            id="fechaPagoFinal"
-            name="fechaPagoFinal"
-            value={datosContrato.fechaPagoFinal}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
-
-      <div className="mb-3">
-        <label htmlFor="servicios" className="form-label">Servicios:</label>
-        <textarea
-          className="form-control"
-          id="servicios"
-          name="servicios"
-          value={datosContrato.servicios}
-          onChange={handleInputChange}
-          rows="3"
-        ></textarea>
-      </div>
-
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label htmlFor="precio" className="form-label">Precio:</label>
-          <input
-            type="number"
-            className="form-control"
-            id="precio"
-            name="precio"
-            value={datosContrato.precio}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="col-md-6">
-          <label htmlFor="metodoPago" className="form-label">Método de Pago:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="metodoPago"
-            name="metodoPago"
-            value={datosContrato.metodoPago}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Entregables:</label>
-        {datosContrato.entregables.map((entregable, index) => (
-          <input
-            key={index}
-            type="text"
-            className="form-control mb-2"
-            value={entregable}
-            onChange={(e) => handleEntregableChange(index, e.target.value)}
-          />
-        ))}
-      </div>
-
-      <div className="mb-3">
-        <label htmlFor="periodoAviso" className="form-label">Periodo de Aviso (días):</label>
-        <input
-          type="number"
-          className="form-control"
-          id="periodoAviso"
-          name="periodoAviso"
-          value={datosContrato.periodoAviso}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <h3 className="mt-5 mb-4">Vista previa del contrato</h3>
+      )}
 
       <div className="contract-preview">
         <p><strong>{datosContrato.nombreFreelance}</strong> (en adelante "CONTRATISTA") se
