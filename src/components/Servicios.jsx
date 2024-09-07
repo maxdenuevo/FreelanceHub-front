@@ -18,17 +18,17 @@ function Servicios() {
     <div className="container py-5">
       <div className="row mb-5">
         <div className="col-12 text-center">
-          <h2 className="fw-bold">Descubre las características que hacen que FreelanceHub sea tan fácil de usar.</h2>
+          <h2 className="titulo-servicios fw-bold">Descubre las características que hacen que FreelanceHub sea tan fácil de usar.</h2>
         </div>
       </div>
       {services.map((service, index) => (
         <div key={index} className={`row align-items-center mb-5 ${index % 2 !== 0 ? 'flex-row-reverse' : ''}`}>
           <div className="col-md-6 mb-3 mb-md-0">
-            <img className="img-fluid" src={service.img} alt={service.title} />
+            <img id='img-servicios' className="img-fluid" src={service.img} alt={service.title} />
           </div>
           <div className="col-md-6">
-            <h4 className="fw-bold mb-3">{service.title}</h4>
-            <p>{service.description}</p>
+            <h4 id='herramientas-home' className="fw-bold mb-3">{service.title}</h4>
+            <p id='herramientas-descripcion'>{service.description}</p>
           </div>
         </div>
       ))}

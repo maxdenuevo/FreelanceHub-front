@@ -63,7 +63,7 @@ function Formularioinicio() {
   }
 
   return (
-    <form className='formulario mt-5'>
+    <form className='formulario mt-5 mb-5'>
         <h2 className="form-title">Inicio de Sesión</h2>
         {location.state?.message && (
         <div className="alert alert-success" role="alert">

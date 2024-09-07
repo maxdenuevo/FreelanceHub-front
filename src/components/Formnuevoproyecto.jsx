@@ -159,7 +159,7 @@ function Formnuevoproyecto() {
         )}
         <div className="Nuevoproyecto-btns d-flex justify-content-around">
           <button type="button" className="btn m-4" onClick={ClickAtras}>Atrás</button>
-          <button type="button" className="btn m-4" onClick={agregarProyecto}>Siguiente</button>
+          <button type="button" className="btn m-4" onClick={agregarProyecto}>Agregar Proyecto</button>
         </div>
       </form>
     </div>

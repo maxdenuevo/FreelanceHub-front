@@ -89,7 +89,7 @@ function Formnuevocliente() {
   };
 
   return (
-    <div className="formulario container mt-5">
+    <div className="formulario container mt-5 mb-5">
       <h2 className="form-title">Crear Nuevo Cliente</h2>
       <form>
         <div className="mb-3">

@@ -16,9 +16,9 @@ function Sidebar() {
 
 return (
     <div className="Dashboard d-flex">
-      <div className="sidebar p-3" style={{ width: "200px", height: "150vh" }}>
-        <h1 className="mt-5">Tu Panel de Proyectos</h1>
-        {usuarioEmail && <p className="text-light mt-5">{usuarioEmail}</p>}
+      <div className="sidebar p-3">
+        <h1 className="">Tu Panel de Proyectos</h1>
+        {usuarioEmail && <p>{usuarioEmail}</p>}
         <div className="nav d-flex align-items-start flex-column nav-pills mt-4 me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
           <Link to="/dashboardpage" className={`nav-link ${location.pathname === '/dashboardpage' ? 'active' : ''}`}>
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-house pe-2 pb-1" viewBox="0 0 16 16">
