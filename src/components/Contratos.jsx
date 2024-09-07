@@ -74,9 +74,10 @@ const Contratos = ({ contratoId }) => {
     }
   };
 
+
   const handleInputChange = (e, index = null) => {
     const { name, value } = e.target;
-    if (index !== null) {
+    if (name === 'entregables') {
       setDatosContrato(prev => ({
         ...prev,
         entregables: prev.entregables.map((item, i) => i === index ? value : item)
@@ -86,10 +87,28 @@ const Contratos = ({ contratoId }) => {
     }
   };
 
+  const addEntregable = () => {
+    setDatosContrato(prev => ({
+      ...prev,
+      entregables: [...prev.entregables, '']
+    }));
+  };
+
+  const removeEntregable = (index) => {
+    setDatosContrato(prev => ({
+      ...prev,
+      entregables: prev.entregables.filter((_, i) => i !== index)
+    }));
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('es-ES', options);
+  };
+
+  const renderPlaceholder = (text) => {
+    return text ? text : <span style={{ color: '#DC8665' }}>[Por completar]</span>;
   };
 
   if (loading) return <div>Cargando...</div>;
@@ -100,8 +119,7 @@ const Contratos = ({ contratoId }) => {
       <h2 className="mb-4">Contrato de prestación de servicios freelance</h2>
       
       <div className="mb-4">
-        <h3>Datos del Contrato</h3>
-        <div className="row">
+        <h3>Datos del Contrato</h3>        <div className="row">
           <div className="col-md-6 mb-3">
             <label className="form-label">Nombre del Freelance:</label>
             <input
@@ -167,13 +185,17 @@ const Contratos = ({ contratoId }) => {
           </div>
           <div className="col-md-6 mb-3">
             <label className="form-label">Método de Pago:</label>
-            <input
-              type="text"
-              className="form-control"
+            <select
+              className="form-select"
               name="metodoPago"
               value={datosContrato.metodoPago}
               onChange={handleInputChange}
-            />
+            >
+              <option value="">Seleccione un método de pago</option>
+              <option value="Transferencia Electrónica">Transferencia Electrónica</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Vale Vista">Vale Vista</option>
+            </select>
           </div>
         </div>
         <div className="mb-3">
@@ -189,52 +211,57 @@ const Contratos = ({ contratoId }) => {
           ))}
         </div>
         <div className="mb-3">
-          <label className="form-label">Periodo de Aviso (días):</label>
-          <input
-            type="number"
-            className="form-control"
+          <label className="form-label">Periodo de Aviso:</label>
+          <select
+            className="form-select"
             name="periodoAviso"
             value={datosContrato.periodoAviso}
             onChange={handleInputChange}
-          />
+          >
+            <option value="">Seleccione un periodo de aviso</option>
+            <option value="15 días">15 días</option>
+            <option value="30 días">30 días</option>
+            <option value="45 días">45 días</option>
+            <option value="90 días">90 días</option>
+          </select>
         </div>
       </div>
 
       <div className="contract-preview">
         <h3>Vista Previa del Contrato</h3>
-        <p><strong>{datosContrato.nombreFreelance}</strong> (en adelante "CONTRATISTA") se
-        obliga para con <strong>{datosContrato.nombreCliente}</strong> (en adelante
+        <p><strong>{renderPlaceholder(datosContrato.nombreFreelance)}</strong> (en adelante "CONTRATISTA") se
+        obliga para con <strong>{renderPlaceholder(datosContrato.nombreCliente)}</strong> (en adelante
         "CONTRATANTE") a ejecutar los trabajos y actividades propias del
         servicio contratado, el cual se debe realizar de acuerdo a las
         condiciones y cláusulas del presente documento y que se detallan a
         continuación. Ambas partes acuerdan celebrar el presente CONTRATO DE
-        PRESTACIÓN DE SERVICIOS FREELANCE, a {formatDate(datosContrato.fechaInicio)}.</p>
+        PRESTACIÓN DE SERVICIOS FREELANCE, a {renderPlaceholder(formatDate(datosContrato.fechaInicio))}.</p>
 
         <h4>PRIMERA.- OBJETO:</h4>
-        <p>El CONTRATISTA realizará {datosContrato.servicios}, sin que exista
+        <p>El CONTRATISTA realizará {renderPlaceholder(datosContrato.servicios)}, sin que exista
         relación de dependencia, ni horario determinado.</p>
 
         <h4>SEGUNDA.- PRECIO:</h4>
-        <p>El CONTRATANTE pagará la suma de ${datosContrato.precio} al CONTRATISTA
-        a través de {datosContrato.metodoPago} según lo acordado por ambas
-        partes, a más tardar {formatDate(datosContrato.fechaPagoFinal)} del cronograma de
+        <p>El CONTRATANTE pagará la suma de ${renderPlaceholder(datosContrato.precio)} al CONTRATISTA
+        a través de {renderPlaceholder(datosContrato.metodoPago)} según lo acordado por ambas
+        partes, a más tardar {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} del cronograma de
         pagos acordado, por el trabajo entregado y aceptado por el Cliente.</p>
 
         <h4>TERCERO.- FORMA DE PAGO:</h4>
-        <p>El valor del contrato se pagará por {datosContrato.metodoPago} a más
-        tardar el {formatDate(datosContrato.fechaPagoFinal)} de acuerdo al cronograma de
+        <p>El valor del contrato se pagará por {renderPlaceholder(datosContrato.metodoPago)} a más
+        tardar el {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} de acuerdo al cronograma de
         entregas y pagos acordado y aceptado por el CONTRATANTE detallado a
         continuación:</p>
 
         <ul>
           {datosContrato.entregables.map((entregable, index) => (
-            <li key={index}>{entregable}</li>
+            <li key={index}>{renderPlaceholder(entregable)}</li>
           ))}
         </ul>
 
         <h4>CUARTA.- DURACIÓN O PLAZO:</h4>
         <p>El CONTRATISTA se compromete a prestar los servicios hasta que el
-        contrato haya finalizado en la fecha acordada ({formatDate(datosContrato.fechaPagoFinal)}).</p>
+        contrato haya finalizado en la fecha acordada ({renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))}).</p>
 
         <h4>QUINTA.- OBLIGACIONES:</h4>
         <p>El CONTRATANTE deberá facilitar acceso a la información y elementos que
@@ -247,7 +274,7 @@ const Contratos = ({ contratoId }) => {
 
         <h4>SEXTA.- TERMINACIÓN</h4>
         <p>Este acuerdo puede ser terminado con un aviso por escrito de
-        {datosContrato.periodoAviso} días por cualquiera de las partes.</p>
+        {renderPlaceholder(datosContrato.periodoAviso)} por cualquiera de las partes.</p>
 
         <h4>SEPTIMA.-INDEPENDENCIA:</h4>
         <p>El CONTRATISTA actuará por su cuenta, con autonomía y sin que exista
@@ -267,12 +294,12 @@ const Contratos = ({ contratoId }) => {
           <div className="row">
             <div className="col-md-6">
               <p><strong>El CONTRATANTE acepta los términos mencionados anteriormente:</strong></p>
-              <p>{datosContrato.nombreCliente}</p>
+              <p>{renderPlaceholder(datosContrato.nombreCliente)}</p>
               <p>Fecha: ____________________</p>
             </div>
             <div className="col-md-6">
               <p><strong>El CONTRATISTA acepta los términos mencionados anteriormente:</strong></p>
-              <p>{datosContrato.nombreFreelance}</p>
+              <p>{renderPlaceholder(datosContrato.nombreFreelance)}</p>
               <p>Fecha: ____________________</p>
             </div>
           </div>
