@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Modal from 'react-modal';
+import { jsPDF } from "jspdf";
 
 const API_BASE_URL = 'https://api-freelancehub.vercel.app';
+
+Modal.setAppElement('#root');
 
 const Contratos = () => {
   const [proyectos, setProyectos] = useState([]);
@@ -18,6 +22,9 @@ const Contratos = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false); // modal
+  const [saveSuccess, setSaveSuccess] = useState(false); // modal
+
 
   const fetchProyectos = useCallback(async () => {
     try {
@@ -103,6 +110,45 @@ const Contratos = () => {
     }));
   }, []);
 
+
+  const handleSaveContract = async () => {
+    try {
+      // Here you would typically send the data to your backend
+      // For this example, we'll just simulate a successful save
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSaveSuccess(true);
+    } catch (error) {
+      setError('Error al guardar el contrato: ' + error.message);
+    }
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    
+    // Add content to the PDF
+    doc.setFontSize(18);
+    doc.text('Contrato de prestación de servicios freelance', 10, 10);
+    
+    doc.setFontSize(12);
+    doc.text(`Freelance: ${datosContrato.nombreFreelance}`, 10, 30);
+    doc.text(`Cliente: ${datosContrato.nombreCliente}`, 10, 40);
+    doc.text(`Fecha de inicio: ${formatDate(datosContrato.fechaInicio)}`, 10, 50);
+    doc.text(`Servicios: ${datosContrato.servicios}`, 10, 60);
+    doc.text(`Precio: $${datosContrato.precio}`, 10, 70);
+    doc.text(`Método de pago: ${datosContrato.metodoPago}`, 10, 80);
+    doc.text(`Fecha de pago final: ${formatDate(datosContrato.fechaPagoFinal)}`, 10, 90);
+    
+    doc.text('Entregables:', 10, 100);
+    datosContrato.entregables.forEach((entregable, index) => {
+      doc.text(`- ${entregable}`, 15, 110 + (index * 10));
+    });
+    
+    doc.text(`Periodo de aviso: ${datosContrato.periodoAviso}`, 10, 120 + (datosContrato.entregables.length * 10));
+
+    // Save the PDF
+    doc.save('contrato.pdf');
+  };
+
   const formatDate = useCallback((dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -141,7 +187,7 @@ const Contratos = () => {
             <h3>Datos del Contrato</h3>
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label className="form-label">Nombre del Freelance:</label>
+                <label className="form-label">Tu nombre completo:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -354,6 +400,39 @@ const Contratos = () => {
         </div>
         </div>
       )}
+
+{selectedProyecto && (
+        <div className="mt-4">
+          <button className="btn btn-primary me-2" onClick={() => setIsModalOpen(true)}>
+            Guardar Contrato
+          </button>
+          <button className="btn btn-secondary" onClick={generatePDF}>
+            Generar PDF
+          </button>
+        </div>
+      )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Guardar Contrato"
+        className="modal-content"
+        overlayClassName="modal-overlay"
+      >
+        <h2>Guardar Contrato</h2>
+        {saveSuccess ? (
+          <div>
+            <p className="text-success">¡El contrato se ha guardado exitosamente!</p>
+            <button className="btn btn-primary" onClick={() => setIsModalOpen(false)}>Cerrar</button>
+          </div>
+        ) : (
+          <div>
+            <p>¿Estás seguro de que deseas guardar este contrato?</p>
+            <button className="btn btn-primary me-2" onClick={handleSaveContract}>Guardar</button>
+            <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>Cancelar</button>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
