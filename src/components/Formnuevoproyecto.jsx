@@ -18,7 +18,14 @@ function Formnuevoproyecto() {
   }
 
   useEffect(() => {
-    fetch("https://api-freelancehub.vercel.app/clientes")
+    const userId = localStorage.getItem('usuario_id');
+
+    if (!userId) {
+      setError('No se pudo cargar la información');
+      setLoading(false);
+      return;
+    }
+    fetch(`https://api-freelancehub.vercel.app/clientes/${userId}`)
       .then(response => response.json())
       .then(data => {
         console.log(data);
@@ -91,7 +98,7 @@ function Formnuevoproyecto() {
     .then(responseConverted => {
       console.log("¡El proyecto se ha registrado correctamente!");
       console.log(responseConverted);
-      navigate('/dashboardpage');
+      navigate('/dashboardpage/proyectos');
     })
     .catch(error => {
       console.log(error);

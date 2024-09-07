@@ -12,11 +12,14 @@ function Sidebar() {
       navigate('/login', { state: { message: 'Sesión cerrada correctamente' } });
     }
 
+    const usuarioEmail = localStorage.getItem('usuario_email');
+
 return (
     <div className="Dashboard d-flex">
       <div className="sidebar p-3" style={{ width: "200px", height: "150vh" }}>
         <h1 className="mt-5">Tu Panel de Proyectos</h1>
-        <div className="nav d-flex align-items-start flex-column nav-pills mt-5 me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        {usuarioEmail && <p className="text-light mt-5">{usuarioEmail}</p>}
+        <div className="nav d-flex align-items-start flex-column nav-pills mt-4 me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
           <Link to="/dashboardpage" className={`nav-link ${location.pathname === '/dashboardpage' ? 'active' : ''}`}>
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-house pe-2 pb-1" viewBox="0 0 16 16">
           <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/></svg>Home</Link>

@@ -19,10 +19,15 @@ const Correo = () => {
     const codigo = Math.floor(Math.random() * 9000 + 1000);
     setCodigo(codigo);
 
+    // Asegúrate de que `correo` sea una lista de un solo elemento
     fetch('https://api-freelancehub.vercel.app/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo, codigo })
+      body: JSON.stringify({
+        subject: 'Recuperación de Contraseña',
+        recipients: [correo],  // Enviando el correo en una lista
+        body: `Tu código de recuperación es: ${codigo}`
+      })
     })
       .then(response => {
         if (!response.ok) {

@@ -264,7 +264,7 @@ p {
   color: white;
 }
 
-.tab-content h1 {
+.seccion-proyectos h1 {
   color: #138086;
   border-bottom: 2px solid #dc876599;
 }
@@ -325,6 +325,32 @@ p {
 }
 
 #btn-proyecto-nuevo:hover {
+  background-color: #13808650;
+  color: white;
+}
+
+#proyectos-page {
+  width: 100%;
+  margin-left: 10px;
+}
+
+#sec-proyect {
+  padding-left: 440px;
+}
+
+#proyectos-p {
+  margin-left: 440px;
+}
+
+#btn-eliminar-proyecto {
+  background-color: #13808698;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#btn-eliminar-proyecto:hover {
   background-color: #13808650;
   color: white;
 }

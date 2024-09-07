@@ -12,7 +12,7 @@ const Codigo = () => {
   const verificarCodigo = () => {
     if (parseInt(codigoIngresado) === codigo) {
       setCodigoVerificado(true);
-      navigate('/cambiarcontrasena');
+      navigate('/cambiarcontraseña');
     } else {
       alert('El código ingresado es incorrecto. Intenta nuevamente.');
     }

@@ -17,7 +17,7 @@ function Home() {
     <div className="home">
       <div className="tarjeta-bienvenida">
         <div className='card-body-text ms-5'>
-          <h1>¡Bienvenido!</h1>
+          <h1>¡Bienvenid@!</h1>
           <p className="card-text pt-3">En esta plataforma podrás gestionar tareas, pagos y contratos de tus proyectos de manera eficiente. Utiliza estas herramientas para mantener todo organizado y al día.</p>
         </div>
         <div className='p-0'>
