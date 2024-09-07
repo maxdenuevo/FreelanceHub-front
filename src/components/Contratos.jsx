@@ -119,7 +119,8 @@ const Contratos = ({ contratoId }) => {
       <h2 className="mb-4">Contrato de prestación de servicios freelance</h2>
       
       <div className="mb-4">
-        <h3>Datos del Contrato</h3>        <div className="row">
+        <h3>Datos del Contrato</h3>
+        <div className="row">
           <div className="col-md-6 mb-3">
             <label className="form-label">Nombre del Freelance:</label>
             <input
@@ -174,7 +175,7 @@ const Contratos = ({ contratoId }) => {
         </div>
         <div className="row">
           <div className="col-md-6 mb-3">
-            <label className="form-label">Precio:</label>
+            <label className="form-label">Presupuesto:</label>
             <input
               type="number"
               className="form-control"
@@ -201,14 +202,31 @@ const Contratos = ({ contratoId }) => {
         <div className="mb-3">
           <label className="form-label">Entregables:</label>
           {datosContrato.entregables.map((entregable, index) => (
-            <input
-              key={index}
-              type="text"
-              className="form-control mb-2"
-              value={entregable}
-              onChange={(e) => handleInputChange(e, index)}
-            />
+            <div key={index} className="input-group mb-2">
+              <input
+                type="text"
+                className="form-control"
+                name="entregables"
+                value={entregable}
+                onChange={(e) => handleInputChange(e, index)}
+              />
+              <button 
+                className="btn btn-outline-danger" 
+                type="button"
+                onClick={() => removeEntregable(index)}
+                disabled={datosContrato.entregables.length === 1}
+              >
+                Eliminar
+              </button>
+            </div>
           ))}
+          <button 
+            className="btn btn-outline-primary mt-2" 
+            type="button"
+            onClick={addEntregable}
+          >
+            Agregar Entregable
+          </button>
         </div>
         <div className="mb-3">
           <label className="form-label">Periodo de Aviso:</label>
