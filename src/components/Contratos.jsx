@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ContractVariablesDropdown from './ContractVariablesDropdown';
 
 const Contratos = ({ contratoId }) => {
   const [datosContrato, setDatosContrato] = useState({
@@ -17,10 +18,12 @@ const Contratos = ({ contratoId }) => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedVariable, setSelectedVariable] = useState(null);
 
   useEffect(() => {
     const fetchContractData = async () => {
       try {
+
         // Fetch contract data
         const contratoRes = await fetch(`https://api-freelancehub.vercel.app/contrato/${contratoId}`);
         const contratoData = await contratoRes.json();
@@ -70,6 +73,10 @@ const Contratos = ({ contratoId }) => {
     fetchContractData();
   }, [contratoId]);
 
+  const handleVariableSelect = (key, value) => {
+    setSelectedVariable({ key, value });
+  };
+
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
 
@@ -81,6 +88,17 @@ const Contratos = ({ contratoId }) => {
 
   return (
     <div className="contract-template">
+      <div className="mb-4">
+        <ContractVariablesDropdown datosContrato={datosContrato} onSelect={handleVariableSelect} />
+      </div>
+      
+      {selectedVariable && (
+        <div className="mb-4">
+          <h3>Variable seleccionada: {selectedVariable.key}</h3>
+          <p>Valor: {selectedVariable.value}</p>
+        </div>
+      )}
+
       <h2>Contrato de prestación de servicios freelance</h2>
       
       <p><strong>{datosContrato.nombreFreelance}</strong> (en adelante "CONTRATISTA") se
