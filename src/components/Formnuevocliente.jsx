@@ -7,8 +7,6 @@ function Formnuevocliente() {
   const [rutCliente, setRutCliente] = useState('');
   const [emailCliente, setEmailCliente] = useState('');
   const [telefonoCliente, setTelefonoCliente] = useState('');
-  const [clientes, setClientes] = useState([]);
-  const [clienteSeleccionado, setClienteSeleccionado] = useState('');
   const [userId, setUserId] = useState('');
   const [errorMensaje, setErrorMensaje] = useState('');
   const navigate = useNavigate();
@@ -26,26 +24,6 @@ function Formnuevocliente() {
       .catch(error => {
         console.error('Error al obtener user_id:', error);
         setErrorMensaje('No se pudo obtener la información del usuario.');
-      });
-
-    fetch("https://api-freelancehub.vercel.app/clientes")
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok.');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Datos de clientes:', data);
-        if (Array.isArray(data.clientes)) {
-          setClientes(data.clientes);
-        } else {
-          throw new Error('La respuesta de clientes no es un array.');
-        }
-      })
-      .catch(error => {
-        console.error('Error al obtener clientes:', error);
-        setErrorMensaje('No se pudo obtener la lista de clientes.');
       });
   }, []);
 
@@ -70,22 +48,20 @@ function Formnuevocliente() {
     setTelefonoCliente(e.target.value);
   }
 
-  function seleccionarCliente(e) {
-    setClienteSeleccionado(e.target.value);
-  }
-
   function agregarClienteNuevo(e) {
     e.preventDefault();
-    console.log(userId);
-    const clienteData = esClienteNuevo ? {
+
+    if (!esClienteNuevo) {
+      navigate('/nuevocliente/nuevoproyecto');
+      return;
+    }
+
+    const clienteData = {
       usuario_id: userId,
       cliente_nombre: nombreCliente,
       cliente_email: emailCliente,
       cliente_tel: telefonoCliente,
       cliente_rut: rutCliente,
-    } : {
-      usuario_id: userId,
-      cliente_id: clienteSeleccionado,
     };
 
     fetch('https://api-freelancehub.vercel.app/create-cliente', {
@@ -104,7 +80,7 @@ function Formnuevocliente() {
       .then(responseConverted => {
         console.log('El cliente se ha registrado correctamente!');
         console.log(responseConverted);
-        navigate('/nuevocliente/nuevoproyecto');
+        navigate('/nuevocliente/nuevoproyecto', { state: { clienteId: responseConverted.cliente_id } });
       })
       .catch(error => {
         console.error('Error al agregar cliente:', error);
@@ -123,36 +99,23 @@ function Formnuevocliente() {
             <option value="no">No, es un cliente nuevo</option>
           </select>
         </div>
-        {!esClienteNuevo && (
-          <div id="clienteExistenteCampos" className="mb-3">
-            <label htmlFor="clienteID" className="form-label">Seleccionar Cliente</label>
-            <select className="form-select" id="clienteID" value={clienteSeleccionado} onChange={seleccionarCliente}>
-              <option value="">Seleccionar un cliente...</option>
-              {clientes.map(cliente => (
-                <option key={cliente.cliente_id} value={cliente.cliente_id}>
-                  {cliente.cliente_nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
         {esClienteNuevo && (
           <div id="nuevoClienteCampos">
             <div className="mb-3">
               <label htmlFor="nombreCliente" className="form-label">Nombre del Cliente</label>
-              <input type="text" className="form-control" id="nombreCliente" value={nombreCliente} onChange={agregarNombreCliente} required/>
+              <input type="text" className="form-control" id="nombreCliente" value={nombreCliente} onChange={agregarNombreCliente} required />
             </div>
             <div className="mb-3">
               <label htmlFor="rutCliente" className="form-label">Rut</label>
-              <input type="text" className="form-control" id="rutCliente" value={rutCliente} onChange={agregarRutCliente} required/>
+              <input type="text" className="form-control" id="rutCliente" value={rutCliente} onChange={agregarRutCliente} required />
             </div>
             <div className="mb-3">
               <label htmlFor="emailCliente" className="form-label">Email</label>
-              <input type="email" className="form-control" id="emailCliente" value={emailCliente} onChange={agregarEmailCliente} required/>
+              <input type="email" className="form-control" id="emailCliente" value={emailCliente} onChange={agregarEmailCliente} required />
             </div>
             <div className="mb-3">
               <label htmlFor="telefonoCliente" className="form-label">Teléfono</label>
-              <input type="text" className="form-control" id="telefonoCliente" value={telefonoCliente} onChange={agregarTelefonoCliente} required/>
+              <input type="text" className="form-control" id="telefonoCliente" value={telefonoCliente} onChange={agregarTelefonoCliente} required />
             </div>
           </div>
         )}
@@ -162,7 +125,7 @@ function Formnuevocliente() {
           </div>
         )}
         <div className="text-center">
-          <button id="nuevoCliente-btn" type="button" className="btn" onClick={agregarClienteNuevo}>Guardar Cliente</button>
+          <button id="nuevoCliente-btn" type="button" className="btn" onClick={agregarClienteNuevo}>Siguiente</button>
         </div>
       </form>
     </div>

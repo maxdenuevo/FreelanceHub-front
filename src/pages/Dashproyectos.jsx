@@ -1,7 +1,7 @@
 import React from 'react';
 import Proyectos from '../components/Proyectos';
 
-function Dashhome() {
+function Dashproyectos() {
   return (
     <div>
       <Proyectos />
@@ -9,4 +9,4 @@ function Dashhome() {
   );
 }
 
-export default Dashhome;
+export default Dashproyectos;

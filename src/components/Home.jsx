@@ -1,7 +1,18 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Hello from '../images/Hello.png'
 
 function Home() {
+  const navigate = useNavigate();
+    
+    const irAProyectos = () => {
+      navigate('/dashboardpage/proyectos');
+  };
+
+    const irAContratos = () => {
+      navigate('/dashboardpage/contratos');
+  };
+
   return (
     <div className="home">
       <div className="tarjeta-bienvenida">
@@ -18,14 +29,14 @@ function Home() {
           <div className="card-body ">
             <h3 className="card-title">Proyectos</h3>
             <p className="card-text">Gestiona tus proyectos con facilidad: visualiza el estado, controla tareas y pagos, y añade nuevos proyectos.</p>
-            <a className="btn d-flex justify-content-center" href="/dashboardpage/proyectos" role="button">Ir a mis proyectos</a>
+            <button className="btn d-flex justify-content-center" role="button" onClick={irAProyectos}>Ir a mis proyectos</button>
           </div>
         </div>
         <div className="card-home m-3">
           <div className="card-body">
             <h3 className="card-title">Contratos</h3>
             <p className="card-text">Administra tus contratos de manera eficiente: revisa contratos existentes, añade nuevos y realiza un seguimiento de los detalles importantes.</p>
-            <a className="btn d-flex justify-content-center" href="/dashboardpage/contratos" role="button">Ir a mis contratos</a>
+            <button className="btn d-flex justify-content-center" role="button" onClick={irAContratos}>Ir a mis contratos</button>
           </div>
         </div>
         <div className="calendar m-3">
