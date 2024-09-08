@@ -107,7 +107,7 @@ function Formnuevoproyecto() {
   }
 
   return (
-    <div className="formulario container mt-5 mb-5">
+    <div className="formulario container">
       <h2 className="form-title mb-4">Crea un nuevo proyecto</h2>
       <form>
         <div className="mb-3">

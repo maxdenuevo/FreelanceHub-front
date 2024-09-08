@@ -17,8 +17,8 @@ function Home() {
     <div className="container py-5">
       <div className="row align-items-center mb-5">
         <div className="card-body-text col-md-6">
-          <h1 className='ms-5'>¡Bienvenid@!</h1>
-          <p className="pt-3 ms-5 ">
+          <h1 className='m-5'>¡Bienvenid@!</h1>
+          <p className="m-5">
             En esta plataforma podrás gestionar tareas, pagos y contratos de tus proyectos de manera eficiente. Utiliza estas herramientas para mantener todo organizado y al día.
           </p>
         </div>

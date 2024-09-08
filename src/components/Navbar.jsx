@@ -10,7 +10,8 @@ import Logo2 from '../images/Logo2.png'
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const esRutaDashboard = location.pathname.startsWith('/dashboardpage');
+  const rutasDashboard = ['/dashboardpage', '/nuevocliente', '/nuevocliente/nuevoproyecto'];
+  const esRutaDashboard = rutasDashboard.some(ruta => location.pathname.startsWith(ruta));
 
   const irAInicio = () => {
     navigate('/');

@@ -24,7 +24,7 @@ function Navbardash() {
     };
 
   return (
-    <nav id="navprincipal" className="navbar navbar-expand-lg">
+    <nav id="navprincipal" className="navbar navbar-expand-lg fixed-top">
     <div className="container-fluid d-flex">
     <img id='logo-nav' src={Logo2} alt="" />
     <button className="nav-link text-light" onClick={irAInicio}>FreelanceHub</button>

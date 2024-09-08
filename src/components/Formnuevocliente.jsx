@@ -11,6 +11,10 @@ function Formnuevocliente() {
   const [errorMensaje, setErrorMensaje] = useState('');
   const navigate = useNavigate();
 
+  function ClickAtras() {
+    navigate(-1);
+  }
+
   useEffect(() => {
     const userId = localStorage.getItem('usuario_id');
     fetch("https://api-freelancehub.vercel.app/get-usuario/" + userId)
@@ -88,8 +92,10 @@ function Formnuevocliente() {
       });
   };
 
+
+
   return (
-    <div className="formulario container mt-5 mb-5">
+    <div className="formulario container">
       <h2 className="form-title">Crear Nuevo Cliente</h2>
       <form>
         <div className="mb-3">
@@ -125,7 +131,8 @@ function Formnuevocliente() {
           </div>
         )}
         <div className="text-center">
-          <button id="nuevoCliente-btn" type="button" className="btn" onClick={agregarClienteNuevo}>Siguiente</button>
+          <button id="nuevoCliente-btn" type="button" className="btn m-3" onClick={ClickAtras}>Atrás</button>
+          <button id="nuevoCliente-btn" type="button" className="btn m-3" onClick={agregarClienteNuevo}>Siguiente</button>
         </div>
       </form>
     </div>
