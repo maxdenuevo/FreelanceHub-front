@@ -42,6 +42,7 @@ const Clientes = () => {
   return (
     <div id='clientes-tabla' className="container">
       <h2 className='mb-5'>Tus Clientes</h2>
+      <div className="table-responsive">
       <table className="table table-striped">
         <thead>
           <tr>
@@ -64,6 +65,7 @@ const Clientes = () => {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };
