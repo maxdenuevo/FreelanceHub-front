@@ -63,8 +63,6 @@ function Pagos({ proyectoSeleccionado }) {
     formData.append('pago_monto', pagoMonto);
     formData.append('pago_fecha', pagoFecha);
     formData.append('pago_completado', pagoCompletado);
-    
-    // Solo agregar el archivo si existe
     if (pagoComprobante) {
       formData.append('pago_comprobante', pagoComprobante);
     }

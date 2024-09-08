@@ -193,7 +193,7 @@ p {
 }
 
 .sidebar {
-  width: 200px;
+  width: 80px;
   height: 100vh;
   background-color: #51a1a5;
   padding: 20px;
@@ -201,6 +201,12 @@ p {
   top: 0;
   left: 0; 
   overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+      width: 200px;
+  }
 }
 
 .content {
@@ -238,6 +244,7 @@ p {
   text-align: center;
   margin-top: 15px;
 }
+
 
 #btn-modal {
   color: white;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Perfil from '../images/Perfil.png';
 
 function Perfilusuario() {
@@ -6,6 +7,12 @@ function Perfilusuario() {
   
  const [usuario, setUsuario] = useState(null);
  const [errorMensaje, setErrorMensaje] = useState('');
+ const navigate = useNavigate();
+
+ const irACambiarContraseña = () => {
+  navigate('/ingresarcorreo');
+};
+
 
   useEffect(() => {
    const userId = localStorage.getItem('usuario_id');
@@ -48,7 +55,7 @@ function Perfilusuario() {
             <input type="text" className="form-control" value={usuario.usuario_rut} readOnly/>
           </div>
           <div className='d-flex justify-content-center'>
-        <button type="button" className="btn me-2">Cambiar contraseña</button>
+        <button type="button" className="btn me-2" onClick={irACambiarContraseña}>Cambiar contraseña</button>
         </div>
         </div>
         ) : (
