@@ -610,7 +610,8 @@ p {
 }
 
 #correo-form {
-  width: 500px;
+  width: 400px;
+  margin: auto;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 100px;
@@ -638,7 +639,8 @@ p {
 }
 
 #codigo-form {
-  width: 500px;
+  width: 400px;
+  margin: auto;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 100px;
@@ -670,7 +672,8 @@ p {
 }
 
 #contraseña-form {
-  width: 500px;
+  width: 400px;
+  margin: auto;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 100px;
@@ -688,7 +691,7 @@ p {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 35%;
+  margin-left: 23%;
   margin-top: 10px;
 }
 

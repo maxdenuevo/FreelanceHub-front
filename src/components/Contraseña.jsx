@@ -36,9 +36,9 @@ function Contraseña() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        usuario_email: email, // Email del usuario
-        otp: codigoVerificadoString, // Código de verificación como cadena
-        new_password: nuevaContrasena, // Nueva contraseña
+        usuario_email: email,
+        otp: codigoVerificadoString,
+        new_password: nuevaContrasena,
       }),
     })
       .then((response) => {

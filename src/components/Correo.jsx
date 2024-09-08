@@ -46,7 +46,7 @@ const Correo = () => {
 
   return (
     <div id='correo-form' className="container p-5">
-      <h2>Recuperar Contraseña</h2>
+      <h2>Cambiar Contraseña</h2>
       {mensajeError && <div className="alert alert-danger" role="alert">{mensajeError}</div>}
       <div className='mt-4'>
         <label htmlFor="correo" className="form-label">Correo electrónico</label>
