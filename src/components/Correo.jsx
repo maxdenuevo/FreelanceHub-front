@@ -50,14 +50,7 @@ const Correo = () => {
       {mensajeError && <div className="alert alert-danger" role="alert">{mensajeError}</div>}
       <div className='mt-4'>
         <label htmlFor="correo" className="form-label">Correo electrónico</label>
-        <input
-          type="email"
-          className="form-control"
-          id="correo"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          placeholder="Ingresa tu correo"
-        />
+        <input type="email" className="form-control" id="correo" value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="Ingresa tu correo"/>
       </div>
       <button className="btn btn-primary" onClick={enviarCodigo}>
         Validar correo

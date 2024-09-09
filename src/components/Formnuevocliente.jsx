@@ -132,7 +132,7 @@ function Formnuevocliente() {
         )}
         <div className="text-center">
           <button id="nuevoCliente-btn" type="button" className="btn m-3" onClick={ClickAtras}>Atrás</button>
-          <button id="nuevoCliente-btn" type="button" className="btn m-3" onClick={agregarClienteNuevo}>Siguiente</button>
+          <button id="nuevoCliente-btn2" type="button" className="btn m-3" onClick={agregarClienteNuevo}>Siguiente</button>
         </div>
       </form>
     </div>

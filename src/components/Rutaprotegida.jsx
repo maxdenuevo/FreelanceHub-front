@@ -1,11 +1,15 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 
-function Rutaprotegida({ canActivate, redirectPath = '/login' }) {
-    if (!canActivate) {
-        return <Navigate to={redirectPath} replace />;
-    }
-    return <Outlet />;
+const Rutaprotegida = ({children}) => {
+
+    const user = localStorage.getItem('usuario_id') || null
+
+if(user){
+     return children
+}else{
+    return <Navigate to='login' />
+}
 }
 
 export default Rutaprotegida;

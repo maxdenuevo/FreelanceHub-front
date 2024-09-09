@@ -211,6 +211,10 @@ p {
   width: auto;
 }
 
+#nuevoCliente-btn2 {
+  width: auto;
+}
+
 #nuevoproyecto-btn {
   background-color: #13808698  !important;
   color: white !important;

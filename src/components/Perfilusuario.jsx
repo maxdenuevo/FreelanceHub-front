@@ -49,28 +49,14 @@ function Perfilusuario() {
             <div className="perfil-detalles">
               <div className="mb-3">
                 <label className="form-label mt-4">Tu correo electrónico</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  value={usuario.usuario_email}
-                  readOnly
-                />
+                <input type="email" className="form-control" value={usuario.usuario_email} readOnly/>
               </div>
               <div className="mb-3">
                 <label className="form-label">Tu RUT</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={usuario.usuario_rut}
-                  readOnly
-                />
+                <input type="text" className="form-control" value={usuario.usuario_rut} readOnly/>
               </div>
               <div className="d-flex justify-content-center">
-                <button
-                  type="button"
-                  className="btn btn-primary me-2 mt-4"
-                  onClick={irACambiarContraseña}
-                >
+                <button type="button" className="btn btn-primary me-2 mt-4" onClick={irACambiarContraseña}>
                   Cambiar contraseña
                 </button>
               </div>
