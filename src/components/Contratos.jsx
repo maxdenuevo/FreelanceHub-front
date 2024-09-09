@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Modal from 'react-modal';
 import { jsPDF } from "jspdf";
 
 const API_BASE_URL = 'https://api-freelancehub.vercel.app';
@@ -24,6 +23,7 @@ const Contratos = () => {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
 
 
   const fetchProyectos = useCallback(async () => {
@@ -46,26 +46,31 @@ const Contratos = () => {
 
   const fetchProyectoDetails = useCallback(async (proyectoId) => {
     try {
-      const [clienteResponse, usuarioResponse] = await Promise.all([
+      const [clienteResponse, usuarioResponse, tareasResponse] = await Promise.all([
         fetch(`${API_BASE_URL}/cliente/${selectedProyecto.cliente_id}`),
-        fetch(`${API_BASE_URL}/get-usuario/${selectedProyecto.usuario_id}`)
+        fetch(`${API_BASE_URL}/get-usuario/${selectedProyecto.usuario_id}`),
+        fetch(`${API_BASE_URL}/tareas-with-pagos/${proyectoId}`)
       ]);
 
-      if (!clienteResponse.ok || !usuarioResponse.ok) {
+      if (!clienteResponse.ok || !usuarioResponse.ok || !tareasResponse.ok) {
         throw new Error('Error al obtener detalles del proyecto');
       }
 
       const clienteData = await clienteResponse.json();
       const usuarioData = await usuarioResponse.json();
+      const tareasData = await tareasResponse.json();
+
+      const entregables = tareasData.tareas_with_pagos.map(tarea => tarea.tarea_nombre);
 
       setDatosContrato(prevDatos => ({
         ...prevDatos,
-        nombreFreelance: usuarioData.usuario?.usuario_email || '',
+        nombreFreelance: usuarioData.usuario?.usuario_nombre || '',
         nombreCliente: clienteData.cliente?.cliente_nombre || '',
         fechaInicio: selectedProyecto.proyecto_inicio || '',
         servicios: selectedProyecto.proyecto_descripcion || '',
         precio: selectedProyecto.proyecto_presupuesto || '',
         fechaPagoFinal: selectedProyecto.proyecto_termino || '',
+        entregables: entregables.length > 0 ? entregables : [''],
       }));
     } catch (error) {
       setError('Error al obtener detalles del proyecto: ' + error.message);
@@ -400,117 +405,36 @@ const Contratos = () => {
       </div>
 
       {selectedProyecto && (
-        <div className="contract-preview">
-          <h3>Vista Previa del Contrato</h3>
-          <p><strong>{renderPlaceholder(datosContrato.nombreFreelance)}</strong> (en adelante "CONTRATISTA") se
-          obliga para con <strong>{renderPlaceholder(datosContrato.nombreCliente)}</strong> (en adelante
-          "CONTRATANTE") a ejecutar los trabajos y actividades propias del
-          servicio contratado, el cual se debe realizar de acuerdo a las
-          condiciones y cláusulas del presente documento y que se detallan a
-          continuación. Ambas partes acuerdan celebrar el presente CONTRATO DE
-          PRESTACIÓN DE SERVICIOS FREELANCE, a {renderPlaceholder(formatDate(datosContrato.fechaInicio))}.</p>
-
-          <h4>PRIMERA.- OBJETO:</h4>
-          <p>El CONTRATISTA realizará {renderPlaceholder(datosContrato.servicios)}, sin que exista
-          relación de dependencia, ni horario determinado.</p>
-
-          <h4>SEGUNDA.- PRECIO:</h4>
-          <p>El CONTRATANTE pagará la suma de ${renderPlaceholder(datosContrato.precio)} al CONTRATISTA
-          a través de {renderPlaceholder(datosContrato.metodoPago)} según lo acordado por ambas
-          partes, a más tardar {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} del cronograma de
-          pagos acordado, por el trabajo entregado y aceptado por el Cliente.</p>
-
-          <h4>TERCERO.- FORMA DE PAGO:</h4>
-          <p>El valor del contrato se pagará por {renderPlaceholder(datosContrato.metodoPago)} a más
-          tardar el {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} de acuerdo al cronograma de
-          entregas y pagos acordado y aceptado por el CONTRATANTE detallado a
-          continuación:</p>
-
-          <ul>
-            {datosContrato.entregables.map((entregable, index) => (
-              <li key={index}>{renderPlaceholder(entregable)}</li>
-            ))}
-          </ul>
-
-          <h4>CUARTA.- DURACIÓN O PLAZO:</h4>
-          <p>El CONTRATISTA se compromete a prestar los servicios hasta que el
-          contrato haya finalizado en la fecha acordada ({renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))}).</p>
-
-          <h4>QUINTA.- OBLIGACIONES:</h4>
-          <p>El CONTRATANTE deberá facilitar acceso a la información y elementos que
-          sean necesarios, de manera oportuna, para la debida ejecución del objeto
-          del contrato, y, estará obligado a cumplir con lo estipulado en las
-          demás cláusulas y condiciones previstas en este documento. El
-          CONTRATISTA deberá cumplir en forma eficiente y oportuna los trabajos
-          encomendados y aquellas obligaciones que se generen de acuerdo con la
-          naturaleza del servicio.</p>
-
-          <h4>SEXTA.- TERMINACIÓN</h4>
-          <p>Este acuerdo puede ser terminado con un aviso por escrito de
-          {renderPlaceholder(datosContrato.periodoAviso)} por cualquiera de las partes.</p>
-
-          <h4>SEPTIMA.-INDEPENDENCIA:</h4>
-          <p>El CONTRATISTA actuará por su cuenta, con autonomía y sin que exista
-          relación laboral, ni subordinación con El CONTRATANTE. Sus derechos se
-          limitarán por la naturaleza del contrato, a exigir el cumplimiento de
-          las obligaciones del CONTRATANTE y el pago oportuno de su remuneración
-          fijada en este documento.</p>
-
-          <h4>OCTAVA.- DERECHOS</h4>
-          <p>El CONTRATANTE será propietario de los derechos de autor de todo el
-          material creado bajo este acuerdo una vez se haya completado el pago
-          íntegro. El CONTRATISTA puede exhibir obras de muestra de este proyecto
-          como piezas de su portafolio sólo con el consentimiento y la aprobación
-          del CONTRATANTE.</p>
-
-
-        <div className="signatures mt-5">
-          <div className="row">
-            <div className="col-md-6">
-              <p><strong>El CONTRATANTE acepta los términos mencionados anteriormente:</strong></p>
-              <p>{renderPlaceholder(datosContrato.nombreCliente)}</p>
-              <p>Fecha: ____________________</p>
-            </div>
-            <div className="col-md-6">
-              <p><strong>El CONTRATISTA acepta los términos mencionados anteriormente:</strong></p>
-              <p>{renderPlaceholder(datosContrato.nombreFreelance)}</p>
-              <p>Fecha: ____________________</p>
-            </div>
-          </div>
-        </div>
-        </div>
-      )}
-
-{selectedProyecto && (
         <div className="mt-4">
-          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+          <button className="btn btn-primary" onClick={() => setShowOffcanvas(true)}>
             Vista Previa y Exportar Contrato
           </button>
         </div>
       )}
 
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
-        contentLabel="Vista Previa del Contrato"
-        className="modal-content"
-        overlayClassName="modal-overlay"
-      >
-        <div className="modal-scroll">
+      {/* Offcanvas component */}
+      <div className={`offcanvas offcanvas-end ${showOffcanvas ? 'show' : ''}`} tabIndex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div className="offcanvas-header">
+          <h5 id="offcanvasRightLabel">Vista Previa del Contrato</h5>
+          <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close" onClick={() => setShowOffcanvas(false)}></button>
+        </div>
+        <div className="offcanvas-body">
           <ContractPreview />
-          <div className="modal-actions mt-4">
+          <div className="mt-4">
             <button className="btn btn-primary me-2" onClick={handleSaveContract}>
               {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
             </button>
             <button className="btn btn-secondary me-2" onClick={generatePDF}>
               Exportar como PDF
             </button>
-            <button className="btn btn-outline-secondary" onClick={() => setIsModalOpen(false)}>
-              Cerrar
-            </button>
           </div>
         </div>
-      </Modal>
+      </div>
+
+      {/* Backdrop */}
+      {showOffcanvas && (
+        <div className="offcanvas-backdrop fade show" onClick={() => setShowOffcanvas(false)}></div>
+      )}
     </div>
   );
 };
