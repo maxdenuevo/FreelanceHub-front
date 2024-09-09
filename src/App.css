@@ -747,9 +747,24 @@ p {
 }
 
 
+.offcanvas {
+  width: 80%; 
+  max-width: 1000px; 
+}
 
+.offcanvas-body {
+  overflow-y: auto;
+  padding: 20px;
+}
 
+.contract-preview {
+  font-size: 0.9rem; /* Slightly smaller font size to fit more content */
+}
 
-
+@media (max-width: 768px) {
+  .offcanvas {
+    width: 100%; /* Full width on smaller screens */
+  }
+}
 
 
