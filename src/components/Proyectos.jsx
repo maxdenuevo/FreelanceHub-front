@@ -64,7 +64,7 @@ function Proyectos() {
         method: 'DELETE',
       })
         .then(response => {
-          if (!response.ok) throw new Error('Error al eliminar el proyecto');
+          if (!response.ok) throw new Error('El proyecto aun tiene tareas y pagos asociados');
           return response.json();
         })
         .then(() => {

@@ -5,6 +5,7 @@ function Formularioregistro() {
   const [usuarioRut, setUsuarioRut] = useState('');
   const [usuarioEmail, setUsuarioEmail] = useState('');
   const [usuarioPassword, setUsuarioPassword] = useState('');
+  const [usuarioNombre, setUsuarioNombre] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
   const [registroExitoso, setRegistroExitoso] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState('');
@@ -21,6 +22,10 @@ function Formularioregistro() {
 
   function cambiarUsuarioPassword(e) {
     setUsuarioPassword(e.target.value);
+  }
+
+  function cambiarUsuarioNombre(e) {
+    setUsuarioNombre(e.target.value);
   }
 
   function aceptarTerminos(e) {
@@ -41,9 +46,10 @@ function Formularioregistro() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        usuario_rut: usuarioRut,
         usuario_email: usuarioEmail,
+        usuario_rut: usuarioRut,
         usuario_password: usuarioPassword,
+        usuario_nombre: usuarioNombre,
       })
     })
       .then(response => {
@@ -82,6 +88,10 @@ function Formularioregistro() {
       {registroExitoso && <div className="alert alert-success mt-3">¡Te has registrado correctamente! Redirigiendo al inicio de sesión...</div>}
       {errorMensaje && <div className="alert alert-danger mt-3">{errorMensaje}</div>}
       <div className="mb-3">
+        <label htmlFor="inputNombre" className="form-label">Nombre</label>
+        <input type="text" className="form-control" id="inputRUT" onChange={cambiarUsuarioNombre}/>
+      </div>
+      <div className="mb-3">
         <label htmlFor="inputRUT" className="form-label">RUT</label>
         <input type="text" className="form-control" id="inputRUT" onChange={cambiarUsuarioRut}/>
       </div>
@@ -103,7 +113,7 @@ function Formularioregistro() {
           Acepto los <a href="#" className="terms-link">términos y condiciones</a>
         </label>
       </div>
-      <button type="button" className="btn" onClick={registrarUsuario}>Registrar</button>
+      <button type="submit" className="btn" onClick={registrarUsuario}>Registrar</button>
     </form>
   );
 }

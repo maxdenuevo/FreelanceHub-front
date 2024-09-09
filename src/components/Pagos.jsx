@@ -129,6 +129,11 @@ function Pagos({ proyectoSeleccionado }) {
     setMostrarAgregarPago(true);
   };
 
+  const formatearFecha = (fecha) => {
+    const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(fecha).toLocaleDateString('es-ES', opciones);
+  };
+
   return (
     <div className="contenido-pagos mt-5">
       <h2>Pagos del Proyecto</h2>
@@ -155,7 +160,7 @@ function Pagos({ proyectoSeleccionado }) {
                     <td>{index + 1}</td>
                     <td>{tarea ? tarea.tarea_nombre : ''}</td>
                     <td>{pago && pago.pago_monto ? pago.pago_monto : ''}</td>
-                    <td>{pago && pago.pago_fecha ? pago.pago_fecha : ''}</td>
+                    <td>{pago && pago.pago_fecha ? formatearFecha(pago.pago_fecha) : ''}</td>
                     <td>{pago && pago.pago_completado ? 'Sí' : 'No'}</td>
                     <td>
                       {pago && pago.pago_comprobante ? (

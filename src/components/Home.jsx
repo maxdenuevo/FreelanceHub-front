@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Hello from '../images/Hello.png';
 
 function Home() {
+  const [usuarioNombre, setUsuarioNombre] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userId = localStorage.getItem('usuario_id');
+
+    if (userId) {
+      fetch(`https://api-freelancehub.vercel.app/get-usuario/${userId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error al obtener los datos del usuario.');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setUsuarioNombre(data.usuario.usuario_nombre);
+        })
+        .catch(error => {
+          console.error('Error al obtener el usuario:', error);
+        });
+    }
+  }, []);
 
   const irAProyectos = () => {
     navigate('/dashboardpage/proyectos');
@@ -17,7 +38,7 @@ function Home() {
     <div className="container py-5">
       <div className="row align-items-center mb-5">
         <div className="card-body-text col-md-6">
-          <h1 className='m-5'>¡Bienvenid@!</h1>
+          <h1 className='m-5'>¡Bienvenid@, {usuarioNombre}!</h1>
           <p className="m-5">
             En esta plataforma podrás gestionar tareas, pagos y contratos de tus proyectos de manera eficiente. Utiliza estas herramientas para mantener todo organizado y al día.
           </p>
@@ -40,7 +61,7 @@ function Home() {
             </div>
           </div>
         </div>
-        <div className="col-lg-4 col-md-6 mb-4 ">
+        <div className="col-lg-4 col-md-6 mb-4">
           <div className="card-home text-center p-3">
             <div className="card-body">
               <h3 className="card-title">Contratos</h3>

@@ -108,6 +108,11 @@ function Tareas({ proyectoSeleccionado }) {
     setMostrarAgregarTarea(true);
   };
 
+  const formatearFecha = (fecha) => {
+    const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(fecha).toLocaleDateString('es-ES', opciones);
+  };
+
   return (
     <div className="contenido-tareas mt-5">
       <h2>Tareas del Proyecto</h2>
@@ -131,7 +136,7 @@ function Tareas({ proyectoSeleccionado }) {
                 <tr key={tarea?.tarea_id || index}>
                   <td>{index + 1}</td>
                   <td>{tarea?.tarea_nombre || ''}</td>
-                  <td>{tarea?.tarea_fecha || ''}</td>
+                  <td>{tarea?.tarea_fecha ? formatearFecha(tarea.tarea_fecha) : ''}</td>
                   <td>{tarea?.tarea_descripcion || ''}</td>
                   <td>{tarea?.tarea_completada ? 'Sí' : 'No'}</td>
                   <td>{tarea?.tarea_necesita_pago ? 'Sí' : 'No'}</td>

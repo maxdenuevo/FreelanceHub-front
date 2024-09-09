@@ -29,6 +29,7 @@ function App() {
   const [codigo, setCodigo] = useState(null);
   const [codigoVerificado, setCodigoVerificado] = useState(false);
 
+
   return (
     <RecoveryContext.Provider value={{ email, setEmail, codigo, setCodigo, codigoVerificado, setCodigoVerificado }}>
     <Router>
@@ -37,12 +38,12 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/nuevocliente/nuevoproyecto" element={<Nuevoproyecto />} />
-        <Route path="/nuevocliente" element={<Nuevocliente />} />
         <Route path="/contactanos" element={<Contactanos />} />
         <Route path="/ingresarcorreo" element={<Ingresarcorreo />} />
         <Route path="/validarcodigo" element={<Validarcodigo />} />
         <Route path="/cambiarcontraseña" element={<Cambiarcontraseña />} />
+        <Route path="/nuevocliente/nuevoproyecto" element={<Nuevoproyecto />} />
+        <Route path="/nuevocliente" element={<Nuevocliente />} />
         <Route path="/dashboardpage" element={<Dashboardpage />}>
           <Route index element={<Dashhome />} />
           <Route path="/dashboardpage/proyectos" element={<Dashproyectos />} />
