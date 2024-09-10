@@ -464,12 +464,12 @@ const Contratos = () => {
                     required
                   />
                   <button 
-                    className="btn btn-outline-danger btn-sm" 
+                    className="btn btn-outline-danger btn-sm"
                     type="button"
                     onClick={() => removeEntregable(index)}
                     disabled={datosContrato.entregables.length === 1}
                   >
-                    Eliminar
+                    <i className="bi bi-trash"></i> Eliminar
                   </button>
                 </div>
               ))
@@ -491,7 +491,7 @@ const Contratos = () => {
               type="button"
               onClick={addEntregable}
             >
-              Agregar Entregable
+              <i className="bi bi-plus-circle"></i> Agregar Entregable
             </button>
           </div>
             <div className="mb-3">
@@ -513,10 +513,11 @@ const Contratos = () => {
         )}
       </div>
 
+
       {selectedProyecto && (
         <div className="mt-4">
           <button className="btn btn-primary btn-sm" onClick={() => setIsOffcanvasOpen(true)}>
-            Vista Previa y Exportar Contrato
+            <i className="bi bi-eye"></i> Vista Previa y Exportar Contrato
           </button>
         </div>
       )}
@@ -530,13 +531,13 @@ const Contratos = () => {
           <ContractPreview datosContrato={datosContrato} formatDate={formatDate} renderPlaceholder={renderPlaceholder} />
           <div className="mt-4">
             <button className="btn btn-primary btn-sm me-2" onClick={handleSaveContract}>
-              {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
+              <i className="bi bi-save"></i> {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
             </button>
             <PDFDownloadLink document={<ContractPDF datosContrato={datosContrato} />} fileName="contrato.pdf">
               {({ blob, url, loading, error }) =>
                 loading ? 'Cargando documento...' : (
                   <button className="btn btn-secondary btn-sm me-2">
-                    Exportar como PDF
+                    <i className="bi bi-file-earmark-pdf"></i> Exportar como PDF
                   </button>
                 )
               }
