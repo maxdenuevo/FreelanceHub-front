@@ -1,10 +1,36 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Modal from 'react-modal';
-import { jsPDF } from "jspdf";
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 
 const API_BASE_URL = 'https://api-freelancehub.vercel.app';
 
-Modal.setAppElement('#root');
+const styles = StyleSheet.create({
+  page: { padding: 30 },
+  title: { fontSize: 24, marginBottom: 10 },
+  section: { margin: 10, padding: 10 },
+  text: { fontSize: 12, marginBottom: 5 },
+});
+
+const ContractPDF = ({ datosContrato }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.title}>Contrato de prestación de servicios freelance</Text>
+      <View style={styles.section}>
+        <Text style={styles.text}>Freelance: {datosContrato.nombreFreelance}</Text>
+        <Text style={styles.text}>Cliente: {datosContrato.nombreCliente}</Text>
+        <Text style={styles.text}>Fecha de inicio: {datosContrato.fechaInicio}</Text>
+        <Text style={styles.text}>Servicios: {datosContrato.servicios}</Text>
+        <Text style={styles.text}>Precio: ${datosContrato.precio}</Text>
+        <Text style={styles.text}>Método de pago: {datosContrato.metodoPago}</Text>
+        <Text style={styles.text}>Fecha de pago final: {datosContrato.fechaPagoFinal}</Text>
+        <Text style={styles.text}>Entregables:</Text>
+        {datosContrato.entregables.map((entregable, index) => (
+          <Text key={index} style={styles.text}>- {entregable}</Text>
+        ))}
+        <Text style={styles.text}>Periodo de aviso: {datosContrato.periodoAviso}</Text>
+      </View>
+    </Page>
+  </Document>
+);
 
 const Contratos = () => {
   const [proyectos, setProyectos] = useState([]);
@@ -22,7 +48,7 @@ const Contratos = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const fetchProyectos = useCallback(async () => {
@@ -112,42 +138,14 @@ const Contratos = () => {
     }));
   }, []);
 
-
   const handleSaveContract = async () => {
     try {
-      // RUTA RUTA RUTA
-      // Max tienes que crear esta ruta en el backend
+      // Implement your save logic here
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSaveSuccess(true);
     } catch (error) {
       setError('Error al guardar el contrato: ' + error.message);
     }
-  };
-
-  const generatePDF = () => {
-    const doc = new jsPDF();
-    
-    doc.setFontSize(18);
-    doc.text('Contrato de prestación de servicios freelance', 10, 10);
-    
-    doc.setFontSize(12);
-    doc.text(`Freelance: ${datosContrato.nombreFreelance}`, 10, 30);
-    doc.text(`Cliente: ${datosContrato.nombreCliente}`, 10, 40);
-    doc.text(`Fecha de inicio: ${formatDate(datosContrato.fechaInicio)}`, 10, 50);
-    doc.text(`Servicios: ${datosContrato.servicios}`, 10, 60);
-    doc.text(`Precio: $${datosContrato.precio}`, 10, 70);
-    doc.text(`Método de pago: ${datosContrato.metodoPago}`, 10, 80);
-    doc.text(`Fecha de pago final: ${formatDate(datosContrato.fechaPagoFinal)}`, 10, 90);
-    
-    doc.text('Entregables:', 10, 100);
-    datosContrato.entregables.forEach((entregable, index) => {
-      doc.text(`- ${entregable}`, 15, 110 + (index * 10));
-    });
-    
-    doc.text(`Periodo de aviso: ${datosContrato.periodoAviso}`, 10, 120 + (datosContrato.entregables.length * 10));
-
-    // Save the PDF
-    doc.save('contrato.pdf');
   };
 
   const formatDate = useCallback((dateString) => {
@@ -486,34 +484,35 @@ const Contratos = () => {
 
 {selectedProyecto && (
         <div className="mt-4">
-          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+          <button className="btn btn-primary btn-sm" onClick={() => setIsOffcanvasOpen(true)}>
             Vista Previa y Exportar Contrato
           </button>
         </div>
       )}
 
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
-        contentLabel="Vista Previa del Contrato"
-        className="modal-content"
-        overlayClassName="modal-overlay"
-      >
-        <div className="modal-scroll">
+      <div className={`offcanvas offcanvas-end ${isOffcanvasOpen ? 'show' : ''}`} tabIndex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div className="offcanvas-header">
+          <h5 id="offcanvasRightLabel">Vista Previa del Contrato</h5>
+          <button type="button" className="btn-close text-reset" onClick={() => setIsOffcanvasOpen(false)} aria-label="Close"></button>
+        </div>
+        <div className="offcanvas-body">
           <ContractPreview />
-          <div className="modal-actions mt-4">
-            <button className="btn btn-primary me-2" onClick={handleSaveContract}>
+          <div className="mt-4">
+            <button className="btn btn-primary btn-sm me-2" onClick={handleSaveContract}>
               {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
             </button>
-            <button className="btn btn-secondary me-2" onClick={generatePDF}>
-              Exportar como PDF
-            </button>
-            <button className="btn btn-outline-secondary" onClick={() => setIsModalOpen(false)}>
-              Cerrar
-            </button>
+            <PDFDownloadLink document={<ContractPDF datosContrato={datosContrato} />} fileName="contrato.pdf">
+              {({ blob, url, loading, error }) =>
+                loading ? 'Cargando documento...' : (
+                  <button className="btn btn-secondary btn-sm me-2">
+                    Exportar como PDF
+                  </button>
+                )
+              }
+            </PDFDownloadLink>
           </div>
         </div>
-      </Modal>
+      </div>
     </div>
   );
 };
