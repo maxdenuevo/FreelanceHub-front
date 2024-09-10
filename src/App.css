@@ -924,9 +924,43 @@ p {
   }
 }
 
+/* Offcanvas */
+.offcanvas {
+  max-width: 100vw;
+}
 
+@media (min-width: 576px) {
+  .offcanvas {
+    width: 75vw;
+  }
+}
 
+@media (min-width: 992px) {
+  .offcanvas {
+    width: 60vw;
+  }
+}
 
+@media (min-width: 1200px) {
+  .offcanvas {
+    width: 50vw;
+  }
+}
+
+.offcanvas-content {
+  max-height: calc(100vh - 56px); 
+  overflow-y: auto;
+}
+
+.contract-preview {
+  font-size: 0.9rem;
+}
+
+@media (min-width: 768px) {
+  .contract-preview {
+    font-size: 1rem;
+  }
+}
 
 
 
