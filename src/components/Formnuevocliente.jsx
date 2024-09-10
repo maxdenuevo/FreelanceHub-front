@@ -112,7 +112,7 @@ function Formnuevocliente() {
               <input type="text" className="form-control" id="nombreCliente" value={nombreCliente} onChange={agregarNombreCliente} required />
             </div>
             <div className="mb-3">
-              <label htmlFor="rutCliente" className="form-label">Rut</label>
+              <label htmlFor="rutCliente" className="form-label">RUT</label>
               <input type="text" className="form-control" id="rutCliente" value={rutCliente} onChange={agregarRutCliente} required />
             </div>
             <div className="mb-3">
