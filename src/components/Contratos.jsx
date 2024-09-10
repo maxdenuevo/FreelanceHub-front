@@ -3,7 +3,6 @@ import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-
 
 const API_BASE_URL = 'https://api-freelancehub.vercel.app';
 
-// Define styles for PDF
 const styles = StyleSheet.create({
   page: { padding: 30, fontSize: 12 },
   title: { fontSize: 18, marginBottom: 20, textAlign: 'center' },
@@ -13,7 +12,6 @@ const styles = StyleSheet.create({
   signature: { marginTop: 50, borderTop: 1, paddingTop: 10 },
 });
 
-// PDF Document Component
 const ContractPDF = ({ datosContrato }) => (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -189,7 +187,7 @@ const Contratos = () => {
         servicios: selectedProyecto.proyecto_descripcion || '',
         precio: selectedProyecto.proyecto_presupuesto || '',
         fechaPagoFinal: selectedProyecto.proyecto_termino || '',
-        entregables: tareasData.tareas_with_pagos.map(tarea => tarea.tarea_nombre) || [],
+        entregables: tareasData.tareas_with_pagos?.map(tarea => tarea.tarea_nombre) || [],
       }));
     } catch (error) {
       setError('Error al obtener detalles del proyecto: ' + error.message);
@@ -283,10 +281,15 @@ const Contratos = () => {
       continuación:</p>
 
       <ul>
-        {datosContrato.entregables.map((entregable, index) => (
-          <li key={index}>{renderPlaceholder(entregable)}</li>
-        ))}
+        {datosContrato.entregables.length > 0 ? (
+          datosContrato.entregables.map((entregable, index) => (
+            <li key={index}>{renderPlaceholder(entregable)}</li>
+          ))
+        ) : (
+          <li>{renderPlaceholder('')}</li>
+        )}
       </ul>
+
 
       <h4>CUARTA.- DURACIÓN O PLAZO:</h4>
       <p>El CONTRATISTA se compromete a prestar los servicios hasta que el
@@ -448,8 +451,9 @@ const Contratos = () => {
               </div>
             </div>
             <div className="mb-3">
-              <label className="form-label">Entregables:</label>
-              {datosContrato.entregables.map((entregable, index) => (
+            <label className="form-label">Entregables:</label>
+            {datosContrato.entregables.length > 0 ? (
+              datosContrato.entregables.map((entregable, index) => (
                 <div key={index} className="input-group mb-2">
                   <input
                     type="text"
@@ -460,23 +464,36 @@ const Contratos = () => {
                     required
                   />
                   <button 
-                    className="btn btn-outline-danger btn-sm" 
+                    className="btn btn-outline-danger btn-sm"
                     type="button"
                     onClick={() => removeEntregable(index)}
                     disabled={datosContrato.entregables.length === 1}
                   >
-                    Eliminar
+                    <i className="bi bi-trash"></i> Eliminar
                   </button>
                 </div>
-              ))}
-              <button 
-                className="btn btn-outline-primary btn-sm mt-2" 
-                type="button"
-                onClick={addEntregable}
-              >
-                Agregar Entregable
-              </button>
-            </div>
+              ))
+            ) : (
+              <div className="input-group mb-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="entregables"
+                  value=""
+                  onChange={(e) => handleInputChange(e, 0)}
+                  placeholder="Agregar entregable"
+                  required
+                />
+              </div>
+            )}
+            <button 
+              className="btn btn-outline-primary btn-sm mt-2" 
+              type="button"
+              onClick={addEntregable}
+            >
+              <i className="bi bi-plus-circle"></i> Agregar Entregable
+            </button>
+          </div>
             <div className="mb-3">
               <label className="form-label">Periodo de Aviso:</label>
               <select
@@ -496,10 +513,11 @@ const Contratos = () => {
         )}
       </div>
 
+
       {selectedProyecto && (
         <div className="mt-4">
           <button className="btn btn-primary btn-sm" onClick={() => setIsOffcanvasOpen(true)}>
-            Vista Previa y Exportar Contrato
+            <i className="bi bi-eye"></i> Vista Previa y Exportar Contrato
           </button>
         </div>
       )}
@@ -513,13 +531,13 @@ const Contratos = () => {
           <ContractPreview datosContrato={datosContrato} formatDate={formatDate} renderPlaceholder={renderPlaceholder} />
           <div className="mt-4">
             <button className="btn btn-primary btn-sm me-2" onClick={handleSaveContract}>
-              {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
+              <i className="bi bi-save"></i> {saveSuccess ? 'Contrato Guardado' : 'Guardar Contrato'}
             </button>
             <PDFDownloadLink document={<ContractPDF datosContrato={datosContrato} />} fileName="contrato.pdf">
               {({ blob, url, loading, error }) =>
                 loading ? 'Cargando documento...' : (
                   <button className="btn btn-secondary btn-sm me-2">
-                    Exportar como PDF
+                    <i className="bi bi-file-earmark-pdf"></i> Exportar como PDF
                   </button>
                 )
               }
