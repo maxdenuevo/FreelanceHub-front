@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 
 function Formularioinicio() {
-
   const [usuarioEmail, setUsuarioEmail] = useState('');
   const [usuarioPassword, setUsuarioPassword] = useState('');
   const [inicioExitoso, setInicioExitoso] = useState('');
@@ -11,19 +10,20 @@ function Formularioinicio() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const irACorreo = () => {
+  const irACorreo = (e) => {
+    e.preventDefault();
     navigate('/ingresarcorreo');
   };
 
-  function cambiarUsuarioEmail(e){
+  function cambiarUsuarioEmail(e) {
     setUsuarioEmail(e.target.value);
   }
 
-  function cambiarUsuarioPassword(e){
+  function cambiarUsuarioPassword(e) {
     setUsuarioPassword(e.target.value);
   }
 
-  function ingresarUsuario(e){
+  function ingresarUsuario(e) {
     e.preventDefault();
     setErrorMensaje('');
     setInicioExitoso('');
@@ -59,33 +59,41 @@ function Formularioinicio() {
       .catch(error => {
         console.log(error);
         setErrorMensaje('No se pudo iniciar sesión. Verifica tus datos e intenta de nuevo.');
-      })
+      });
   }
 
   return (
-    <form className='formulario mt-5 mb-5'>
-        <h2 className="form-title">Inicio de Sesión</h2>
-        {location.state?.message && (
-        <div className="alert alert-success" role="alert">
-          {location.state.message}
+    <div className="container">
+      <div className="row justify-content-center">
+        <div className="col-12 col-sm-10 col-md-8 col-lg-6">
+          <form className='formulario mt-5 mb-5 p-4 bg-white rounded shadow'>
+            <h2 className="form-title text-center mb-4">Inicio de Sesión</h2>
+            {location.state?.message && (
+              <div className="alert alert-success" role="alert">
+                {location.state.message}
+              </div>
+            )}
+            {inicioExitoso && <div className="alert alert-success">{inicioExitoso}</div>}
+            {errorMensaje && <div className="alert alert-danger">{errorMensaje}</div>}
+            <div className="mb-3">
+              <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
+              <input onChange={cambiarUsuarioEmail} type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required />
+              <div id="emailHelp" className="form-text">Nunca compartiremos tu email con nadie.</div>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="exampleInputPassword1" className="form-label">Contraseña</label>
+              <input onChange={cambiarUsuarioPassword} type="password" className="form-control" id="exampleInputPassword1" required />
+            </div>
+            <div className="mb-3">
+              <a href="#" className="forgot-password-link" onClick={irACorreo}>¿Olvidaste tu contraseña?</a>
+            </div>
+            <div className="d-grid">
+              <button type="submit" onClick={ingresarUsuario} className="btn btn-primary">Ingresar</button>
+            </div>
+          </form>
         </div>
-      )}
-      {inicioExitoso && <div className="alert alert-success">{inicioExitoso}</div>}
-      {errorMensaje && <div className="alert alert-danger">{errorMensaje}</div>}
-        <div className="mb-3">
-            <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
-            <input onChange={cambiarUsuarioEmail} type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required></input>
-            <div id="emailHelp" className="form-text">Nunca compartiremos tu email con nadie.</div>
-        </div>
-        <div className="mb-3">
-            <label htmlFor="exampleInputPassword1" className="form-label">Contraseña</label>
-            <input onChange={cambiarUsuarioPassword} type="password" className="form-control" id="exampleInputPassword1" required></input>
-        </div>
-        <div className="mb-3">
-            <a href="" className="forgot-password-link" onClick={irACorreo}>¿olvidaste tu contraseña?</a>
-        </div>
-        <button type="submit" onClick={ingresarUsuario} className="btn" required>Ingresar</button>
-    </form>
+      </div>
+    </div>
   );
 }
 
