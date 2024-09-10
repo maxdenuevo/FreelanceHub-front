@@ -3,12 +3,26 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const TerminosYCondiciones = () => {
   return (
+<<<<<<< HEAD
     <div>
               <h1 className="text-center mb-4" style={{ color: '#138086' }}>Términos y Condiciones de FreelanceHub</h1>
+=======
+    <Container className="mt-5 mb-5">
+      <Row className="justify-content-center">
+        <Col md={10}>
+          <Card className="shadow-sm">
+            <Card.Body>
+              <h1 className="text-center mb-4" style={{ color: '#138086' }}>Términos y Condiciones de FreelanceHub</h1>
+              
+>>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
               <section>
                 <h2 className="h4 mb-3" style={{ color: '#138086', borderBottom: '2px solid #DC8665', paddingBottom: '0.5rem' }}>1. Introducción</h2>
                 <p>Bienvenido a FreelanceHub. Estos Términos y Condiciones rigen el uso de nuestra aplicación web diseñada para ayudar a freelancers a gestionar sus proyectos, contratos y pagos. Al acceder o utilizar FreelanceHub, usted acepta estar sujeto a estos términos. Si no está de acuerdo con alguna parte de los términos, no podrá utilizar nuestros servicios.</p>
               </section>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
               <section className="mt-4">
                 <h2 className="h4 mb-3" style={{ color: '#138086', borderBottom: '2px solid #DC8665', paddingBottom: '0.5rem' }}>2. Definiciones</h2>
                 <ul>
@@ -88,8 +102,18 @@ const TerminosYCondiciones = () => {
                 <h2 className="h4 mb-3" style={{ color: '#138086', borderBottom: '2px solid #DC8665', paddingBottom: '0.5rem' }}>11. Contacto</h2>
                 <p>Si tiene alguna pregunta sobre estos Términos, por favor contáctenos a <a href="mailto:contact@freelancehub.com" className="text-decoration-none" style={{ color: '#DC8665' }}>contact@freelancehub.com</a>.</p>
               </section>
+<<<<<<< HEAD
               <p className="mt-5 text-muted text-center">Última actualización: 10 de septiembre, 2024</p>
               </div>
+=======
+
+              <p className="mt-5 text-muted text-center">Última actualización: 10 de septiembre, 2024</p>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+>>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
   );
 };
 

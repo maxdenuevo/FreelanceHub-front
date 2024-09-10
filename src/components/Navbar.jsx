@@ -33,7 +33,11 @@ function Navbar() {
     <nav id="navprincipal" className="navbar navbar-expand-lg">
     <div className="container-fluid d-flex">
     <img id='logo-nav' src={Logo2} alt="" />
+<<<<<<< HEAD
     <button title='Al Dashboard' className="nav-link text-light" onClick={irAPortal}>FreelanceHub</button>
+=======
+    <button className="nav-link text-light" onClick={irAPortal}>FreelanceHub</button>
+>>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
     <div className="collapse navbar-collapse d-none d-lg-flex" id="navbarNavAltMarkup">
       <div className="navbar-nav ms-auto text-end">
         <button className="nav-link active text-light" aria-current="page" onClick={irAInicio}>Home</button>
