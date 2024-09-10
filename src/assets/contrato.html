@@ -1,0 +1,104 @@
+const generarContratoHTML = () => { const html = `
+<h2>Contrato de prestación de servicios freelance</h2>
+<p>
+  <strong>${datosContrato.nombreFreelance}</strong> (en adelante "CONTRATISTA")
+  se obliga para con <strong>${datosContrato.nombreCliente}</strong> (en
+  adelante "CONTRATANTE") a ejecutar los trabajos y actividades propias del
+  servicio contratado, el cual se debe realizar de acuerdo a las condiciones y
+  cláusulas del presente documento y que se detallan a continuación. Ambas
+  partes acuerdan celebrar el presente CONTRATO DE PRESTACIÓN DE SERVICIOS
+  FREELANCE, a ${datosContrato.fechaInicio}.
+</p>
+
+<h3>PRIMERA.- OBJETO:</h3>
+<p>
+  El CONTRATISTA realizará ${datosContrato.servicios}, sin que exista relación
+  de dependencia, ni horario determinado.
+</p>
+
+<h3>SEGUNDA.- PRECIO:</h3>
+<p>
+  El CONTRATANTE pagará la suma de ${datosContrato.precio} al CONTRATISTA a
+  través de ${datosContrato.metodoPago} según lo acordado por ambas partes, a
+  más tardar ${datosContrato.fechaPagoFinal} del cronograma de pagos acordado,
+  por el trabajo entregado y aceptado por el Cliente.
+</p>
+
+<h3>TERCERO.- FORMA DE PAGO:</h3>
+<p>
+  El valor del contrato se pagará por ${datosContrato.metodoPago} a más tardar
+  el ${datosContrato.fechaPagoFinal} de acuerdo al cronograma de entregas y
+  pagos acordado y aceptado por el CONTRATANTE detallado a continuación:
+</p>
+<ul>
+  ${datosContrato.entregables.map((entregable, index) => `
+  <li>${entregable}</li>
+  `).join('')}
+</ul>
+
+<h3>CUARTA.- DURACIÓN O PLAZO:</h3>
+<p>
+  El CONTRATISTA se compromete a prestar los servicios hasta que el contrato
+  haya finalizado en la fecha acordada.
+</p>
+
+<h3>QUINTA.- OBLIGACIONES:</h3>
+<p>
+  El CONTRATANTE deberá facilitar acceso a la información y elementos que sean
+  necesarios, de manera oportuna, para la debida ejecución del objeto del
+  contrato, y, estará obligado a cumplir con lo estipulado en las demás
+  cláusulas y condiciones previstas en este documento. El CONTRATISTA deberá
+  cumplir en forma eficiente y oportuna los trabajos encomendados y aquellas
+  obligaciones que se generen de acuerdo con la naturaleza del servicio. El
+  CONTRATISTA declara que no puede garantizar que el trabajo terminado estará
+  completamente libre de errores, por lo que no puede ser responsable ante el
+  CONTRATANTE o TERCEROS por daños, incluyendo pérdida de beneficios u otros
+  daños incidentales, consecuentes o especiales, incluso con asesoramiento
+  previo. El CONTRATANTE supervisará la ejecución del servicio encomendado, y
+  podrá formular las observaciones del caso, para ser analizadas conjuntamente
+  con El CONTRATISTA.
+</p>
+
+<h3>SEXTA.- TERMINACIÓN</h3>
+<p>
+  Este acuerdo puede ser terminado con un aviso por escrito de
+  ${datosContrato.periodoAviso} días por cualquiera de las partes.
+</p>
+
+<h3>SEPTIMA.-INDEPENDENCIA:</h3>
+<p>
+  El CONTRATISTA actuará por su cuenta, con autonomía y sin que exista relación
+  laboral, ni subordinación con El CONTRATANTE. Sus derechos se limitarán por la
+  naturaleza del contrato, a exigir el cumplimiento de las obligaciones del
+  CONTRATANTE y el pago oportuno de su remuneración fijada en este documento.
+</p>
+
+<h3>OCTAVA.- DERECHOS</h3>
+<p>
+  El CONTRATANTE será propietario de los derechos de autor de todo el material
+  creado bajo este acuerdo una vez se haya completado el pago íntegro. El
+  CONTRATISTA puede exhibir obras de muestra de este proyecto como piezas de su
+  portafolio sólo con el consentimiento y la aprobación del CONTRATANTE.
+</p>
+
+<div style="display: flex; justify-content: space-between; margin-top: 50px">
+  <div>
+    <p>
+      <strong
+        >El CONTRATANTE acepta los términos mencionados anteriormente:</strong
+      >
+    </p>
+    <p>${datosContrato.nombreCliente}</p>
+    <p>Fecha: ____________________</p>
+  </div>
+  <div>
+    <p>
+      <strong
+        >El CONTRATISTA acepta los términos mencionados anteriormente:</strong
+      >
+    </p>
+    <p>${datosContrato.nombreFreelance}</p>
+    <p>Fecha: ____________________</p>
+  </div>
+</div>
+`; }
