@@ -38,7 +38,7 @@ function Navbar() {
       <div className="navbar-nav ms-auto text-end">
         <button className="nav-link active text-light" aria-current="page" onClick={irAInicio}>Inicio</button>
         <button className="nav-link text-light" onClick={irARegistro}>Registrarse</button>
-        <button className="nav-link text-light" onClick={irAInicioSesion}>Iniciar sesion</button>
+        <button className="nav-link text-light" onClick={irAInicioSesion}>Login</button>
       </div>
     </div>
     <div className="dropdown d-lg-none ms-auto">
