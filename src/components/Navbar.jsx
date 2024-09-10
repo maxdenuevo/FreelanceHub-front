@@ -5,8 +5,6 @@ import Menu from '../images/Menu.png'
 import Logo2 from '../images/Logo2.png'
 
 
-
-
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
