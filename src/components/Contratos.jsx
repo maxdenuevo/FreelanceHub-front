@@ -17,14 +17,13 @@ const Contratos = () => {
     precio: '',
     metodoPago: 'Transferencia Electrónica',
     fechaPagoFinal: '',
-    entregables: [''],
+    entregables: [],
     periodoAviso: '30 días',
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
 
   const fetchProyectos = useCallback(async () => {
     try {
@@ -46,26 +45,29 @@ const Contratos = () => {
 
   const fetchProyectoDetails = useCallback(async (proyectoId) => {
     try {
-      const [clienteResponse, usuarioResponse] = await Promise.all([
+      const [clienteResponse, usuarioResponse, tareasResponse] = await Promise.all([
         fetch(`${API_BASE_URL}/cliente/${selectedProyecto.cliente_id}`),
-        fetch(`${API_BASE_URL}/get-usuario/${selectedProyecto.usuario_id}`)
+        fetch(`${API_BASE_URL}/get-usuario/${selectedProyecto.usuario_id}`),
+        fetch(`${API_BASE_URL}/tareas-with-pagos/${proyectoId}`)
       ]);
 
-      if (!clienteResponse.ok || !usuarioResponse.ok) {
+      if (!clienteResponse.ok || !usuarioResponse.ok || !tareasResponse.ok) {
         throw new Error('Error al obtener detalles del proyecto');
       }
 
       const clienteData = await clienteResponse.json();
       const usuarioData = await usuarioResponse.json();
+      const tareasData = await tareasResponse.json();
 
       setDatosContrato(prevDatos => ({
         ...prevDatos,
-        nombreFreelance: usuarioData.usuario?.usuario_email || '',
+        nombreFreelance: usuarioData.usuario?.usuario_nombre || '',
         nombreCliente: clienteData.cliente?.cliente_nombre || '',
         fechaInicio: selectedProyecto.proyecto_inicio || '',
         servicios: selectedProyecto.proyecto_descripcion || '',
         precio: selectedProyecto.proyecto_presupuesto || '',
         fechaPagoFinal: selectedProyecto.proyecto_termino || '',
+        entregables: tareasData.tareas_with_pagos.map(tarea => tarea.tarea_nombre) || [],
       }));
     } catch (error) {
       setError('Error al obtener detalles del proyecto: ' + error.message);
@@ -351,35 +353,35 @@ const Contratos = () => {
               </div>
             </div>
             <div className="mb-3">
-              <label className="form-label">Entregables:</label>
-              {datosContrato.entregables.map((entregable, index) => (
-                <div key={index} className="input-group mb-2">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="entregables"
-                    value={entregable}
-                    onChange={(e) => handleInputChange(e, index)}
-                    required
-                  />
-                  <button 
-                    className="btn btn-outline-danger" 
-                    type="button"
-                    onClick={() => removeEntregable(index)}
-                    disabled={datosContrato.entregables.length === 1}
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              ))}
-              <button 
-                className="btn btn-outline-primary mt-2" 
-                type="button"
-                onClick={addEntregable}
-              >
-                Agregar Entregable
-              </button>
-            </div>
+            <label className="form-label">Entregables:</label>
+            {datosContrato.entregables.map((entregable, index) => (
+              <div key={index} className="input-group mb-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="entregables"
+                  value={entregable}
+                  onChange={(e) => handleInputChange(e, index)}
+                  required
+                />
+                <button 
+                  className="btn btn-outline-danger btn-sm" 
+                  type="button"
+                  onClick={() => removeEntregable(index)}
+                  disabled={datosContrato.entregables.length === 1}
+                >
+                  Eliminar
+                </button>
+              </div>
+            ))}
+            <button 
+              className="btn btn-outline-primary btn-sm mt-2" 
+              type="button"
+              onClick={addEntregable}
+            >
+              Agregar Entregable
+            </button>
+          </div>
             <div className="mb-3">
               <label className="form-label">Periodo de Aviso:</label>
               <select
@@ -481,6 +483,7 @@ const Contratos = () => {
         </div>
       )}
 
+
 {selectedProyecto && (
         <div className="mt-4">
           <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
@@ -514,6 +517,5 @@ const Contratos = () => {
     </div>
   );
 };
-
 
 export default Contratos;
