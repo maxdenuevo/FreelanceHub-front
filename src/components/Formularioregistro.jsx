@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
 import TerminosYCondiciones from './TerminosYCondiciones'
-=======
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
 
 function Formularioregistro() {
   const [usuarioRut, setUsuarioRut] = useState('');
@@ -14,10 +11,7 @@ function Formularioregistro() {
   const [registroExitoso, setRegistroExitoso] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState('');
   const [terminosAceptados, setTerminosAceptados] = useState(false);
-<<<<<<< HEAD
   const [mostrarModal, setMostrarModal] = useState(false);
-=======
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
   const navigate = useNavigate();
 
   function cambiarUsuarioRut(e) {
@@ -97,11 +91,7 @@ function Formularioregistro() {
       {errorMensaje && <div className="alert alert-danger mt-3">{errorMensaje}</div>}
       <div className="mb-3">
         <label htmlFor="inputNombre" className="form-label">Nombre</label>
-<<<<<<< HEAD
-        <input type="text" className="form-control" id="inputNombre" onChange={cambiarUsuarioNombre}/>
-=======
-        <input type="text" className="form-control" id="inputRUT" onChange={cambiarUsuarioNombre}/>
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
+        <input type="text" className="form-control" id="inputNombre" onChange={cambiarUsuarioNombre}/>     
       </div>
       <div className="mb-3">
         <label htmlFor="inputRUT" className="form-label">RUT</label>
@@ -122,7 +112,6 @@ function Formularioregistro() {
       <div className="mb-3 form-check">
         <input type="checkbox" className="form-check-input" id="termsCheck" onChange={aceptarTerminos}/>
         <label className="form-check-label" htmlFor="termsCheck">
-<<<<<<< HEAD
           Acepto los <a href="#" className="terms-link" onClick={() => setMostrarModal(true)}>términos y condiciones</a>
         </label>
       </div>
@@ -141,12 +130,6 @@ function Formularioregistro() {
           </div>
         </div>
       )}
-=======
-          Acepto los <a href="#" className="terms-link">términos y condiciones</a>
-        </label>
-      </div>
-      <button type="submit" className="btn" onClick={registrarUsuario}>Registrar</button>
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
     </form>
   );
 }

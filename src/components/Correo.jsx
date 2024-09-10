@@ -6,18 +6,12 @@ const Correo = () => {
   const { setEmail, setCodigo } = useContext(RecoveryContext);
   const [correo, setCorreo] = useState('');
   const [mensajeError, setMensajeError] = useState('');
-<<<<<<< HEAD
   const [mensajeExito, setMensajeExito] = useState('');
-=======
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
   const navigate = useNavigate();
 
   const enviarCodigo = () => {
     setMensajeError('');
-<<<<<<< HEAD
     setMensajeExito('');
-=======
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
 
     if (!correo) {
       setMensajeError('Por favor ingresa tu correo electrónico');
@@ -31,7 +25,6 @@ const Correo = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-<<<<<<< HEAD
         subject: 'Codigo de verificacion para FreelanceHub',
         recipients: [correo],
         body: 
@@ -47,11 +40,6 @@ const Correo = () => {
         
         freelancehub.cl
         [contacto@freelancehub.cl]`
-=======
-        subject: 'Recuperación de Contraseña',
-        recipients: [correo],
-        body: `Tu código de recuperación es: ${codigo}`
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
       })
     })
       .then(response => {
@@ -62,12 +50,8 @@ const Correo = () => {
       })
       .then(() => {
         setEmail(correo);
-<<<<<<< HEAD
         setMensajeExito('El código de verificación ha sido enviado a tu correo electrónico.');
         setTimeout(() => navigate('/validarcodigo'), 2000);
-=======
-        navigate('/validarcodigo');
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
       })
       .catch((error) => {
         console.error('Error al enviar el código:', error);
@@ -79,12 +63,9 @@ const Correo = () => {
     <div id='correo-form' className="container p-5">
       <h2>Cambiar Contraseña</h2>
       {mensajeError && <div className="alert alert-danger" role="alert">{mensajeError}</div>}
-<<<<<<< HEAD
       {mensajeExito && <div className="alert alert-success" role="alert">{mensajeExito}</div>}
       <div className='mt-4'></div>
       {mensajeError && <div className="alert alert-danger" role="alert">{mensajeError}</div>}
-=======
->>>>>>> d26d8f1b86e135260d40de86611d713ea9d113ef
       <div className='mt-4'>
         <label htmlFor="correo" className="form-label">Correo electrónico</label>
         <input type="email" className="form-control" id="correo" value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="Ingresa tu correo"/>
