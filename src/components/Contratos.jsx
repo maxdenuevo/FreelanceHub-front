@@ -1,34 +1,129 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 
 const API_BASE_URL = 'https://api-freelancehub.vercel.app';
 
 const styles = StyleSheet.create({
-  page: { padding: 30 },
-  title: { fontSize: 24, marginBottom: 10 },
+  page: { padding: 30, fontSize: 12 },
+  title: { fontSize: 18, marginBottom: 20, textAlign: 'center' },
   section: { margin: 10, padding: 10 },
-  text: { fontSize: 12, marginBottom: 5 },
+  heading: { fontSize: 14, marginBottom: 10, fontWeight: 'bold' },
+  text: { marginBottom: 5 },
+  signature: { marginTop: 50, borderTop: 1, paddingTop: 10 },
 });
 
 const ContractPDF = ({ datosContrato }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+
       <Text style={styles.title}>Contrato de prestación de servicios freelance</Text>
+      
       <View style={styles.section}>
-        <Text style={styles.text}>Freelance: {datosContrato.nombreFreelance}</Text>
-        <Text style={styles.text}>Cliente: {datosContrato.nombreCliente}</Text>
-        <Text style={styles.text}>Fecha de inicio: {datosContrato.fechaInicio}</Text>
-        <Text style={styles.text}>Servicios: {datosContrato.servicios}</Text>
-        <Text style={styles.text}>Precio: ${datosContrato.precio}</Text>
-        <Text style={styles.text}>Método de pago: {datosContrato.metodoPago}</Text>
-        <Text style={styles.text}>Fecha de pago final: {datosContrato.fechaPagoFinal}</Text>
-        <Text style={styles.text}>Entregables:</Text>
-        {datosContrato.entregables.map((entregable, index) => (
-          <Text key={index} style={styles.text}>- {entregable}</Text>
-        ))}
-        <Text style={styles.text}>Periodo de aviso: {datosContrato.periodoAviso}</Text>
+        <Text style={styles.text}>
+          <Text style={styles.heading}>{datosContrato.nombreFreelance}</Text> (en adelante "CONTRATISTA") se
+          obliga para con <Text style={styles.heading}>{datosContrato.nombreCliente}</Text> (en adelante
+          "CONTRATANTE") a ejecutar los trabajos y actividades propias del
+          servicio contratado, el cual se debe realizar de acuerdo a las
+          condiciones y cláusulas del presente documento y que se detallan a
+          continuación. Ambas partes acuerdan celebrar el presente CONTRATO DE
+          PRESTACIÓN DE SERVICIOS FREELANCE, a {datosContrato.fechaInicio}.
+        </Text>
       </View>
-    </Page>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>PRIMERA.- OBJETO:</Text>
+        <Text style={styles.text}>
+          El CONTRATISTA realizará {datosContrato.servicios}, sin que exista
+          relación de dependencia, ni horario determinado.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>SEGUNDA.- PRECIO:</Text>
+        <Text style={styles.text}>
+          El CONTRATANTE pagará la suma de ${datosContrato.precio} al CONTRATISTA
+          a través de {datosContrato.metodoPago} según lo acordado por ambas
+          partes, a más tardar {datosContrato.fechaPagoFinal} del cronograma de
+          pagos acordado, por el trabajo entregado y aceptado por el Cliente.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>TERCERO.- FORMA DE PAGO:</Text>
+        <Text style={styles.text}>
+          El valor del contrato se pagará por {datosContrato.metodoPago} a más
+          tardar el {datosContrato.fechaPagoFinal} de acuerdo al cronograma de
+          entregas y pagos acordado y aceptado por el CONTRATANTE detallado a
+          continuación:
+        </Text>
+        {datosContrato.entregables.map((entregable, index) => (
+          <Text key={index} style={styles.text}>• {entregable}</Text>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>CUARTA.- DURACIÓN O PLAZO:</Text>
+        <Text style={styles.text}>
+          El CONTRATISTA se compromete a prestar los servicios hasta que el
+          contrato haya finalizado en la fecha acordada ({datosContrato.fechaPagoFinal}).
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>QUINTA.- OBLIGACIONES:</Text>
+        <Text style={styles.text}>
+          El CONTRATANTE deberá facilitar acceso a la información y elementos que
+          sean necesarios, de manera oportuna, para la debida ejecución del objeto
+          del contrato, y, estará obligado a cumplir con lo estipulado en las
+          demás cláusulas y condiciones previstas en este documento. El
+          CONTRATISTA deberá cumplir en forma eficiente y oportuna los trabajos
+          encomendados y aquellas obligaciones que se generen de acuerdo con la
+          naturaleza del servicio.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>SEXTA.- TERMINACIÓN</Text>
+        <Text style={styles.text}>
+          Este acuerdo puede ser terminado con un aviso por escrito de
+          {datosContrato.periodoAviso} por cualquiera de las partes.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>SEPTIMA.-INDEPENDENCIA:</Text>
+        <Text style={styles.text}>
+          El CONTRATISTA actuará por su cuenta, con autonomía y sin que exista
+          relación laboral, ni subordinación con El CONTRATANTE. Sus derechos se
+          limitarán por la naturaleza del contrato, a exigir el cumplimiento de
+          las obligaciones del CONTRATANTE y el pago oportuno de su remuneración
+          fijada en este documento.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.heading}>OCTAVA.- DERECHOS</Text>
+        <Text style={styles.text}>
+          El CONTRATANTE será propietario de los derechos de autor de todo el
+          material creado bajo este acuerdo una vez se haya completado el pago
+          íntegro. El CONTRATISTA puede exhibir obras de muestra de este proyecto
+          como piezas de su portafolio sólo con el consentimiento y la aprobación
+          del CONTRATANTE.
+        </Text>
+      </View>
+
+      <View style={styles.signature}>
+        <Text style={styles.text}>El CONTRATANTE acepta los términos mencionados anteriormente:</Text>
+        <Text style={styles.text}>{datosContrato.nombreCliente}</Text>
+        <Text style={styles.text}>Fecha: ____________________</Text>
+      </View>
+
+      <View style={styles.signature}>
+        <Text style={styles.text}>El CONTRATISTA acepta los términos mencionados anteriormente:</Text>
+        <Text style={styles.text}>{datosContrato.nombreFreelance}</Text>
+        <Text style={styles.text}>Fecha: ____________________</Text>
+      </View>
+      </Page>
   </Document>
 );
 
@@ -148,98 +243,6 @@ const Contratos = () => {
     }
   };
 
-  const formatDate = useCallback((dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('es-ES', options);
-  }, []);
-
-  const renderPlaceholder = useMemo(() => (text) => {
-    return text ? text : <span style={{ color: '#DC8665' }}>[POR COMPLETAR]</span>;
-  }, []);
-
-  const ContractPreview = () => (
-    <div className="contract-preview">
-      <h3>Vista Previa del Contrato</h3>
-      <p><strong>{renderPlaceholder(datosContrato.nombreFreelance)}</strong> (en adelante "CONTRATISTA") se
-      obliga para con <strong>{renderPlaceholder(datosContrato.nombreCliente)}</strong> (en adelante
-      "CONTRATANTE") a ejecutar los trabajos y actividades propias del
-      servicio contratado, el cual se debe realizar de acuerdo a las
-      condiciones y cláusulas del presente documento y que se detallan a
-      continuación. Ambas partes acuerdan celebrar el presente CONTRATO DE
-      PRESTACIÓN DE SERVICIOS FREELANCE, a {renderPlaceholder(formatDate(datosContrato.fechaInicio))}.</p>
-
-      <h4>PRIMERA.- OBJETO:</h4>
-      <p>El CONTRATISTA realizará {renderPlaceholder(datosContrato.servicios)}, sin que exista
-      relación de dependencia, ni horario determinado.</p>
-
-      <h4>SEGUNDA.- PRECIO:</h4>
-      <p>El CONTRATANTE pagará la suma de ${renderPlaceholder(datosContrato.precio)} al CONTRATISTA
-      a través de {renderPlaceholder(datosContrato.metodoPago)} según lo acordado por ambas
-      partes, a más tardar {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} del cronograma de
-      pagos acordado, por el trabajo entregado y aceptado por el Cliente.</p>
-
-      <h4>TERCERO.- FORMA DE PAGO:</h4>
-      <p>El valor del contrato se pagará por {renderPlaceholder(datosContrato.metodoPago)} a más
-      tardar el {renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))} de acuerdo al cronograma de
-      entregas y pagos acordado y aceptado por el CONTRATANTE detallado a
-      continuación:</p>
-
-      <ul>
-        {datosContrato.entregables.map((entregable, index) => (
-          <li key={index}>{renderPlaceholder(entregable)}</li>
-        ))}
-      </ul>
-
-      <h4>CUARTA.- DURACIÓN O PLAZO:</h4>
-      <p>El CONTRATISTA se compromete a prestar los servicios hasta que el
-      contrato haya finalizado en la fecha acordada ({renderPlaceholder(formatDate(datosContrato.fechaPagoFinal))}).</p>
-
-      <h4>QUINTA.- OBLIGACIONES:</h4>
-      <p>El CONTRATANTE deberá facilitar acceso a la información y elementos que
-      sean necesarios, de manera oportuna, para la debida ejecución del objeto
-      del contrato, y, estará obligado a cumplir con lo estipulado en las
-      demás cláusulas y condiciones previstas en este documento. El
-      CONTRATISTA deberá cumplir en forma eficiente y oportuna los trabajos
-      encomendados y aquellas obligaciones que se generen de acuerdo con la
-      naturaleza del servicio.</p>
-
-      <h4>SEXTA.- TERMINACIÓN</h4>
-      <p>Este acuerdo puede ser terminado con un aviso por escrito de
-      {renderPlaceholder(datosContrato.periodoAviso)} por cualquiera de las partes.</p>
-
-      <h4>SEPTIMA.-INDEPENDENCIA:</h4>
-      <p>El CONTRATISTA actuará por su cuenta, con autonomía y sin que exista
-      relación laboral, ni subordinación con El CONTRATANTE. Sus derechos se
-      limitarán por la naturaleza del contrato, a exigir el cumplimiento de
-      las obligaciones del CONTRATANTE y el pago oportuno de su remuneración
-      fijada en este documento.</p>
-
-      <h4>OCTAVA.- DERECHOS</h4>
-      <p>El CONTRATANTE será propietario de los derechos de autor de todo el
-      material creado bajo este acuerdo una vez se haya completado el pago
-      íntegro. El CONTRATISTA puede exhibir obras de muestra de este proyecto
-      como piezas de su portafolio sólo con el consentimiento y la aprobación
-      del CONTRATANTE.</p>
-
-      <div className="signatures mt-5">
-        <div className="row">
-          <div className="col-md-6">
-            <p><strong>El CONTRATANTE acepta los términos mencionados anteriormente:</strong></p>
-            <p>{renderPlaceholder(datosContrato.nombreCliente)}</p>
-            <p>Fecha: ____________________</p>
-          </div>
-          <div className="col-md-6">
-            <p><strong>El CONTRATISTA acepta los términos mencionados anteriormente:</strong></p>
-            <p>{renderPlaceholder(datosContrato.nombreFreelance)}</p>
-            <p>Fecha: ____________________</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   if (loading) return <div className="alert alert-info">Cargando...</div>;
   if (error) return <div className="alert alert-danger">Error: {error}</div>;
 
@@ -351,35 +354,35 @@ const Contratos = () => {
               </div>
             </div>
             <div className="mb-3">
-            <label className="form-label">Entregables:</label>
-            {datosContrato.entregables.map((entregable, index) => (
-              <div key={index} className="input-group mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="entregables"
-                  value={entregable}
-                  onChange={(e) => handleInputChange(e, index)}
-                  required
-                />
-                <button 
-                  className="btn btn-outline-danger btn-sm" 
-                  type="button"
-                  onClick={() => removeEntregable(index)}
-                  disabled={datosContrato.entregables.length === 1}
-                >
-                  Eliminar
-                </button>
-              </div>
-            ))}
-            <button 
-              className="btn btn-outline-primary btn-sm mt-2" 
-              type="button"
-              onClick={addEntregable}
-            >
-              Agregar Entregable
-            </button>
-          </div>
+              <label className="form-label">Entregables:</label>
+              {datosContrato.entregables.map((entregable, index) => (
+                <div key={index} className="input-group mb-2">
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="entregables"
+                    value={entregable}
+                    onChange={(e) => handleInputChange(e, index)}
+                    required
+                  />
+                  <button 
+                    className="btn btn-outline-danger btn-sm" 
+                    type="button"
+                    onClick={() => removeEntregable(index)}
+                    disabled={datosContrato.entregables.length === 1}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              ))}
+              <button 
+                className="btn btn-outline-primary btn-sm mt-2" 
+                type="button"
+                onClick={addEntregable}
+              >
+                Agregar Entregable
+              </button>
+            </div>
             <div className="mb-3">
               <label className="form-label">Periodo de Aviso:</label>
               <select
@@ -490,7 +493,7 @@ const Contratos = () => {
         </div>
       )}
 
-      <div className={`offcanvas offcanvas-end ${isOffcanvasOpen ? 'show' : ''}`} tabIndex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+<div className={`offcanvas offcanvas-end ${isOffcanvasOpen ? 'show' : ''}`} tabIndex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
         <div className="offcanvas-header">
           <h5 id="offcanvasRightLabel">Vista Previa del Contrato</h5>
           <button type="button" className="btn-close text-reset" onClick={() => setIsOffcanvasOpen(false)} aria-label="Close"></button>
