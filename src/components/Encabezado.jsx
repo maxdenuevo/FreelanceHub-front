@@ -18,7 +18,7 @@ function Encabezado() {
       <div className="row align-items-center mb-5">
         <div className="col-md-6">
           <h6 className="p-4">
-            <strong>"Organiza, colabora y conquista tus metas. Tu éxito, un proyecto a la vez."</strong>
+            <strong>Organiza, colabora y conquista tus metas. Tu éxito, un proyecto a la vez.</strong>
           </h6>
           <p className="parrafo-titulo p-4">
             Nuestra plataforma ayuda a freelancers a gestionar proyectos de manera efectiva, desde la asignación de tareas hasta la creación de contratos, con herramientas completas para mantener la organización. Es intuitiva y flexible, adaptándose a diversas áreas como diseño, programación y escritura, para llevar tus proyectos al siguiente nivel.

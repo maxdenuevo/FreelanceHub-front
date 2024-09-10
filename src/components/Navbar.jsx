@@ -46,7 +46,7 @@ function Navbar() {
       <ul className="dropdown-menu dropdown-menu-end">
         <li><button className="dropdown-item" onClick={irAInicio}>Inicio</button></li>
         <li><button className="dropdown-item" onClick={irARegistro}>Registrate</button></li>
-        <li><button className="dropdown-item" onClick={irAInicioSesion}>Iniciar sesion</button></li>
+        <li><button className="dropdown-item" onClick={irAInicioSesion}>Login</button></li>
       </ul>
     </div>
   </div>
