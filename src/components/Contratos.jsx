@@ -187,7 +187,7 @@ const Contratos = () => {
         servicios: selectedProyecto.proyecto_descripcion || '',
         precio: selectedProyecto.proyecto_presupuesto || '',
         fechaPagoFinal: selectedProyecto.proyecto_termino || '',
-        entregables: tareasData.tareas_with_pagos.map(tarea => tarea.tarea_nombre) || [],
+        entregables: tareasData.tareas_with_pagos?.map(tarea => tarea.tarea_nombre) || [],
       }));
     } catch (error) {
       setError('Error al obtener detalles del proyecto: ' + error.message);
@@ -281,10 +281,15 @@ const Contratos = () => {
       continuación:</p>
 
       <ul>
-        {datosContrato.entregables.map((entregable, index) => (
-          <li key={index}>{renderPlaceholder(entregable)}</li>
-        ))}
+        {datosContrato.entregables.length > 0 ? (
+          datosContrato.entregables.map((entregable, index) => (
+            <li key={index}>{renderPlaceholder(entregable)}</li>
+          ))
+        ) : (
+          <li>{renderPlaceholder('')}</li>
+        )}
       </ul>
+
 
       <h4>CUARTA.- DURACIÓN O PLAZO:</h4>
       <p>El CONTRATISTA se compromete a prestar los servicios hasta que el
@@ -446,8 +451,9 @@ const Contratos = () => {
               </div>
             </div>
             <div className="mb-3">
-              <label className="form-label">Entregables:</label>
-              {datosContrato.entregables.map((entregable, index) => (
+            <label className="form-label">Entregables:</label>
+            {datosContrato.entregables.length > 0 ? (
+              datosContrato.entregables.map((entregable, index) => (
                 <div key={index} className="input-group mb-2">
                   <input
                     type="text"
@@ -466,15 +472,28 @@ const Contratos = () => {
                     Eliminar
                   </button>
                 </div>
-              ))}
-              <button 
-                className="btn btn-outline-primary btn-sm mt-2" 
-                type="button"
-                onClick={addEntregable}
-              >
-                Agregar Entregable
-              </button>
-            </div>
+              ))
+            ) : (
+              <div className="input-group mb-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="entregables"
+                  value=""
+                  onChange={(e) => handleInputChange(e, 0)}
+                  placeholder="Agregar entregable"
+                  required
+                />
+              </div>
+            )}
+            <button 
+              className="btn btn-outline-primary btn-sm mt-2" 
+              type="button"
+              onClick={addEntregable}
+            >
+              Agregar Entregable
+            </button>
+          </div>
             <div className="mb-3">
               <label className="form-label">Periodo de Aviso:</label>
               <select
