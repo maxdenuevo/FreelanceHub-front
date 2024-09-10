@@ -7,14 +7,16 @@ const Codigo = () => {
   const [codigoIngresado, setCodigoIngresado] = useState('');
   const [reintentar, setReintentar] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(60);
+  const [mensajeError, setMensajeError] = useState('');
+  const [mensajeExito, setMensajeExito] = useState('');
   const navigate = useNavigate();
 
   const verificarCodigo = () => {
-    if (parseInt(codigoIngresado) === codigo) {
+    if (isNaN(codigoIngresado) || parseInt(codigoIngresado) !== codigo) {
+      setMensajeError('El código ingresado es incorrecto. Intenta nuevamente.');
+    } else {
       setCodigoVerificado(true);
       navigate('/cambiarcontraseña');
-    } else {
-      alert('El código ingresado es incorrecto. Intenta nuevamente.');
     }
   };
 
@@ -25,17 +27,38 @@ const Codigo = () => {
     fetch('https://api-freelancehub.vercel.app/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo: email, codigo: nuevoCodigo }),
+      body: JSON.stringify({
+        subject: 'Nuevo código de verificación para FreelanceHub',
+        recipients: [email],
+        body: 
+        `¡Gracias por usar FreelanceHub!
+
+        Para completar el proceso de verificación de tu correo electrónico, por favor utiliza el nuevo código:
+        
+        Código de Verificación: ${nuevoCodigo}
+        
+        Este código es válido por 1 min. Si tienes algún problema o necesitas ayuda, no dudes en contactarnos.
+        
+        El equipo de FreelanceHub
+        
+        freelancehub.cl
+        [contacto@freelancehub.cl]`
+      })
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json();
+      })
       .then(() => {
-        alert('Nuevo código enviado.');
+        setMensajeExito('Nuevo código enviado.');
         setTiempoRestante(60);
         setReintentar(false);
       })
       .catch((error) => {
         console.error('Error al reenviar el código:', error);
-        alert('Hubo un problema al reenviar el código. Intenta nuevamente.');
+        setMensajeError('Hubo un problema al reenviar el código. Intenta nuevamente.');
       });
   };
 
@@ -51,16 +74,25 @@ const Codigo = () => {
   return (
     <div id='codigo-form' className="container p-5">
       <h2>Validar Código</h2>
+      {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
+      {mensajeExito && <div className="alert alert-success">{mensajeExito}</div>}
       <div className="mb-3 mt-4">
         <label htmlFor="codigo" className="form-label">Ingresa el código que recibiste</label>
-        <input type="text" className="form-control" id="codigo" value={codigoIngresado} onChange={(e) => setCodigoIngresado(e.target.value)} placeholder="Código de verificación"/>
+        <input
+          type="text"
+          className="form-control"
+          id="codigo"
+          value={codigoIngresado}
+          onChange={(e) => setCodigoIngresado(e.target.value)}
+          placeholder="Código de verificación"
+        />
       </div>
-      <button className="btn" onClick={verificarCodigo}>
+      <button className="btn btn-primary" onClick={verificarCodigo}>
         Verificar Código
       </button>
       <div className="mt-3">
         {reintentar ? (
-          <a className="d-flex justify-content-center" onClick={reenviarCodigo}>
+          <a className="d-flex justify-content-center" onClick={reenviarCodigo} style={{ cursor: 'pointer' }}>
             Reenviar código
           </a>
         ) : (
@@ -72,3 +104,4 @@ const Codigo = () => {
 };
 
 export default Codigo;
+

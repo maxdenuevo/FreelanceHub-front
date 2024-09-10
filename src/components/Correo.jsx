@@ -6,10 +6,12 @@ const Correo = () => {
   const { setEmail, setCodigo } = useContext(RecoveryContext);
   const [correo, setCorreo] = useState('');
   const [mensajeError, setMensajeError] = useState('');
+  const [mensajeExito, setMensajeExito] = useState('');
   const navigate = useNavigate();
 
   const enviarCodigo = () => {
     setMensajeError('');
+    setMensajeExito('');
 
     if (!correo) {
       setMensajeError('Por favor ingresa tu correo electrónico');
@@ -23,9 +25,21 @@ const Correo = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        subject: 'Recuperación de Contraseña',
+        subject: 'Codigo de verificacion para FreelanceHub',
         recipients: [correo],
-        body: `Tu código de recuperación es: ${codigo}`
+        body: 
+        `¡Gracias por usar FreelanceHub!
+
+        Para completar el proceso de verificación de tu correo electrónico, por favor utiliza el siguiente código:
+        
+        Código de Verificación: ${codigo}
+        
+        Este código es válido por 1 min. Si tienes algún problema o necesitas ayuda, no dudes en contactarnos.
+        
+        El equipo de FreelanceHub
+        
+        freelancehub.cl
+        [contacto@freelancehub.cl]`
       })
     })
       .then(response => {
@@ -36,7 +50,8 @@ const Correo = () => {
       })
       .then(() => {
         setEmail(correo);
-        navigate('/validarcodigo');
+        setMensajeExito('El código de verificación ha sido enviado a tu correo electrónico.');
+        setTimeout(() => navigate('/validarcodigo'), 2000);
       })
       .catch((error) => {
         console.error('Error al enviar el código:', error);
@@ -47,6 +62,9 @@ const Correo = () => {
   return (
     <div id='correo-form' className="container p-5">
       <h2>Cambiar Contraseña</h2>
+      {mensajeError && <div className="alert alert-danger" role="alert">{mensajeError}</div>}
+      {mensajeExito && <div className="alert alert-success" role="alert">{mensajeExito}</div>}
+      <div className='mt-4'></div>
       {mensajeError && <div className="alert alert-danger" role="alert">{mensajeError}</div>}
       <div className='mt-4'>
         <label htmlFor="correo" className="form-label">Correo electrónico</label>

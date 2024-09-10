@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import TerminosYCondiciones from './TerminosYCondiciones'
 
 function Formularioregistro() {
   const [usuarioRut, setUsuarioRut] = useState('');
@@ -10,6 +11,7 @@ function Formularioregistro() {
   const [registroExitoso, setRegistroExitoso] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState('');
   const [terminosAceptados, setTerminosAceptados] = useState(false);
+  const [mostrarModal, setMostrarModal] = useState(false);
   const navigate = useNavigate();
 
   function cambiarUsuarioRut(e) {
@@ -89,7 +91,7 @@ function Formularioregistro() {
       {errorMensaje && <div className="alert alert-danger mt-3">{errorMensaje}</div>}
       <div className="mb-3">
         <label htmlFor="inputNombre" className="form-label">Nombre</label>
-        <input type="text" className="form-control" id="inputRUT" onChange={cambiarUsuarioNombre}/>
+        <input type="text" className="form-control" id="inputNombre" onChange={cambiarUsuarioNombre}/>     
       </div>
       <div className="mb-3">
         <label htmlFor="inputRUT" className="form-label">RUT</label>
@@ -110,10 +112,24 @@ function Formularioregistro() {
       <div className="mb-3 form-check">
         <input type="checkbox" className="form-check-input" id="termsCheck" onChange={aceptarTerminos}/>
         <label className="form-check-label" htmlFor="termsCheck">
-          Acepto los <a href="#" className="terms-link">términos y condiciones</a>
+          Acepto los <a href="#" className="terms-link" onClick={() => setMostrarModal(true)}>términos y condiciones</a>
         </label>
       </div>
       <button type="submit" className="btn" onClick={registrarUsuario}>Registrar</button>
+      {mostrarModal && (
+        <div className="modal fade show" style={{ display: 'block' }}>
+           <div className="modal-dialog" style={{ position: 'fixed', bottom: '100px', right: '460px', margin: '0' }}>
+            <div className="modal-content">
+              <div className="modal-header">
+                <button type="button" className="btn-close" onClick={() => setMostrarModal(false)}></button>
+              </div>
+              <div className="modal-body" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                <p><TerminosYCondiciones /></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

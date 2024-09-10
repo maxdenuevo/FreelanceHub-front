@@ -5,8 +5,6 @@ import Menu from '../images/Menu.png'
 import Logo2 from '../images/Logo2.png'
 
 
-
-
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,7 +31,7 @@ function Navbar() {
     <nav id="navprincipal" className="navbar navbar-expand-lg">
     <div className="container-fluid d-flex">
     <img id='logo-nav' src={Logo2} alt="" />
-    <button className="nav-link text-light" onClick={irAPortal}>FreelanceHub</button>
+    <button title='Al Dashboard' className="nav-link text-light" onClick={irAPortal}>FreelanceHub</button>
     <div className="collapse navbar-collapse d-none d-lg-flex" id="navbarNavAltMarkup">
       <div className="navbar-nav ms-auto text-end">
         <button className="nav-link active text-light" aria-current="page" onClick={irAInicio}>Home</button>

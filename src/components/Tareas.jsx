@@ -185,7 +185,7 @@ function Tareas({ proyectoSeleccionado }) {
                 <tr key={tarea?.tarea_id || index}>
                   <td>{index + 1}</td>
                   <td>{tarea?.tarea_nombre || ''}</td>
-                  <td>{tarea?.tarea_fecha ? formatoFecha(tarea.tarea_fecha) : ''}</td>
+                  <td title='Recibirás un correo recordatorio un dia antes de la fecha limite'>{tarea?.tarea_fecha ? formatoFecha(tarea.tarea_fecha) : ''}</td>
                   <td>{tarea?.tarea_descripcion || ''}</td>
                   <td>{tarea?.tarea_completada ? 'Sí' : 'No'}</td>
                   <td>{tarea?.tarea_necesita_pago ? 'Sí' : 'No'}</td>
@@ -235,7 +235,7 @@ function Tareas({ proyectoSeleccionado }) {
           </div>
           <div className="mb-3">
             <label htmlFor="fechaLimiteTarea" className="form-label">Fecha Límite:</label>
-            <input type="date" className="form-control" id="fechaLimiteTarea" value={fechaLimiteTarea} onChange={(e) => setFechaLimiteTarea(e.target.value)} required />
+            <input title='Recibirás un correo recordatorio un dia antes de la fecha limite' type="date" className="form-control" id="fechaLimiteTarea" value={fechaLimiteTarea} onChange={(e) => setFechaLimiteTarea(e.target.value)} required />
           </div>
           <div className="mb-3 form-check">
             <input type="checkbox" className="form-check-input" id="tareaCompletada" checked={tareaCompletada} onChange={(e) => setTareaCompletada(e.target.checked)} />
