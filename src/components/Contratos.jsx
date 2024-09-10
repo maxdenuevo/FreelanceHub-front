@@ -3,7 +3,6 @@ import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-
 
 const API_BASE_URL = 'https://api-freelancehub.vercel.app';
 
-// Define styles for PDF
 const styles = StyleSheet.create({
   page: { padding: 30, fontSize: 12 },
   title: { fontSize: 18, marginBottom: 20, textAlign: 'center' },
@@ -13,7 +12,6 @@ const styles = StyleSheet.create({
   signature: { marginTop: 50, borderTop: 1, paddingTop: 10 },
 });
 
-// PDF Document Component
 const ContractPDF = ({ datosContrato }) => (
   <Document>
     <Page size="A4" style={styles.page}>
