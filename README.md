@@ -1,17 +1,78 @@
 # FreelanceHub
 
-A full-stack web application for comprehensive project management, developed as a graduation project for 4Geeks Academy bootcamp. FreelanceHub helps freelancers manage their projects, clients, tasks, and payments in one centralized platform.
+Una aplicación full-stack para gestionar todos tus proyectos como freelancer, diseñada para optimizar tus flujos, recordar plazos y asegurar pagos a tiempo. Desarrollada como proyecto de graduación para 4Geeks Academy bootcamp.
 
-## Features
+## Descripción del Proyecto
 
-- User authentication with JWT
-- Client management system
-- Project tracking and organization
-- Task management with reminder system
-- Payment tracking and verification
-- Contract generation and management
-- Email notification system
-- Responsive design for all devices
+FreelanceHub es una aplicación diseñada para ayudar a freelancers a gestionar contratos, tareas y pagos de manera eficiente y organizada. La plataforma permite a los freelancers crear y administrar contratos, realizar seguimientos de tareas, pagos y mantener un registro organizado.
+
+## Arquitectura Técnica
+
+```mermaid
+graph TD
+    subgraph "Frontend"
+        A[React.js]
+        B[Bootstrap 5.3]
+        C[React Router]
+        N[HTML]
+        O[CSS]
+    end
+
+    subgraph "Backend"
+        D[Python Flask]
+        E[Flask-Mail]
+    end
+
+    subgraph "Database"
+        F[PostgreSQL]
+    end
+
+    subgraph "Authentication & Security"
+        G[JWT]
+        H[Password Hashing]
+        I[CORS]
+    end
+
+    subgraph "File Storage"
+        J[Cloudinary]
+    end
+
+    subgraph "Deployment"
+        K[Vercel]
+    end
+
+    subgraph "Additional Tools"
+        L[dotenv]
+        M[psycopg2]
+    end
+
+    N --> A
+    O --> A
+    A --> D
+    B --> A
+    C --> A
+    D --> F
+    D --> G
+    D --> H
+    D --> I
+    D --> J
+    D --> E
+    F --> M
+    D --> L
+    A --> K
+    D --> K
+```
+
+## Funcionalidades Principales
+
+- Registro y autenticación de usuarios
+- Gestión de clientes
+- Registro y seguimiento de proyectos
+- Sistema de tareas con recordatorios
+- Seguimiento de pagos
+- Generación y gestión de contratos
+- Sistema de notificaciones por email
+- Diseño responsivo
 
 ## Tech Stack
 
@@ -19,23 +80,23 @@ A full-stack web application for comprehensive project management, developed as 
 
 - Python Flask
 - PostgreSQL
-- JWT for authentication
-- CORS for cross-origin resource sharing
-- Cloudinary for file storage
-- Flask-Mail for email notifications
-- Schedule for task automation
-- psycopg2 for database connectivity
+- JWT para autenticación
+- CORS para seguridad cross-origin
+- Cloudinary para almacenamiento de archivos
+- Flask-Mail para notificaciones por email
+- Schedule para automatización de tareas
+- psycopg2 para conectividad con base de datos
 
 ### Frontend
 
 - React.js
 - Bootstrap 5.3
-- React Router for navigation
-- Vercel for deployment
+- React Router para navegación
+- Vercel para deployment
 
-## Database Schema
+## Modelo de Base de Datos
 
-The application uses a PostgreSQL database with the following main tables:
+El sistema utiliza PostgreSQL con las siguientes tablas principales:
 
 - usuarios (Users)
 - clientes (Clients)
@@ -45,23 +106,23 @@ The application uses a PostgreSQL database with the following main tables:
 - plantillas (Templates)
 - contratos (Contracts)
 
-## Installation
+## Instalación
 
-1. Clone the repository:
+1. Clonar el repositorio:
 
 ```bash
 git clone [repository-url]
 ```
 
-2. Install backend dependencies:
+2. Instalar dependencias del backend:
 
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
-   Create a `.env` file in the backend directory with the following variables:
+3. Configurar variables de entorno:
+   Crear archivo `.env` en el directorio backend con las siguientes variables:
 
 ```
 DATABASE_NAME=
@@ -81,14 +142,14 @@ MAIL_DEFAULT_SENDER_NAME=
 MAIL_DEFAULT_SENDER_EMAIL=
 ```
 
-4. Install frontend dependencies:
+4. Instalar dependencias del frontend:
 
 ```bash
 cd frontend
 npm install
 ```
 
-5. Start the development servers:
+5. Iniciar servidores de desarrollo:
 
 Backend:
 
@@ -104,49 +165,65 @@ npm run dev
 
 ## API Endpoints
 
-### Users
+### Usuarios
 
-- POST `/register-usuario` - Register new user
-- POST `/login-usuario` - User login
-- PATCH `/usuario/:id/update` - Update user profile
-- PATCH `/usuario/:id/update-password` - Update password
+- POST `/register-usuario` - Registro de nuevo usuario
+- POST `/login-usuario` - Login de usuario
+- PATCH `/usuario/:id/update` - Actualizar perfil
+- PATCH `/usuario/:id/update-password` - Actualizar contraseña
 
-### Projects
+### Proyectos
 
-- GET `/proyectos/:user_id` - Get all projects for a user
-- POST `/create-proyecto` - Create new project
-- GET `/proyecto/:id` - Get specific project
-- PATCH `/proyecto/:id` - Update project
-- DELETE `/proyecto/:id` - Delete project
+- GET `/proyectos/:user_id` - Obtener proyectos de usuario
+- POST `/create-proyecto` - Crear nuevo proyecto
+- GET `/proyecto/:id` - Obtener proyecto específico
+- PATCH `/proyecto/:id` - Actualizar proyecto
+- DELETE `/proyecto/:id` - Eliminar proyecto
 
-### Tasks
+### Tareas
 
-- GET `/tareas/:proyecto_id` - Get tasks for a project
-- POST `/create-tarea` - Create new task
-- GET `/tarea/:id` - Get specific task
-- PATCH `/tarea/:id` - Update task
-- DELETE `/tarea/:id` - Delete task
+- GET `/tareas/:proyecto_id` - Obtener tareas de un proyecto
+- POST `/create-tarea` - Crear nueva tarea
+- GET `/tarea/:id` - Obtener tarea específica
+- PATCH `/tarea/:id` - Actualizar tarea
+- DELETE `/tarea/:id` - Eliminar tarea
 
-### Payments
+### Pagos
 
-- POST `/create-pago` - Create new payment
-- GET `/pagos/:proyecto_id` - Get payments for a project
-- PATCH `/pago/:id` - Update payment
-- DELETE `/pago/:id` - Delete payment
+- POST `/create-pago` - Crear nuevo pago
+- GET `/pagos/:proyecto_id` - Obtener pagos de un proyecto
+- PATCH `/pago/:id` - Actualizar pago
+- DELETE `/pago/:id` - Eliminar pago
+
+## Desafíos Técnicos y Soluciones
+
+- Deployment y caída de la API
+- Manejo de tiempo con horarios rotativos
+- Navegación de documentación de librerías externas
+- Implementación de OTP (One-Time Password)
+
+## FreelanceHub 2.0: Futuras Mejoras
+
+- Generación de boletas o facturas
+- Enfoque Mobile First
+- Integración de sistemas de pago
+- Calculadora Freelance
+- Block de notas con registro de pagos
 
 ## Deployment
 
-The application is deployed using:
+La aplicación está desplegada usando:
 
 - Backend: Flask server
-- Frontend: Vercel
-- Database: PostgreSQL
+- Frontend: Vercel (freelancehub.cl)
+- API: api-freelancehub.vercel.app
+- Base de datos: PostgreSQL
 
 ## Contributors
 
-- Team Lead & Back-end Developer: Max Ihnen
 - Front-end Developer: Jeneydis Molina
+- Team Lead & Back-end Developer: Max Ihnen
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+Este proyecto está licenciado bajo MIT License - ver el archivo LICENSE.md para detalles.
