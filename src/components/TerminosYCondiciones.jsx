@@ -77,7 +77,7 @@ const TerminosYCondiciones = () => {
               </section>
               <section className="mt-4">
                 <h2 className="h4 mb-3" style={{ color: '#138086', borderBottom: '2px solid #DC8665', paddingBottom: '0.5rem' }}>11. Contacto</h2>
-                <p>Si tiene alguna pregunta sobre estos Términos, por favor contáctenos a <a href="mailto:contact@freelancehub.com" className="text-decoration-none" style={{ color: '#DC8665' }}>contact@freelancehub.com</a>.</p>
+                <p>Si tiene alguna pregunta sobre estos Términos, por favor contáctenos a <a href="mailto:contacto@freelancehub.cl" className="text-decoration-none" style={{ color: '#DC8665' }}>contacto@freelancehub.cl</a>.</p>
               </section>
               <p className="mt-5 text-muted text-center">Última actualización: 10 de septiembre, 2024</p>
               </div>
