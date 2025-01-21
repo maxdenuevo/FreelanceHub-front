@@ -1,60 +1,166 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Menu from '../images/Menu.png'
-import Usuario from '../images/Usuario.png'
-import Logo2 from '../images/Logo2.png'
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { 
+  Menu, 
+  Home, 
+  HelpCircle, 
+  User, 
+  Settings, 
+  LogOut,
+  LayoutDashboard 
+} from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-function Navbardash() {
-    const navigate = useNavigate();
-  
-    const irAInicio = () => {
-      navigate('/');
-    };
-  
-    const irAContactanos = () => {
-      navigate('/contactanos');
-    };
-  
-    const irAPerfil = () => {
-      navigate('/dashboardpage/perfil');
-    };
-  
-    const irACambiarContraseña = () => {
-      navigate('/ingresarcorreo');
-    };
+const Navbardash = () => {
+  const navigate = useNavigate();
+
+  const navigationLinks = [
+    { name: 'Inicio', path: '/', icon: Home },
+    { name: '¿Necesitas ayuda?', path: '/contactanos', icon: HelpCircle },
+  ];
+
+  const profileMenuItems = [
+    { name: 'Perfil', path: '/dashboardpage/perfil', icon: User },
+    { name: 'Cambiar contraseña', path: '/ingresarcorreo', icon: Settings },
+  ];
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const getUserInitials = () => {
+    const userName = localStorage.getItem('usuario_nombre') || 'U';
+    return userName.charAt(0).toUpperCase();
+  };
 
   return (
-    <nav id="navprincipal" className="navbar navbar-expand-lg fixed-top">
-    <div className="container-fluid d-flex">
-    <img id='logo-nav' src={Logo2} alt="" />
-    <button title='Al inicio' className="nav-link text-light" onClick={irAInicio}>FreelanceHub</button>
-    <div className="collapse navbar-collapse d-none d-lg-flex" id="navbarNavAltMarkup">
-      <div className="navbar-nav ms-auto text-end">
-        <button className="nav-link active text-light" aria-current="page" onClick={irAInicio}>Inicio</button>
-        <button className="nav-link text-light" onClick={irAContactanos}>¿Necesitas ayuda?</button>
-        <div className="dropdown ms-auto">
-              <button className="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src={Usuario} alt="" />
-              </button>
-              <ul className="dropdown-menu dropdown-menu-end">
-                <li><button className="dropdown-item" onClick={irAPerfil}>Perfil</button></li>
-                <li><button className="dropdown-item" onClick={irACambiarContraseña}>Cambiar contraseña</button></li>
-              </ul>
-            </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-primary">
+      <div className="container flex h-16 items-center px-4">
+        {/* Logo and Brand */}
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="link" 
+            className="flex items-center space-x-2 text-white"
+            onClick={() => handleNavigation('/')}
+          >
+            <LayoutDashboard className="h-6 w-6" />
+            <span className="font-bold text-xl">FreelanceHub</span>
+          </Button>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex ml-auto">
+          <NavigationMenu>
+            <NavigationMenuList className="flex items-center space-x-4">
+              {navigationLinks.map((link) => (
+                <NavigationMenuItem key={link.path}>
+                  <Button
+                    variant="ghost"
+                    className="text-white hover:text-white hover:bg-primary/90"
+                    onClick={() => handleNavigation(link.path)}
+                  >
+                    <link.icon className="h-4 w-4 mr-2" />
+                    {link.name}
+                  </Button>
+                </NavigationMenuItem>
+              ))}
+
+              {/* User Profile Dropdown */}
+              <NavigationMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                      <Avatar>
+                        <AvatarFallback className="bg-primary-foreground text-primary">
+                          {getUserInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {profileMenuItems.map((item) => (
+                      <DropdownMenuItem
+                        key={item.path}
+                        className="cursor-pointer"
+                        onClick={() => handleNavigation(item.path)}
+                      >
+                        <item.icon className="h-4 w-4 mr-2" />
+                        {item.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden ml-auto">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" className="text-white">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>FreelanceHub</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col space-y-4 mt-4">
+                {navigationLinks.map((link) => (
+                  <Button
+                    key={link.path}
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleNavigation(link.path)}
+                  >
+                    <link.icon className="h-4 w-4 mr-2" />
+                    {link.name}
+                  </Button>
+                ))}
+                <DropdownMenuSeparator />
+                {profileMenuItems.map((item) => (
+                  <Button
+                    key={item.path}
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleNavigation(item.path)}
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {item.name}
+                  </Button>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
-    </div>
-    <div className="dropdown d-lg-none ms-auto">
-      <button className="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><img src={Menu} alt="" /></button>
-      <ul className="dropdown-menu dropdown-menu-end">
-        <li><button className="dropdown-item" onClick={irAInicio}>Home</button></li>
-        <li><button className="dropdown-item" onClick={irAContactanos}>¿Necesitas ayuda?</button></li>
-        <li><button className="dropdown-item" onClick={irAPerfil}>Perfil</button></li>
-        <li><button className="dropdown-item" onClick={irACambiarContraseña}>Cambiar contraseña</button></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+    </header>
   );
-}
+};
 
 export default Navbardash;

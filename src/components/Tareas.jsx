@@ -1,18 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Pencil, 
+  Trash2, 
+  Plus, 
+  X, 
+  Save,
+  Calendar,
+  AlertCircle,
+  Loader2 
+} from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-function Tareas({ proyectoSeleccionado }) {
+const Tareas = ({ proyectoSeleccionado }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [tareas, setTareas] = useState([]);
   const [mostrarAgregarTarea, setMostrarAgregarTarea] = useState(false);
-  const [tareaNombre, setTareaNombre] = useState('');
-  const [descripcionTarea, setDescripcionTarea] = useState('');
-  const [fechaLimiteTarea, setFechaLimiteTarea] = useState('');
-  const [tareaCompletada, setTareaCompletada] = useState(false);
-  const [pendientePagoTarea, setPendientePagoTarea] = useState(false);
-  const [editarTareaId, setEditarTareaId] = useState(null);
   const [error, setError] = useState('');
-
+  
+  const [formData, setFormData] = useState({
+    tareaNombre: '',
+    descripcionTarea: '',
+    fechaLimiteTarea: '',
+    tareaCompletada: false,
+    pendientePagoTarea: false
+  });
+  
+  const [editarTareaId, setEditarTareaId] = useState(null);
 
   useEffect(() => {
     if (proyectoSeleccionado) {
@@ -22,239 +52,342 @@ function Tareas({ proyectoSeleccionado }) {
     }
   }, [proyectoSeleccionado]);
 
-  const fetchTareas = () => {
-    fetch(`https://api-freelancehub.vercel.app/tareas/${proyectoSeleccionado}`)
-      .then(response => {
-        if (!response.ok) throw new Error('Error al obtener las tareas');
-        return response.json();
-      })
-      .then(data => {
-        console.log('Datos recibidos:', data);
-        if (data && Array.isArray(data.tareas)) {
-          setTareas(data.tareas);
-        } else {
-          console.error('Datos de tareas no están en el formato esperado');
-          setTareas([]);
-        }
+  const fetchTareas = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://api-freelancehub.vercel.app/tareas/${proyectoSeleccionado}`);
+      if (!response.ok) throw new Error('Error al obtener las tareas');
+      
+      const data = await response.json();
+      if (data && Array.isArray(data.tareas)) {
+        setTareas(data.tareas);
         setError('');
-      })
-      .catch(error => {
-        setError(error.message);
-      });
+      } else {
+        throw new Error('Formato de datos inválido');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const agregarTarea = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = editarTareaId ? `https://api-freelancehub.vercel.app/tarea/${editarTareaId}` : 'https://api-freelancehub.vercel.app/create-tarea';
-    const method = editarTareaId ? 'PATCH' : 'POST';
+    setIsLoading(true);
 
-    fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        proyecto_id: proyectoSeleccionado,
-        tarea_nombre: tareaNombre,
-        tarea_fecha: fechaLimiteTarea,
-        tarea_descripcion: descripcionTarea,
-        tarea_completada: tareaCompletada,
-        tarea_necesita_pago: pendientePagoTarea,
-      }),
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Error al guardar la tarea');
-        return response.json();
-      })
-      .then(responseConverted => {
-        console.log('Respuesta de la API:', responseConverted);
-        fetchTareas();
-        setTareaNombre('');
-        setFechaLimiteTarea('');
-        setDescripcionTarea('');
-        setTareaCompletada(false);
-        setPendientePagoTarea(false);
-        setMostrarAgregarTarea(false);
-        setEditarTareaId(null);
-        setError('');
-        if (!editarTareaId) {
-          enviarCorreoRecordatorio(tareaNombre, fechaLimiteTarea);
-        }
-      })
-      .catch(error => {
-        setError(error.message);
+    const url = editarTareaId 
+      ? `https://api-freelancehub.vercel.app/tarea/${editarTareaId}` 
+      : 'https://api-freelancehub.vercel.app/create-tarea';
+
+    try {
+      const response = await fetch(url, {
+        method: editarTareaId ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          proyecto_id: proyectoSeleccionado,
+          tarea_nombre: formData.tareaNombre,
+          tarea_fecha: formData.fechaLimiteTarea,
+          tarea_descripcion: formData.descripcionTarea,
+          tarea_completada: formData.tareaCompletada,
+          tarea_necesita_pago: formData.pendientePagoTarea,
+        }),
       });
+
+      if (!response.ok) throw new Error('Error al guardar la tarea');
+      
+      await fetchTareas();
+      resetForm();
+      setMostrarAgregarTarea(false);
+      
+      if (!editarTareaId) {
+        enviarCorreoRecordatorio(formData.tareaNombre, formData.fechaLimiteTarea);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const eliminarTarea = (id) => {
-    fetch(`https://api-freelancehub.vercel.app/tarea/${id}`, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('No se pudo eliminar la tarea, aun tiene pagos asociados');
-        return response.json();
-      })
-      .then(() => {
-        console.log('¡La tarea se ha eliminado correctamente!');
-        fetchTareas();
-        setError('');
-      })
-      .catch(error => {
-        setError(error.message);
+  const handleDelete = async (id) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta tarea?')) return;
+    
+    try {
+      const response = await fetch(`https://api-freelancehub.vercel.app/tarea/${id}`, {
+        method: 'DELETE',
       });
+      
+      if (!response.ok) throw new Error('No se pudo eliminar la tarea, aún tiene pagos asociados');
+      
+      await fetchTareas();
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
-  const manejarEdicionTarea = (tarea) => {
-    setTareaNombre(tarea?.tarea_nombre || '');
-    setFechaLimiteTarea(tarea?.tarea_fecha || '');
-    setDescripcionTarea(tarea?.tarea_descripcion || '');
-    setTareaCompletada(tarea?.tarea_completada || false);
-    setPendientePagoTarea(tarea?.tarea_necesita_pago || false);
-    setEditarTareaId(tarea?.tarea_id || null);
+  const handleEdit = (tarea) => {
+    setFormData({
+      tareaNombre: tarea?.tarea_nombre || '',
+      descripcionTarea: tarea?.tarea_descripcion || '',
+      fechaLimiteTarea: tarea?.tarea_fecha?.split('T')[0] || '',
+      tareaCompletada: tarea?.tarea_completada || false,
+      pendientePagoTarea: tarea?.tarea_necesita_pago || false,
+    });
+    setEditarTareaId(tarea?.tarea_id);
     setMostrarAgregarTarea(true);
   };
 
-  const enviarCorreoRecordatorio = (tareaNombre, fechaLimiteTarea) => {
-    const fechaActual = new Date();
-    const fechaLimite = new Date(fechaLimiteTarea);
-  
-    const tiempoRestante = fechaLimite.getTime() - fechaActual.getTime();
-    
-    if (tiempoRestante >= 0) {
-      setTimeout(() => {
-        const email = localStorage.getItem('usuario_email');
-        fetch('https://api-freelancehub.vercel.app/send-email-recordatorios', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            subject: 'Recordatorio de Tarea Pendiente',
-            recipients: [email],
-            body: `Recordatorio: la tarea "${tareaNombre}" tiene su fecha límite hoy.
-            
-            Atentamente,
-            FreelanceHub
-            `,
-          }),
-        })
-          .then(response => {
-            if (!response.ok) throw new Error('Error al enviar el correo');
-            return response.json();
-          })
-          .then(data => {
-            console.log('Correo enviado:', data.message);
-          })
-          .catch(error => {
-            console.error('Error al enviar el correo:', error.message);
-          });
-      }, tiempoRestante);
+  const resetForm = () => {
+    setFormData({
+      tareaNombre: '',
+      descripcionTarea: '',
+      fechaLimiteTarea: '',
+      tareaCompletada: false,
+      pendientePagoTarea: false,
+    });
+    setEditarTareaId(null);
+  };
+
+  const enviarCorreoRecordatorio = async (tareaNombre, fechaLimiteTarea) => {
+    const email = localStorage.getItem('usuario_email');
+    if (!email) return;
+
+    try {
+      const response = await fetch('https://api-freelancehub.vercel.app/send-email-recordatorios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: 'Recordatorio de Tarea Pendiente',
+          recipients: [email],
+          body: `Recordatorio: la tarea "${tareaNombre}" tiene su fecha límite hoy.\n\nAtentamente,\nFreelanceHub`,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Error al enviar el correo');
+    } catch (err) {
+      console.error('Error al enviar correo:', err);
     }
-  };  
+  };
 
   const formatoFecha = (fecha) => {
     try {
-      const fechaDate = new Date(fecha);
-      const fechaLocal = new Date(fechaDate.getTime() + fechaDate.getTimezoneOffset() * 60000);
-      return format(fechaLocal, 'dd MMMM yyyy', { locale: es });
-    } catch (error) {
-      console.error('Error al formatear la fecha:', error);
+      return format(new Date(fecha), 'dd MMMM yyyy', { locale: es });
+    } catch (err) {
+      console.error('Error al formatear fecha:', err);
       return fecha;
     }
   };
+
   return (
-    <div className="contenido-tareas mt-5">
-      <h2>Tareas del Proyecto</h2>
-      <p className='text-center'>En esta sección podrás gestionar actividades del proyecto: agregar, ver, eliminar y marcar tareas como completadas, con fechas límite y recordatorios para un mejor seguimiento.</p>
-      <div className="table-responsive">
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Tarea</th>
-              <th scope="col">Fecha Límite</th>
-              <th scope="col">Descripción</th>
-              <th scope="col">Completada</th>
-              <th scope="col">Pendiente de Pago</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tareas.length > 0 ? (
-              tareas.map((tarea, index) => (
-                <tr key={tarea?.tarea_id || index}>
-                  <td>{index + 1}</td>
-                  <td>{tarea?.tarea_nombre || ''}</td>
-                  <td title='Recibirás un correo recordatorio un dia antes de la fecha limite'>{tarea?.tarea_fecha ? formatoFecha(tarea.tarea_fecha) : ''}</td>
-                  <td>{tarea?.tarea_descripcion || ''}</td>
-                  <td>{tarea?.tarea_completada ? 'Sí' : 'No'}</td>
-                  <td>{tarea?.tarea_necesita_pago ? 'Sí' : 'No'}</td>
-                  <td>
-                    <button onClick={() => manejarEdicionTarea(tarea)} className="btn btn-sm btn-primary m-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                        <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-                      </svg>
-                    </button>
-                    <button onClick={() => eliminarTarea(tarea?.tarea_id)} className="btn btn-sm btn-danger m-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" fill="currentColor" className="bi bi-trash3" viewBox="0 0 16 16">
-                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold">Tareas del Proyecto</CardTitle>
+        <p className="text-sm text-muted-foreground text-center">
+          Gestiona las actividades del proyecto: agrega, visualiza, elimina y marca tareas como completadas.
+        </p>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">#</TableHead>
+                <TableHead>Tarea</TableHead>
+                <TableHead>Fecha Límite</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Pago</TableHead>
+                <TableHead className="w-24">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <div className="flex justify-center">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : tareas.length > 0 ? (
+                tareas.map((tarea, index) => (
+                  <TableRow key={tarea?.tarea_id || index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{tarea?.tarea_nombre}</TableCell>
+                    <TableCell>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {formatoFecha(tarea?.tarea_fecha)}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Recibirás un recordatorio por correo
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell>{tarea?.tarea_descripcion}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        tarea?.tarea_completada 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {tarea?.tarea_completada ? 'Completada' : 'Pendiente'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        tarea?.tarea_necesita_pago 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {tarea?.tarea_necesita_pago ? 'Requiere Pago' : 'Sin Pago'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(tarea)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(tarea?.tarea_id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    No hay tareas asignadas para este proyecto.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setMostrarAgregarTarea(!mostrarAgregarTarea)}
+          >
+            {mostrarAgregarTarea ? (
+              <X className="h-4 w-4" />
             ) : (
-              <tr>
-                <td colSpan="7" className="text-center">No hay tareas asignadas para este proyecto.</td>
-              </tr>
+              <Plus className="h-4 w-4" />
             )}
-          </tbody>
-        </table>
-      </div>
-      <button className="btn btn-sm mb-3 mt-3" onClick={() => setMostrarAgregarTarea(!mostrarAgregarTarea)}>
-  {mostrarAgregarTarea ? (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
-      <path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 0 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414 2.707 14.707a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/>
-    </svg>
-  ) : (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-plus" viewBox="0 0 16 16">
-      <path d="M8 1a1 1 0 0 1 1 1v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H1a1 1 0 0 1 0-2h6V2a1 1 0 0 1 1-1z"/>
-    </svg>
-  )}
-</button>
-      {mostrarAgregarTarea && (
-        <form onSubmit={agregarTarea}>
-          <div className="mb-3">
-            <label htmlFor="tareaNombre" className="form-label">Nombre de la Tarea:</label>
-            <input type="text" className="form-control" id="tareaNombre" value={tareaNombre} onChange={(e) => setTareaNombre(e.target.value)} required />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="descripcionTarea" className="form-label">Descripción:</label>
-            <textarea className="form-control" id="descripcionTarea" rows="3" value={descripcionTarea} onChange={(e) => setDescripcionTarea(e.target.value)} required />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="fechaLimiteTarea" className="form-label">Fecha Límite:</label>
-            <input title='Recibirás un correo recordatorio un dia antes de la fecha limite' type="date" className="form-control" id="fechaLimiteTarea" value={fechaLimiteTarea} onChange={(e) => setFechaLimiteTarea(e.target.value)} required />
-          </div>
-          <div className="mb-3 form-check">
-            <input type="checkbox" className="form-check-input" id="tareaCompletada" checked={tareaCompletada} onChange={(e) => setTareaCompletada(e.target.checked)} />
-            <label className="form-check-label" htmlFor="tareaCompletada">Completada</label>
-          </div>
-          <div className="mb-3 form-check">
-            <input type="checkbox" className="form-check-input" id="pendientePagoTarea" checked={pendientePagoTarea} onChange={(e) => setPendientePagoTarea(e.target.checked)} />
-            <label className="form-check-label" htmlFor="pendientePagoTarea">Pendiente de Pago</label>
-          </div>
-          <button type="submit" className="btn btn-sm btn-primary">
-           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-floppy2" viewBox="0 0 16 16">
-            <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v3.5A1.5 1.5 0 0 1 11.5 6h-7A1.5 1.5 0 0 1 3 4.5V1H1.5a.5.5 0 0 0-.5.5m9.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
-           </svg>
-          </button>
-        </form>
-      )}
-      {error && <div className="alert alert-danger mt-3">{error}</div>}
-    </div>
+          </Button>
+        </div>
+
+        {mostrarAgregarTarea && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="tareaNombre">Nombre de la Tarea</Label>
+                <Input
+                  id="tareaNombre"
+                  value={formData.tareaNombre}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    tareaNombre: e.target.value
+                  }))}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="descripcionTarea">Descripción</Label>
+                <Textarea
+                  id="descripcionTarea"
+                  value={formData.descripcionTarea}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    descripcionTarea: e.target.value
+                  }))}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fechaLimiteTarea">Fecha Límite</Label>
+                <Input
+                  id="fechaLimiteTarea"
+                  type="date"
+                  value={formData.fechaLimiteTarea}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    fechaLimiteTarea: e.target.value
+                  }))}
+                  required
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="tareaCompletada"
+                  checked={formData.tareaCompletada}
+                  onCheckedChange={(checked) => setFormData(prev => ({
+                    ...prev,
+                    tareaCompletada: checked
+                  }))}
+                />
+                <Label htmlFor="tareaCompletada">Tarea Completada</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="pendientePagoTarea"
+                  checked={formData.pendientePagoTarea}
+                  onCheckedChange={(checked) => setFormData(prev => ({
+                    ...prev,
+                    pendientePagoTarea: checked
+                  }))}
+                />
+                <Label htmlFor="pendientePagoTarea">Requiere Pago</Label>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button 
+                type="submit"
+                disabled={isLoading}
+                className="flex items-center gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                {isLoading ? 'Guardando...' : 'Guardar'}
+              </Button>
+            </div>
+          </form>
+        )}
+      </CardContent>
+    </Card>
   );
-}
+};
 
 export default Tareas;

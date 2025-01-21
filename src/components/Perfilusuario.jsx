@@ -1,75 +1,125 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Perfil from '../images/Perfil.png';
+import { 
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { User, Lock, Loader2 } from 'lucide-react';
 
-function Perfilusuario() {
-  const [usuario, setUsuario] = useState(null);
-  const [usuarioNombre, setUsuarioNombre] = useState('');
-  const [errorMensaje, setErrorMensaje] = useState('');
+const Perfilusuario = () => {
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const irACambiarContraseña = () => {
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    const userId = localStorage.getItem('usuario_id');
+    if (!userId) {
+      setError('No se encontró ID de usuario');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://api-freelancehub.vercel.app/get-usuario/${userId}`);
+      if (!response.ok) throw new Error('Error al obtener los datos del usuario');
+      
+      const data = await response.json();
+      setUserData(data.usuario);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching user:', err);
+      setError('No se pudo obtener la información del usuario');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangePassword = () => {
     navigate('/ingresarcorreo');
   };
 
-  useEffect(() => {
-    const userId = localStorage.getItem('usuario_id');
-
-    fetch(`https://api-freelancehub.vercel.app/get-usuario/${userId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los datos del usuario.');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUsuario(data.usuario);
-        setUsuarioNombre(data.usuario.usuario_nombre);
-      })
-      .catch((error) => {
-        console.error('Error al obtener el usuario:', error);
-        setErrorMensaje('No se pudo obtener la información del usuario.');
-      });
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="perfil-usuario">
-      <div className="row d-flex align-items-center">
-        <div className="col-12 col-md-4 text-center">
-          <img id="img-perfil" src={Perfil} alt="" className="" />
-        </div>
-        <div className="col-12 col-md-8">
-          <h2 className="perfil-titulo">{usuarioNombre}</h2>
-          {errorMensaje && (
-            <div className="alert alert-danger" role="alert">
-              {errorMensaje}
+    <div className="container mx-auto px-4 py-8">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+            <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center">
+              <User className="h-16 w-16 text-gray-400" />
             </div>
+            <div className="text-center md:text-left">
+              <h2 className="text-2xl font-bold tracking-tight">
+                {userData?.usuario_nombre || 'Usuario'}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Perfil de Usuario
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
-          {usuario ? (
-            <div className="perfil-detalles">
-              <div className="mb-3">
-                <label className="form-label mt-4">Tu correo electrónico</label>
-                <input type="email" className="form-control" value={usuario.usuario_email} readOnly/>
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Tu RUT</label>
-                <input type="text" className="form-control" value={usuario.usuario_rut} readOnly/>
-              </div>
-              <div className="d-flex justify-content-center">
-                <button type="button" className="btn btn-primary me-2 mt-4" onClick={irACambiarContraseña}>
-                  Cambiar contraseña
-                </button>
-              </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
+                id="email"
+                type="email"
+                value={userData?.usuario_email || ''}
+                readOnly
+                className="bg-muted"
+              />
             </div>
-          ) : (
-            <div className="text-center">
-              <p>Cargando la información...</p>
+
+            <div className="space-y-2">
+              <Label htmlFor="rut">RUT</Label>
+              <Input
+                id="rut"
+                type="text"
+                value={userData?.usuario_rut || ''}
+                readOnly
+                className="bg-muted"
+              />
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </CardContent>
+
+        <CardFooter className="flex justify-center pt-6">
+          <Button
+            onClick={handleChangePassword}
+            className="w-full sm:w-auto"
+          >
+            <Lock className="h-4 w-4 mr-2" />
+            Cambiar contraseña
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
-}
+};
 
 export default Perfilusuario;

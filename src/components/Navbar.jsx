@@ -1,55 +1,108 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { Menu, Home, LogIn, UserPlus, LayoutDashboard } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import Navbardash from './Navbardash';
-import Menu from '../images/Menu.png'
-import Logo2 from '../images/Logo2.png'
 
-
-function Navbar() {
+const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const rutasDashboard = ['/dashboardpage', '/nuevocliente', '/nuevocliente/nuevoproyecto'];
-  const esRutaDashboard = rutasDashboard.some(ruta => location.pathname.startsWith(ruta));
 
-  const irAInicio = () => {
-    navigate('/');
-  };
-
-  const irAInicioSesion = () => {
-    navigate('/login');
-  };
-
-  const irARegistro = () => {
-    navigate('/registro');
-  };
-
-  const irAPortal = () => {
-    navigate('/dashboardpage');
-  };
-
-  return esRutaDashboard ? <Navbardash /> : (
-    <nav id="navprincipal" className="navbar navbar-expand-lg">
-    <div className="container-fluid d-flex">
-    <img id='logo-nav' src={Logo2} alt="" />
-    <button title='Al Dashboard' className="nav-link text-light" onClick={irAPortal}>FreelanceHub</button>
-    <div className="collapse navbar-collapse d-none d-lg-flex" id="navbarNavAltMarkup">
-      <div className="navbar-nav ms-auto text-end">
-        <button className="nav-link active text-light" aria-current="page" onClick={irAInicio}>Home</button>
-        <button className="nav-link text-light" onClick={irARegistro}>Registrarse</button>
-        <button className="nav-link text-light" onClick={irAInicioSesion}>Login</button>
-      </div>
-    </div>
-    <div className="dropdown d-lg-none ms-auto">
-      <button className="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><img src={Menu} alt="" /></button>
-      <ul className="dropdown-menu dropdown-menu-end">
-        <li><button className="dropdown-item" onClick={irAInicio}>Home</button></li>
-        <li><button className="dropdown-item" onClick={irARegistro}>Registrate</button></li>
-        <li><button className="dropdown-item" onClick={irAInicioSesion}>Login</button></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+  const dashboardRoutes = ['/dashboardpage', '/nuevocliente', '/nuevocliente/nuevoproyecto'];
+  const isDashboardRoute = dashboardRoutes.some(route => 
+    location.pathname.startsWith(route)
   );
-}
+
+  const navigationLinks = [
+    { name: 'Home', path: '/', icon: Home },
+    { name: 'Registrarse', path: '/registro', icon: UserPlus },
+    { name: 'Login', path: '/login', icon: LogIn },
+  ];
+
+  if (isDashboardRoute) {
+    return <Navbardash />;
+  }
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-primary">
+      <div className="container flex h-16 items-center px-4">
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="link" 
+            className="flex items-center space-x-2 text-white"
+            onClick={() => navigate('/dashboardpage')}
+          >
+            <LayoutDashboard className="h-6 w-6" />
+            <span className="font-bold text-xl">FreelanceHub</span>
+          </Button>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex ml-auto">
+          <NavigationMenu>
+            <NavigationMenuList>
+              {navigationLinks.map((link) => (
+                <NavigationMenuItem key={link.path}>
+                  <Button
+                    variant="ghost"
+                    className="text-white hover:text-white hover:bg-primary/90"
+                    onClick={() => navigate(link.path)}
+                  >
+                    <link.icon className="h-4 w-4 mr-2" />
+                    {link.name}
+                  </Button>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden ml-auto">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" className="text-white">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>FreelanceHub</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col space-y-4 mt-4">
+                {navigationLinks.map((link) => (
+                  <Button
+                    key={link.path}
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => navigate(link.path)}
+                  >
+                    <link.icon className="h-4 w-4 mr-2" />
+                    {link.name}
+                  </Button>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </header>
+  );
+};
 
 export default Navbar;
