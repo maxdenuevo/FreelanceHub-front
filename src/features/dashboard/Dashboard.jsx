@@ -36,53 +36,51 @@ import {
  */
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    projects: 0,
-    clients: 0,
-    tasks: 0,
-    income: 0
+    totalProjects: 0,
+    activeProjects: 0,
+    completedProjects: 0,
+    totalClients: 0,
+    totalEarnings: 0,
   });
   const [recentProjects, setRecentProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        setIsLoading(true);
-        // For demo purposes, using mock data
-        // In a real app, these would be API calls
-        setTimeout(() => {
-          setStats({
-            projects: 5,
-            clients: 3,
-            tasks: 12,
-            income: 2500
-          });
-          
-          setRecentProjects([
-            { id: 1, name: 'Website Redesign', client: 'ABC Corp', dueDate: '2023-06-30', status: 'In Progress' },
-            { id: 2, name: 'Mobile App Development', client: 'XYZ Ltd', dueDate: '2023-07-15', status: 'Planning' },
-            { id: 3, name: 'SEO Optimization', client: 'Local Business', dueDate: '2023-06-10', status: 'Completed' }
-          ]);
-          
-          setIsLoading(false);
-        }, 1000);
+        // Mock data - would be replaced with actual API calls
+        setStats({
+          totalProjects: 12,
+          activeProjects: 5,
+          completedProjects: 7,
+          totalClients: 8,
+          totalEarnings: 4500000,
+        });
+        
+        setRecentProjects([
+          { id: 1, name: 'Diseño de Página Web', client: 'Empresa XYZ', status: 'En progreso', dueDate: '2023-12-15' },
+          { id: 2, name: 'Aplicación Móvil', client: 'Startup ABC', status: 'Completado', dueDate: '2023-11-30' },
+          { id: 3, name: 'Campaña de Marketing', client: 'Cliente Personal', status: 'En progreso', dueDate: '2023-12-20' },
+        ]);
+        
+        setLoading(false);
       } catch (err) {
         setError('Error al cargar los datos del dashboard');
         toast({
-          variant: "destructive",
           title: "Error",
           description: "No se pudieron cargar los datos del dashboard",
+          variant: "destructive",
         });
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [toast]);
 
   // Format currency (CLP)
   const formatCurrency = (amount) => {
@@ -114,7 +112,7 @@ const Dashboard = () => {
   const handleViewProjects = () => navigate('/dashboardpage/proyectos');
 
   // Render loading state
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col space-y-6">
@@ -150,57 +148,69 @@ const Dashboard = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
       
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Proyectos Activos</h3>
-          <p className="text-3xl font-bold">{stats.projects}</p>
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm text-gray-500">Proyectos Totales</h3>
+          <p className="text-2xl font-bold">{stats.totalProjects}</p>
+          <div className="flex mt-2">
+            <div className="mr-4">
+              <span className="text-sm text-gray-500">Activos: </span>
+              <span className="font-medium">{stats.activeProjects}</span>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500">Completados: </span>
+              <span className="font-medium">{stats.completedProjects}</span>
+            </div>
+          </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Clientes</h3>
-          <p className="text-3xl font-bold">{stats.clients}</p>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm text-gray-500">Clientes</h3>
+          <p className="text-2xl font-bold">{stats.totalClients}</p>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Tareas Pendientes</h3>
-          <p className="text-3xl font-bold">{stats.tasks}</p>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-gray-500 text-sm font-medium">Ingresos del Mes</h3>
-          <p className="text-3xl font-bold">${stats.income}</p>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm text-gray-500">Ingresos Totales</h3>
+          <p className="text-2xl font-bold">${stats.totalEarnings.toLocaleString()}</p>
         </div>
       </div>
       
       {/* Recent Projects */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Proyectos Recientes</h2>
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <h2 className="text-lg font-bold mb-4">Proyectos Recientes</h2>
+        
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
+          <table className="w-full">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Límite</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Nombre del Proyecto</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Cliente</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Estado</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">Fecha de Entrega</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {recentProjects.map((project) => (
-                <tr key={project.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.client}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.dueDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      project.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                      project.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
+                <tr 
+                  key={project.id} 
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/dashboardpage/proyectos/${project.id}`)}
+                >
+                  <td className="px-4 py-2">{project.name}</td>
+                  <td className="px-4 py-2">{project.client}</td>
+                  <td className="px-4 py-2">
+                    <span 
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        project.status === 'En progreso' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                    >
                       {project.status}
                     </span>
                   </td>
+                  <td className="px-4 py-2">{new Date(project.dueDate).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -209,22 +219,22 @@ const Dashboard = () => {
       </div>
       
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Acciones Rápidas</h2>
-        <div className="flex flex-wrap gap-4">
-          <button 
-            onClick={() => window.location.href = '/nuevocliente'} 
-            className="px-4 py-2 bg-primary text-white rounded-md"
-          >
-            Nuevo Cliente
-          </button>
-          <button 
-            onClick={() => window.location.href = '/nuevocliente/nuevoproyecto'} 
-            className="px-4 py-2 bg-primary text-white rounded-md"
-          >
-            Nuevo Proyecto
-          </button>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button 
+          onClick={() => navigate('/nuevocliente')}
+          className="bg-primary text-white p-4 rounded-lg flex items-center justify-between"
+        >
+          <span>Nuevo Cliente</span>
+          <span>→</span>
+        </button>
+        
+        <button 
+          onClick={() => navigate('/nuevocliente/nuevoproyecto')}
+          className="bg-secondary text-white p-4 rounded-lg flex items-center justify-between"
+        >
+          <span>Nuevo Proyecto</span>
+          <span>→</span>
+        </button>
       </div>
     </div>
   );

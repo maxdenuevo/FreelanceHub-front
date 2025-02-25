@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import logoWhite from '@/assets/logo-white.svg';
@@ -9,15 +9,38 @@ import logoWhite from '@/assets/logo-white.svg';
  */
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  const isAuthenticated = !!localStorage.getItem('usuario_id');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const userId = localStorage.getItem('usuario_id');
+    setIsAuthenticated(!!userId);
+  }, [location]);
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const isInDashboard = location.pathname.includes('/dashboardpage');
 
   const handleLogout = () => {
     localStorage.removeItem('usuario_id');
     localStorage.removeItem('token');
+    setIsAuthenticated(false);
     navigate('/login');
   };
 
@@ -37,7 +60,9 @@ const Navbar = () => {
   }
 
   return (
-    <header className="bg-primary text-white">
+    <header className={`fixed w-full z-10 transition-all duration-300 ${
+      isScrolled ? 'bg-white shadow-md' : 'bg-transparent'
+    }`}>
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo section */}
@@ -50,7 +75,7 @@ const Navbar = () => {
           <nav className="hidden md:flex items-center space-x-6">
             <Link 
               to="/" 
-              className={`text-white hover:text-white/80 ${
+              className={`text-gray-800 hover:text-primary ${
                 location.pathname === '/' ? 'border-b-2 border-primary' : ''
               }`}
             >
@@ -59,7 +84,7 @@ const Navbar = () => {
             {!isInDashboard && (
               <Link 
                 to="/contactanos" 
-                className={`text-white hover:text-white/80 ${
+                className={`text-gray-800 hover:text-primary ${
                   location.pathname === '/contactanos' ? 'border-b-2 border-primary' : ''
                 }`}
               >
@@ -72,14 +97,14 @@ const Navbar = () => {
                   {!isInDashboard && (
                     <Link 
                       to="/dashboardpage" 
-                      className="text-white hover:text-white/80"
+                      className="text-gray-800 hover:text-primary"
                     >
                       Dashboard
                     </Link>
                   )}
                   <Button 
                     variant="ghost" 
-                    className="text-white hover:text-white/80 hover:bg-primary-600"
+                    className="bg-transparent text-gray-800 hover:text-primary hover:bg-primary px-0"
                     onClick={handleLogout}
                   >
                     Cerrar Sesión
@@ -89,14 +114,14 @@ const Navbar = () => {
                 <>
                   <Button 
                     variant="ghost" 
-                    className="text-white hover:text-white/80 hover:bg-primary-600"
+                    className="bg-transparent text-gray-800 hover:text-primary hover:bg-primary px-0"
                     onClick={() => navigate('/login')}
                   >
                     Iniciar Sesión
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="text-white border-white hover:bg-white hover:text-primary"
+                    className="bg-transparent text-gray-800 border border-primary hover:bg-primary hover:text-white px-4 py-2 rounded"
                     onClick={() => navigate('/registro')}
                   >
                     Registrarse
@@ -107,13 +132,20 @@ const Navbar = () => {
           </nav>
           
           {/* Mobile menu button */}
-          <button 
-            className="md:hidden text-white"
-            onClick={toggleMenu}
-            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden">
+            <button 
+              onClick={toggleMenu}
+              className="text-gray-800 focus:outline-none"
+            >
+              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
         
         {/* Mobile navigation */}
@@ -121,7 +153,7 @@ const Navbar = () => {
           <nav className="md:hidden py-4 flex flex-col space-y-4">
             <Link 
               to="/" 
-              className={`text-white hover:text-white/80 py-2 ${
+              className={`text-gray-800 hover:text-primary py-2 ${
                 location.pathname === '/' ? 'border-b-2 border-primary' : ''
               }`}
               onClick={() => setIsMenuOpen(false)}
@@ -131,7 +163,7 @@ const Navbar = () => {
             {!isInDashboard && (
               <Link 
                 to="/contactanos" 
-                className={`text-white hover:text-white/80 py-2 ${
+                className={`text-gray-800 hover:text-primary py-2 ${
                   location.pathname === '/contactanos' ? 'border-b-2 border-primary' : ''
                 }`}
                 onClick={() => setIsMenuOpen(false)}
@@ -145,15 +177,18 @@ const Navbar = () => {
                   {!isInDashboard && (
                     <Link
                       to="/dashboardpage"
-                      className="text-white hover:text-white/80"
+                      className="text-gray-800 hover:text-primary"
                     >
                       Dashboard
                     </Link>
                   )}
                   <Button 
                     variant="ghost" 
-                    className="text-white hover:text-white/80 hover:bg-primary-600 justify-start px-0"
-                    onClick={handleLogout}
+                    className="bg-transparent text-gray-800 hover:text-primary hover:bg-primary px-0 justify-start"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
                   >
                     Cerrar Sesión
                   </Button>
@@ -162,7 +197,7 @@ const Navbar = () => {
                 <>
                   <Button 
                     variant="ghost" 
-                    className="text-white hover:text-white/80 hover:bg-primary-600 justify-start px-0"
+                    className="bg-transparent text-gray-800 hover:text-primary hover:bg-primary px-0 justify-start"
                     onClick={() => {
                       setIsMenuOpen(false);
                       navigate('/login');
@@ -172,7 +207,7 @@ const Navbar = () => {
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="text-white border-white hover:bg-white hover:text-primary w-full"
+                    className="bg-transparent text-gray-800 border border-primary hover:bg-primary hover:text-white px-4 py-2 rounded w-full"
                     onClick={() => {
                       setIsMenuOpen(false);
                       navigate('/registro');

@@ -37,6 +37,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * Clients page component
@@ -45,7 +46,7 @@ import {
 const Clients = () => {
   const [clients, setClients] = useState([]);
   const [filteredClients, setFilteredClients] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
@@ -55,37 +56,61 @@ const Clients = () => {
   // Fetch clients on component mount
   useEffect(() => {
     const fetchClients = async () => {
-      const userId = localStorage.getItem('usuario_id');
-
-      if (!userId) {
-        setError('No se pudo cargar la información del usuario');
-        setIsLoading(false);
-        return;
-      }
-
       try {
-        const data = await clientsApi.getUserClients(userId);
-        
-        if (data.clientes && Array.isArray(data.clientes)) {
-          setClients(data.clientes);
-          setFilteredClients(data.clientes);
-        } else {
-          throw new Error('La respuesta de la API no contiene un array de clientes');
-        }
-      } catch (error) {
-        console.error('Error fetching clients:', error);
-        setError(error.message || 'Error al obtener los clientes');
-        
+        // For now, we'll use mock data
+        // In a real app, we would use: const data = await clientsApi.getAll();
+        setClients([
+          { 
+            id: 1, 
+            name: 'Empresa XYZ', 
+            contact: 'Juan Pérez',
+            email: 'juan@xyz.com',
+            phone: '+56 9 1234 5678',
+            projects: 3,
+            totalValue: 2500000
+          },
+          { 
+            id: 2, 
+            name: 'Startup ABC', 
+            contact: 'María González',
+            email: 'maria@abc.com',
+            phone: '+56 9 8765 4321',
+            projects: 1,
+            totalValue: 3000000
+          },
+          { 
+            id: 3, 
+            name: 'Cliente Personal', 
+            contact: 'Pedro Soto',
+            email: 'pedro@mail.com',
+            phone: '+56 9 5555 5555',
+            projects: 2,
+            totalValue: 900000
+          },
+          { 
+            id: 4, 
+            name: 'Comercial DEF', 
+            contact: 'Ana Muñoz',
+            email: 'ana@def.com',
+            phone: '+56 9 4444 4444',
+            projects: 1,
+            totalValue: 1500000
+          }
+        ]);
+        setFilteredClients(clients);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError('Error al cargar los clientes');
         toast({
-          title: "Error",
-          description: "No se pudieron cargar los clientes. Intenta nuevamente.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'No se pudieron cargar los clientes',
+          variant: 'destructive'
         });
-      } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-
+    
     fetchClients();
   }, [toast]);
 
@@ -98,9 +123,9 @@ const Clients = () => {
       setFilteredClients(clients);
     } else {
       const filtered = clients.filter(client => 
-        client.cliente_nombre.toLowerCase().includes(value) ||
-        client.cliente_email.toLowerCase().includes(value) ||
-        client.cliente_rut.toLowerCase().includes(value)
+        client.name.toLowerCase().includes(value) ||
+        client.email.toLowerCase().includes(value) ||
+        client.contact.toLowerCase().includes(value)
       );
       setFilteredClients(filtered);
     }
@@ -110,6 +135,43 @@ const Clients = () => {
   const handleAddNewClient = () => {
     navigate('/nuevocliente');
   };
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="flex justify-between items-center mb-6">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        
+        <div className="bg-white rounded-lg shadow">
+          <Skeleton className="h-12 w-full" />
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-16 w-full mt-1" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+  
+  // Render error state
+  if (error) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="bg-red-50 text-red-800 p-4 rounded-lg">
+          <p className="font-medium">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()}
+            className="mt-2"
+            variant="outline"
+          >
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -158,7 +220,7 @@ const Clients = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   const filtered = [...clients].sort((a, b) => 
-                    a.cliente_nombre.localeCompare(b.cliente_nombre)
+                    a.name.localeCompare(b.name)
                   );
                   setFilteredClients(filtered);
                 }}>
@@ -168,17 +230,22 @@ const Clients = () => {
             </DropdownMenu>
           </div>
           
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          {clients.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <UserX className="h-12 w-12 mx-auto mb-3 text-muted-foreground/60" />
+              <div className="space-y-3">
+                <p>No tienes clientes registrados aún.</p>
+                <Button 
+                  variant="outline"
+                  onClick={handleAddNewClient}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Agregar tu primer cliente
+                </Button>
+              </div>
             </div>
-          ) : filteredClients.length > 0 ? (
+          ) : (
             <div className="border rounded-md">
               <Table>
                 <TableHeader>
@@ -186,38 +253,35 @@ const Clients = () => {
                     <TableHead>Nombre</TableHead>
                     <TableHead className="hidden md:table-cell">Email</TableHead>
                     <TableHead className="hidden md:table-cell">Teléfono</TableHead>
-                    <TableHead className="hidden lg:table-cell">RUT</TableHead>
+                    <TableHead className="hidden lg:table-cell">Proyectos</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredClients.map(client => (
-                    <TableRow key={client.cliente_id}>
-                      <TableCell className="font-medium">{client.cliente_nombre}</TableCell>
+                    <TableRow key={client.id}>
+                      <TableCell className="font-medium">{client.name}</TableCell>
                       <TableCell className="hidden md:table-cell">
                         <div className="flex items-center gap-2">
                           <Mail className="h-4 w-4 text-muted-foreground" />
-                          {client.cliente_email}
+                          {client.email}
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <div className="flex items-center gap-2">
                           <Phone className="h-4 w-4 text-muted-foreground" />
-                          {client.cliente_tel}
+                          {client.phone}
                         </div>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          {client.cliente_rut}
-                        </div>
+                        {client.projects}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => navigate(`/dashboardpage/clientes/${client.cliente_id}`)}
+                            onClick={() => navigate(`/dashboardpage/clientes/${client.id}`)}
                           >
                             <FileText className="h-4 w-4" />
                           </Button>
@@ -227,25 +291,6 @@ const Clients = () => {
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <UserX className="h-12 w-12 mx-auto mb-3 text-muted-foreground/60" />
-              {searchTerm ? (
-                <p>No se encontraron clientes con ese criterio de búsqueda.</p>
-              ) : (
-                <div className="space-y-3">
-                  <p>No tienes clientes registrados aún.</p>
-                  <Button 
-                    variant="outline"
-                    onClick={handleAddNewClient}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Agregar tu primer cliente
-                  </Button>
-                </div>
-              )}
             </div>
           )}
         </CardContent>

@@ -4,47 +4,65 @@
 
 /**
  * Combines multiple class names into a single string
- * Similar to the clsx or classnames libraries
- * @param {...string} classes - Class names to combine
- * @returns {string} Combined class names
+ * This is a simple implementation similar to the 'clsx' or 'classnames' libraries
+ * @param  {...any} classes - Class names to be combined
+ * @returns {string} - Combined class names
  */
 export function cn(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(' ')
 }
 
 /**
- * Format a date as a localized string
- * @param {Date|string} date - Date to format
+ * Format a date to a localized string
+ * @param {Date|string|number} date - Date to format
  * @param {Object} options - Intl.DateTimeFormat options
- * @returns {string} Formatted date
+ * @returns {string} - Formatted date string
  */
 export function formatDate(date, options = {}) {
-  if (!date) return '';
-  
   const defaultOptions = {
+    day: 'numeric',
+    month: 'long',
     year: 'numeric',
-    month: 'short',
-    day: 'numeric'
   };
   
-  const mergedOptions = { ...defaultOptions, ...options };
-  
-  return new Date(date).toLocaleDateString('es-CL', mergedOptions);
+  return new Date(date).toLocaleDateString(
+    'es-CL', 
+    { ...defaultOptions, ...options }
+  );
 }
 
 /**
- * Format a currency amount
+ * Format currency values
  * @param {number} amount - Amount to format
- * @param {string} currency - Currency code (default: CLP)
- * @returns {string} Formatted currency
+ * @param {string} currency - Currency code
+ * @returns {string} - Formatted currency string
  */
 export function formatCurrency(amount, currency = 'CLP') {
-  if (amount === undefined || amount === null) return '';
-  
   return new Intl.NumberFormat('es-CL', {
     style: 'currency',
-    currency
+    currency,
+    maximumFractionDigits: 0,
   }).format(amount);
+}
+
+/**
+ * Truncate text with ellipsis if it exceeds maxLength
+ * @param {string} text - Text to truncate
+ * @param {number} maxLength - Maximum length
+ * @returns {string} - Truncated text
+ */
+export function truncateText(text, maxLength = 100) {
+  if (!text || text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
+}
+
+/**
+ * Sleep function for async operations
+ * @param {number} ms - Milliseconds to sleep
+ * @returns {Promise} - Promise that resolves after ms
+ */
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -65,24 +83,12 @@ export function generateId(length = 8) {
   return Math.random().toString(36).substring(2, 2 + length);
 }
 
-/**
- * Truncate text with ellipsis
- * @param {string} text - Text to truncate
- * @param {number} maxLength - Maximum length (default: 100)
- * @returns {string} Truncated text
- */
-export function truncateText(text, maxLength = 100) {
-  if (!text) return '';
-  if (text.length <= maxLength) return text;
-  
-  return text.substring(0, maxLength) + '...';
-}
-
 export default {
   cn,
   formatDate,
   formatCurrency,
   delay,
   generateId,
-  truncateText
+  truncateText,
+  sleep
 }; 

@@ -28,61 +28,54 @@ import {
  */
 const Contacto = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    nombre: '',
     email: '',
-    message: ''
+    asunto: '',
+    mensaje: ''
   });
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
   
   const { toast } = useToast();
   
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate form
-    if (!formData.name || !formData.email || !formData.message) {
-      setError('Por favor completa todos los campos');
-      return;
-    }
-    
-    setIsLoading(true);
-    setError(null);
-    setSuccess(false);
+    setLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Here would be the API call to send the contact form
       
-      // Simulate successful submission
-      setSuccess(true);
+      // For demo purposes, we'll just simulate a successful submission
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Mensaje enviado",
         description: "Hemos recibido tu mensaje. Te contactaremos pronto.",
+        variant: "success",
       });
       
       // Reset form
       setFormData({
-        name: '',
+        nombre: '',
         email: '',
-        message: ''
+        asunto: '',
+        mensaje: ''
       });
     } catch (error) {
-      console.error('Error al enviar mensaje:', error);
-      setError('Error al enviar tu mensaje. Intenta nuevamente.');
+      toast({
+        title: "Error al enviar",
+        description: "Ha ocurrido un error al enviar tu mensaje. Por favor intenta nuevamente.",
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
   
@@ -92,7 +85,7 @@ const Contacto = () => {
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Contáctanos</h1>
           <p className="text-muted-foreground">
-            Estamos aquí para ayudarte. Envíanos un mensaje y te responderemos lo antes posible.
+            Estamos aquí para ayudarte. Completa el formulario a continuación y nos pondremos en contacto contigo lo antes posible.
           </p>
         </div>
         
@@ -125,16 +118,16 @@ const Contacto = () => {
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nombre completo</Label>
+                    <Label htmlFor="nombre">Nombre completo</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        id="name"
+                        id="nombre"
                         placeholder="Tu nombre"
-                        value={formData.name}
-                        onChange={handleInputChange}
+                        value={formData.nombre}
+                        onChange={handleChange}
                         className="pl-10"
-                        disabled={isLoading}
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -148,24 +141,39 @@ const Contacto = () => {
                         type="email"
                         placeholder="correo@ejemplo.com"
                         value={formData.email}
-                        onChange={handleInputChange}
+                        onChange={handleChange}
                         className="pl-10"
-                        disabled={isLoading}
+                        disabled={loading}
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="message">Mensaje</Label>
+                    <Label htmlFor="asunto">Asunto</Label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="asunto"
+                        placeholder="Asunto del mensaje"
+                        value={formData.asunto}
+                        onChange={handleChange}
+                        className="min-h-[120px] pl-10"
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="mensaje">Mensaje</Label>
                     <div className="relative">
                       <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Textarea
-                        id="message"
+                        id="mensaje"
                         placeholder="¿En qué podemos ayudarte?"
-                        value={formData.message}
-                        onChange={handleInputChange}
+                        value={formData.mensaje}
+                        onChange={handleChange}
                         className="min-h-[120px] pl-10"
-                        disabled={isLoading}
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -173,9 +181,9 @@ const Contacto = () => {
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={isLoading}
+                    disabled={loading}
                   >
-                    {isLoading ? (
+                    {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Enviando...

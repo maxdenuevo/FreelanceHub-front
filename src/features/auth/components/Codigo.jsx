@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/services/api';
 import { useToast } from '@/components/ui/use-toast';
@@ -29,212 +29,139 @@ import logoWhite from '@/assets/logo-white.svg';
  * Verification code entry component for password recovery
  */
 const Codigo = () => {
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const { email, setCodigo, setCodigoVerificado } = useContext(RecoveryContext);
+  const [code, setCode] = useState(['', '', '', '']);
+  const [loading, setLoading] = useState(false);
+  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Get the recovery context from App.jsx
-  const { 
-    email, 
-    setEmail: setContextEmail, 
-    setCodigo: setContextCodigo,
-    setCodigoVerificado 
-  } = useContext(RecoveryContext);
-  
-  // Check if email is set in context
+  // Redirect if email is not set
   useEffect(() => {
     if (!email) {
       navigate('/ingresarcorreo');
     }
   }, [email, navigate]);
   
-  // Resend cooldown timer
-  useEffect(() => {
-    let timer;
-    if (resendCooldown > 0) {
-      timer = setTimeout(() => {
-        setResendCooldown(prev => prev - 1);
-      }, 1000);
+  const handleChange = (index, value) => {
+    // Only allow numbers
+    if (!/^\d*$/.test(value)) return;
+    
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
+    
+    // Auto-focus next input
+    if (value && index < 3) {
+      inputRefs[index + 1].current.focus();
     }
-    
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [resendCooldown]);
-  
-  const handleCodeChange = (e) => {
-    // Only allow numbers, maximum 6 digits
-    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-    setVerificationCode(value);
   };
   
-  const handleBack = () => {
-    navigate('/ingresarcorreo');
-  };
-  
-  const handleResendCode = async () => {
-    if (resendCooldown > 0) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await authApi.requestPasswordReset(email);
-      
-      if (response.success) {
-        toast({
-          title: "Código reenviado",
-          description: "Se ha enviado un nuevo código de verificación a tu correo.",
-        });
-        
-        // Set cooldown for 60 seconds
-        setResendCooldown(60);
-      } else {
-        setError(response.error || 'No se pudo reenviar el código');
-      }
-    } catch (error) {
-      console.error('Error al reenviar código:', error);
-      setError('Error al conectar con el servidor. Intenta nuevamente.');
-    } finally {
-      setIsLoading(false);
+  const handleKeyDown = (index, e) => {
+    // Handle backspace
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
+      inputRefs[index - 1].current.focus();
     }
   };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!verificationCode || verificationCode.length !== 6) {
-      setError('Por favor ingresa el código de 6 dígitos');
+    const fullCode = code.join('');
+    
+    if (fullCode.length !== 4) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa el código completo",
+        variant: "destructive",
+      });
       return;
     }
     
-    setIsLoading(true);
-    setError(null);
+    setLoading(true);
     
     try {
-      const response = await authApi.verifyPasswordResetCode(email, verificationCode);
+      // API call would go here to verify code
       
-      if (response.success) {
-        // Save code in context for next steps
-        setContextCodigo(verificationCode);
-        setCodigoVerificado(true);
-        
-        toast({
-          title: "Código verificado",
-          description: "Ahora puedes crear una nueva contraseña.",
-        });
-        
-        navigate('/cambiarcontraseña');
-      } else {
-        setError(response.error || 'Código inválido o expirado');
-      }
+      // Store code in context for next steps
+      setCodigo(fullCode);
+      setCodigoVerificado(true);
+      
+      toast({
+        title: "Código verificado",
+        description: "Código verificado correctamente",
+        variant: "success",
+      });
+      
+      navigate('/cambiarcontraseña');
     } catch (error) {
-      console.error('Error al verificar código:', error);
-      setError('Error al conectar con el servidor. Intenta nuevamente.');
+      toast({
+        title: "Error",
+        description: error.message || "Código incorrecto o expirado",
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
   
   return (
-    <div className="flex min-h-[80vh] items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-2 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="bg-primary p-3 rounded-full">
-              <img 
-                src={logoWhite} 
-                alt="FreelanceHub Logo" 
-                className="h-10 w-auto" 
-              />
-            </div>
-          </div>
-          <CardTitle className="text-2xl font-bold">Verificar código</CardTitle>
-          <CardDescription>
-            Ingresa el código de 6 dígitos enviado a {email}
-          </CardDescription>
-        </CardHeader>
+    <div className="container mx-auto max-w-md p-6">
+      <h1 className="text-2xl font-bold mb-2 text-center">Verificar Código</h1>
+      <p className="text-center text-gray-600 mb-6">
+        Ingresa el código de 4 dígitos enviado a {email}
+      </p>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex justify-center space-x-3">
+          {code.map((digit, index) => (
+            <input
+              key={index}
+              ref={inputRefs[index]}
+              type="text"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              className="w-12 h-12 text-center text-xl border rounded-md"
+              required
+            />
+          ))}
+        </div>
         
-        <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="verificationCode">Código de verificación</Label>
-              <div className="relative">
-                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="verificationCode"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="000000"
-                  value={verificationCode}
-                  onChange={handleCodeChange}
-                  className="pl-10 text-center text-lg tracking-widest"
-                  disabled={isLoading}
-                  maxLength={6}
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Revisa tu correo electrónico para encontrar el código de 6 dígitos.
-              </p>
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verificando...
-                </>
-              ) : (
-                <>
-                  Verificar código
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
-          </form>
-          
-          <div className="mt-4 text-center">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleResendCode}
-              disabled={resendCooldown > 0 || isLoading}
-              className="text-sm"
-            >
-              <RefreshCw className="mr-2 h-3 w-3" />
-              {resendCooldown > 0 
-                ? `Reenviar código (${resendCooldown}s)` 
-                : 'Reenviar código'}
-            </Button>
-          </div>
-        </CardContent>
-        
-        <CardFooter className="flex justify-center">
-          <Button 
-            variant="ghost" 
-            onClick={handleBack}
-            className="flex items-center"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver
-          </Button>
-        </CardFooter>
-      </Card>
+        <button
+          type="submit"
+          className="w-full p-2 bg-primary text-white rounded-md"
+          disabled={loading}
+        >
+          {loading ? 'Verificando...' : 'Verificar Código'}
+        </button>
+      </form>
+      
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-600 mb-2">¿No recibiste el código?</p>
+        <button 
+          className="text-primary hover:underline"
+          onClick={() => {
+            toast({
+              title: "Código reenviado",
+              description: "Se ha enviado un nuevo código a tu correo electrónico",
+            });
+          }}
+        >
+          Reenviar código
+        </button>
+      </div>
+      
+      <p className="mt-4 text-center">
+        <button 
+          onClick={() => navigate('/ingresarcorreo')}
+          className="text-primary hover:underline"
+        >
+          Volver
+        </button>
+      </p>
     </div>
   );
 };

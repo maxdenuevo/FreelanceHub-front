@@ -1,40 +1,24 @@
 import React, { createContext, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-
-// Layout Components
-import Navbar from './components/layout/Navbar';
+import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Piedepagina';
-import DashboardLayout from './components/layout/DashboardLayout';
-
-// Auth Components
-import Login from './features/auth/components/Forminicio';
-import Register from './features/auth/components/Formregistro';
-import ForgotPassword from './features/auth/components/Correo';
-import VerifyCode from './features/auth/components/Codigo';
-import ResetPassword from './features/auth/components/Contraseña';
-
-// Dashboard Components
+import DashboardLayout from '@/components/layout/DashboardLayout';
+import Login from '@/features/auth/components/Forminicio';
+import Register from '@/features/auth/components/Formregistro';
+import ForgotPassword from '@/features/auth/components/Correo';
+import VerifyCode from '@/features/auth/components/Codigo';
+import ResetPassword from '@/features/auth/components/Contraseña';
 import Dashboard from '@/features/dashboard/Dashboard';
 import Projects from '@/features/projects/Projects';
 import Clients from '@/features/clients/Clients';
 import Contracts from '@/features/contracts/Contracts';
 import Profile from '@/features/profile/Profile';
-
-// Project Components
 import NewProject from '@/features/projects/components/Formnuevoproyecto';
 import ProjectDetails from '@/features/projects/components/ProjectDetails';
-
-// Client Components
 import NewClient from '@/features/clients/components/Formnuevocliente';
-
-// Contact
 import Contact from '@/components/Contacto';
-
-// Create Context for password recovery flow
 export const RecoveryContext = createContext();
-
-// Protected Route component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem('usuario_id');
   
@@ -105,7 +89,6 @@ function App() {
               <Route path="/dashboardpage/perfil" element={<Profile />} />
             </Route>
             
-            {/* Form Routes with Main Layout (these often need their own UI) */}
             <Route element={<Navbar />}>
               <Route path="/nuevocliente" element={
                 <ProtectedRoute>

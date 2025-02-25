@@ -1,167 +1,104 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 const Forminicio = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
   });
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'El correo electrónico es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'El correo electrónico no es válido';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'La contraseña es requerida';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-    
-    setIsLoading(true);
+    setLoading(true);
     
     try {
-      // Mock API call - replace with your actual login API
-      setTimeout(() => {
-        // Simulate successful login
-        localStorage.setItem('usuario_id', '123456');
-        localStorage.setItem('token', 'mock-jwt-token');
-        
-        toast({
-          title: "Inicio de sesión exitoso",
-          description: "Bienvenido a FreelanceHub",
-          variant: "success",
-        });
-        
-        navigate('/dashboardpage');
-      }, 1500);
+      // API call would go here
+      localStorage.setItem('usuario_id', '123'); // For demo purposes
+      
+      toast({
+        title: "Inicio de sesión exitoso",
+        description: "Has iniciado sesión correctamente.",
+        variant: "success",
+      });
+      
+      navigate('/dashboardpage');
     } catch (error) {
       toast({
         title: "Error al iniciar sesión",
-        description: error.message || "Credenciales inválidas. Inténtalo de nuevo.",
+        description: error.message || "Credenciales incorrectas.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto max-w-md w-full p-6 bg-white rounded-lg shadow-md">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Iniciar Sesión</h1>
-        <p className="text-gray-600 mt-2">Ingresa tus credenciales para acceder</p>
-      </div>
+    <div className="container mx-auto max-w-md p-6">
+      <h1 className="text-2xl font-bold mb-6 text-center">Iniciar sesión</h1>
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Correo electrónico
-          </label>
+          <label className="block text-sm font-medium mb-1">Correo electrónico</label>
           <input
-            id="email"
-            name="email"
             type="email"
-            autoComplete="email"
+            name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm ${
-              errors.email ? 'border-red-500' : ''
-            }`}
+            className="w-full p-2 border rounded-md"
+            required
           />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
         </div>
         
         <div>
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <Link to="/ingresarcorreo" className="text-sm font-medium text-primary hover:underline">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
+          <label className="block text-sm font-medium mb-1">Contraseña</label>
           <input
-            id="password"
-            name="password"
             type="password"
-            autoComplete="current-password"
+            name="password"
             value={formData.password}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm ${
-              errors.password ? 'border-red-500' : ''
-            }`}
+            className="w-full p-2 border rounded-md"
+            required
           />
-          {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
         </div>
         
-        <div className="flex items-center">
-          <input
-            id="rememberMe"
-            name="rememberMe"
-            type="checkbox"
-            checked={formData.rememberMe}
-            onChange={handleChange}
-            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-          />
-          <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
-            Recordarme
-          </label>
-        </div>
-        
-        <div>
+        <div className="flex justify-end">
           <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-              isLoading ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
+            type="button"
+            onClick={() => navigate('/ingresarcorreo')}
+            className="text-sm text-primary hover:underline"
           >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            ¿Olvidaste tu contraseña?
           </button>
         </div>
+        
+        <button
+          type="submit"
+          className="w-full p-2 bg-primary text-white rounded-md"
+          disabled={loading}
+        >
+          {loading ? 'Procesando...' : 'Iniciar sesión'}
+        </button>
       </form>
       
-      <div className="mt-6 text-center text-sm">
-        <p className="text-gray-600">
-          ¿No tienes una cuenta?{' '}
-          <Link to="/registro" className="font-medium text-primary hover:underline">
-            Regístrate aquí
-          </Link>
-        </p>
-      </div>
+      <p className="mt-4 text-center">
+        ¿No tienes una cuenta?{' '}
+        <button 
+          onClick={() => navigate('/registro')}
+          className="text-primary hover:underline"
+        >
+          Regístrate
+        </button>
+      </p>
     </div>
   );
 };
