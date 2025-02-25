@@ -1,229 +1,154 @@
 # FreelanceHub
 
-Una aplicación full-stack para gestionar todos tus proyectos como freelancer, diseñada para optimizar tus flujos, recordar plazos y asegurar pagos a tiempo. Desarrollada como proyecto de graduación para 4Geeks Academy bootcamp.
+![FreelanceHub Logo](src/assets/logo-white.svg)
 
-## Descripción del Proyecto
+## 📌 Descripción
 
-FreelanceHub es una aplicación diseñada para ayudar a freelancers a gestionar contratos, tareas y pagos de manera eficiente y organizada. La plataforma permite a los freelancers crear y administrar contratos, realizar seguimientos de tareas, pagos y mantener un registro organizado.
+FreelanceHub es una plataforma integral para freelancers que permite gestionar proyectos, clientes, contratos, tareas y pagos, todo desde un solo lugar. Diseñada para optimizar el flujo de trabajo de profesionales independientes, esta aplicación centraliza toda la información necesaria para una gestión eficiente.
 
-## Arquitectura Técnica
+## ✨ Características principales
 
-```mermaid
-graph TD
-    subgraph "Frontend"
-        A[React.js]
-        B[Bootstrap 5.3]
-        C[React Router]
-        N[HTML]
-        O[CSS]
-    end
+- **Gestión de proyectos**: Crea, edita y gestiona tus proyectos freelance
+- **Gestión de clientes**: Mantén organizada la información de tus clientes
+- **Seguimiento de tareas**: Controla el avance de tus tareas en cada proyecto
+- **Gestión de contratos**: Genera y administra contratos para tus proyectos
+- **Control de pagos**: Realiza un seguimiento de los pagos recibidos y pendientes
+- **Estadísticas**: Visualiza el estado general de tu actividad freelance
 
-    subgraph "Backend"
-        D[Python Flask]
-        E[Flask-Mail]
-    end
+## 🔧 Tecnologías utilizadas
 
-    subgraph "Database"
-        F[PostgreSQL]
-    end
+- **React**: Biblioteca de JavaScript para construir interfaces de usuario
+- **Vite**: Herramienta de desarrollo rápida para aplicaciones web modernas
+- **React Router**: Enrutamiento para aplicaciones React
+- **Tailwind CSS**: Framework CSS para diseño rápido y responsive
+- **Lucide Icons**: Conjunto de iconos modernos
+- **API RESTful**: Comunicación con el backend a través de una API
 
-    subgraph "Authentication & Security"
-        G[JWT]
-        H[Password Hashing]
-        I[CORS]
-    end
+## 🚀 Instalación y uso
 
-    subgraph "File Storage"
-        J[Cloudinary]
-    end
+### Prerrequisitos
 
-    subgraph "Deployment"
-        K[Vercel]
-    end
+- Node.js (v14.0.0 o superior)
+- npm (v6.0.0 o superior) o yarn
 
-    subgraph "Additional Tools"
-        L[dotenv]
-        M[psycopg2]
-    end
+### Instalación
 
-    N --> A
-    O --> A
-    A --> D
-    B --> A
-    C --> A
-    D --> F
-    D --> G
-    D --> H
-    D --> I
-    D --> J
-    D --> E
-    F --> M
-    D --> L
-    A --> K
-    D --> K
-```
+1. Clona el repositorio:
 
-## Funcionalidades Principales
+   ```bash
+   git clone https://github.com/tu-usuario/FreelanceHub-front.git
+   cd FreelanceHub-front
+   ```
 
-- Registro y autenticación de usuarios
-- Gestión de clientes
-- Registro y seguimiento de proyectos
-- Sistema de tareas con recordatorios
-- Seguimiento de pagos
-- Generación y gestión de contratos
-- Sistema de notificaciones por email
-- Diseño responsivo
+2. Instala las dependencias:
 
-## Tech Stack
+   ```bash
+   npm install
+   # o
+   yarn install
+   ```
 
-### Backend
+3. Inicia el servidor de desarrollo:
 
-- Python Flask
-- PostgreSQL
-- JWT para autenticación
-- CORS para seguridad cross-origin
-- Cloudinary para almacenamiento de archivos
-- Flask-Mail para notificaciones por email
-- Schedule para automatización de tareas
-- psycopg2 para conectividad con base de datos
+   ```bash
+   npm run dev
+   # o
+   yarn dev
+   ```
 
-### Frontend
+4. Abre tu navegador y visita `http://localhost:5173`
 
-- React.js
-- Bootstrap 5.3
-- React Router para navegación
-- Vercel para deployment
-
-## Modelo de Base de Datos
-
-El sistema utiliza PostgreSQL con las siguientes tablas principales:
-
-- usuarios (Users)
-- clientes (Clients)
-- proyectos (Projects)
-- tareas (Tasks)
-- pagos (Payments)
-- plantillas (Templates)
-- contratos (Contracts)
-
-## Instalación
-
-1. Clonar el repositorio:
+### Construir para producción
 
 ```bash
-git clone [repository-url]
+npm run build
+# o
+yarn build
 ```
 
-2. Instalar dependencias del backend:
+## 📁 Estructura del proyecto
 
-```bash
-cd backend
-pip install -r requirements.txt
-```
-
-3. Configurar variables de entorno:
-   Crear archivo `.env` en el directorio backend con las siguientes variables:
+El proyecto sigue una arquitectura basada en características (feature-based), lo que permite una mejor organización y escalabilidad:
 
 ```
-DATABASE_NAME=
-DATABASE_USER=
-DATABASE_PASSWORD=
-DATABASE_HOST=
-DATABASE_PORT=
-JWT_SECRET=
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-MAIL_SERVER=
-MAIL_PORT=
-MAIL_USERNAME=
-MAIL_PASSWORD=
-MAIL_DEFAULT_SENDER_NAME=
-MAIL_DEFAULT_SENDER_EMAIL=
+src/
+├── assets/           # Archivos estáticos (logos, imágenes)
+├── components/       # Componentes reutilizables
+│   ├── ui/           # Componentes de UI básicos
+│   └── layout/       # Componentes de estructura
+├── features/         # Características principales organizadas por dominio
+│   ├── auth/         # Autenticación (login, registro, recuperación)
+│   ├── clients/      # Gestión de clientes
+│   ├── contracts/    # Gestión de contratos
+│   ├── dashboard/    # Dashboard principal
+│   ├── payments/     # Gestión de pagos
+│   ├── profile/      # Perfil de usuario
+│   ├── projects/     # Gestión de proyectos
+│   └── tasks/        # Gestión de tareas
+├── hooks/            # Hooks personalizados
+├── lib/              # Utilidades y funciones auxiliares
+├── services/         # Servicios de API y lógica de negocio
+├── styles/           # Estilos globales y configuración de tema
+└── utils/            # Funciones utilitarias
 ```
 
-4. Instalar dependencias del frontend:
+## 🔒 Autenticación
 
-```bash
-cd frontend
-npm install
-```
+La aplicación utiliza un sistema de autenticación basado en localStorage para mantener la sesión del usuario. El flujo de autenticación incluye:
 
-5. Iniciar servidores de desarrollo:
+- **Inicio de sesión**: Mediante email y contraseña
+- **Registro**: Creación de nueva cuenta de usuario
+- **Recuperación de contraseña**: Proceso de tres pasos para restablecer la contraseña
 
-Backend:
+## 🌐 API
 
-```bash
-python index.py
-```
+La aplicación se comunica con un backend a través de una API RESTful. Los endpoints principales son:
 
-Frontend:
+- **Autenticación**: `/login`, `/agregar-usuario`
+- **Proyectos**: `/get-proyectos/:userId`, `/get-proyecto/:projectId`, `/agregar-proyecto`, `/actualizar-proyecto/:projectId`
+- **Clientes**: `/get-clientes/:userId`, `/get-cliente/:clientId`, `/agregar-cliente`
+- **Tareas**: `/get-tareas/:projectId`, `/agregar-tarea`, `/actualizar-tarea/:taskId`
+- **Pagos**: `/get-pagos/:projectId`, `/agregar-pago`
+- **Contratos**: `/get-contrato/:projectId`, `/agregar-contrato`
 
-```bash
-npm run dev
-```
+## 🔄 Flujo de trabajo
 
-## API Endpoints
+1. El usuario inicia sesión o crea una cuenta
+2. En el dashboard, puede visualizar estadísticas y proyectos recientes
+3. Puede crear un nuevo proyecto seleccionando un cliente existente o creando uno nuevo
+4. Para cada proyecto, puede gestionar tareas, contratos y pagos
+5. El sistema proporciona una vista general del estado de todos los proyectos
 
-### Usuarios
+## 🎨 Personalización del tema
 
-- POST `/register-usuario` - Registro de nuevo usuario
-- POST `/login-usuario` - Login de usuario
-- PATCH `/usuario/:id/update` - Actualizar perfil
-- PATCH `/usuario/:id/update-password` - Actualizar contraseña
+El tema visual se puede personalizar a través del archivo `src/styles/theme.js`, que incluye:
 
-### Proyectos
+- Paleta de colores
+- Tipografía
+- Bordes y sombras
+- Animaciones
+- Espaciado
 
-- GET `/proyectos/:user_id` - Obtener proyectos de usuario
-- POST `/create-proyecto` - Crear nuevo proyecto
-- GET `/proyecto/:id` - Obtener proyecto específico
-- PATCH `/proyecto/:id` - Actualizar proyecto
-- DELETE `/proyecto/:id` - Eliminar proyecto
+## 📊 Dashboard
 
-### Tareas
+El dashboard principal proporciona información en tiempo real sobre:
 
-- GET `/tareas/:proyecto_id` - Obtener tareas de un proyecto
-- POST `/create-tarea` - Crear nueva tarea
-- GET `/tarea/:id` - Obtener tarea específica
-- PATCH `/tarea/:id` - Actualizar tarea
-- DELETE `/tarea/:id` - Eliminar tarea
+- Número total de proyectos
+- Número total de clientes
+- Porcentaje de tareas completadas
+- Pagos pendientes
+- Proyectos recientes
 
-### Pagos
+## 👥 Contribuciones
 
-- POST `/create-pago` - Crear nuevo pago
-- GET `/pagos/:proyecto_id` - Obtener pagos de un proyecto
-- PATCH `/pago/:id` - Actualizar pago
-- DELETE `/pago/:id` - Eliminar pago
+Las contribuciones son bienvenidas. Para contribuir:
 
-## Desafíos Técnicos y Soluciones
+1. Haz un fork del repositorio
+2. Crea una rama para tu función (`git checkout -b feature/nueva-funcionalidad`)
+3. Realiza tus cambios y haz commits (`git commit -m 'Añade nueva funcionalidad'`)
+4. Sube tus cambios (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
 
-- Deployment y caída de la API
-- Manejo de tiempo con horarios rotativos
-- Navegación de documentación de librerías externas
-- Implementación de OTP (One-Time Password)
+## 📄 Licencia
 
-## FreelanceHub 2.0: Futuras Mejoras
-
-- Generación de boletas o facturas
-- Enfoque Mobile First
-- Integración de sistemas de pago
-- Calculadora Freelance
-- Block de notas con registro de pagos
-
-## Deployment
-
-La aplicación está desplegada usando:
-
-- Backend: Flask server
-- Frontend: Vercel (freelancehub.cl)
-- API: api-freelancehub.vercel.app
-- Base de datos: PostgreSQL
-
-## Contributors
-
-- Front-end Developer: Jeneydis Molina
-- Team Lead & Back-end Developer: Max Ihnen
-
-## License
-
-Este proyecto está licenciado bajo MIT License - ver el archivo LICENSE.md para detalles.
+Este proyecto está licenciado bajo [MIT License](LICENSE.md)

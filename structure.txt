@@ -1,70 +1,71 @@
 .
 ├── public
-│   └── vite.svg
+│   └── vite.svg
 ├── src
-│   ├── assets
-│   │   ├── contrato.html
-│   │   └── react.svg
-│   ├── components
-│   │   ├── Clientes.jsx
-│   │   ├── Codigo.jsx
-│   │   ├── Contacto.jsx
-│   │   ├── Contraseña.jsx
-│   │   ├── Contratos.jsx
-│   │   ├── Correo.jsx
-│   │   ├── Encabezado.jsx
-│   │   ├── Forminicio.jsx
-│   │   ├── Formnuevocliente.jsx
-│   │   ├── Formnuevoproyecto.jsx
-│   │   ├── Formularioregistro.jsx
-│   │   ├── Home.jsx
-│   │   ├── Navbar.jsx
-│   │   ├── Navbardash.jsx
-│   │   ├── Pagos.jsx
-│   │   ├── Perfilusuario.jsx
-│   │   ├── Piedepagina.jsx
-│   │   ├── Proyectos.jsx
-│   │   ├── Rutaprotegida.jsx
-│   │   ├── Rutasapp.jsx
-│   │   ├── Servicios.jsx
-│   │   ├── Sidebar.jsx
-│   │   ├── Tareas.jsx
-│   │   ├── TerminosYCondiciones.jsx
-│   │   └── Titulo.jsx
-│   ├── images
-│   │   ├── Contrato.png
-│   │   ├── Hello.png
-│   │   ├── Icon.png
-│   │   ├── Imagen-principal.png
-│   │   ├── Logo.png
-│   │   ├── Logo2.png
-│   │   ├── Menu.png
-│   │   ├── Pago.png
-│   │   ├── Perfil.png
-│   │   ├── Progreso.png
-│   │   ├── Recordatorio.png
-│   │   ├── Tareas.png
-│   │   └── Usuario.png
-│   ├── pages
-│   │   ├── Cambiarcontraseña.jsx
-│   │   ├── Contactanos.jsx
-│   │   ├── Dashboardpage.jsx
-│   │   ├── Dashclientes.jsx
-│   │   ├── Dashcontratos.jsx
-│   │   ├── Dashhome.jsx
-│   │   ├── Dashproyectos.jsx
-│   │   ├── Homepage.jsx
-│   │   ├── Ingresarcorreo.jsx
-│   │   ├── Login.jsx
-│   │   ├── Nuevocliente.jsx
-│   │   ├── Nuevoproyecto.jsx
-│   │   ├── Perfil.jsx
-│   │   ├── Registro.jsx
-│   │   └── Validarcodigo.jsx
-│   ├── App.css
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
+│   ├── assets
+│   │   ├── contrato.html
+│   │   └── react.svg
+│   ├── components
+│   │   ├── Clientes.jsx
+│   │   ├── Codigo.jsx
+│   │   ├── Contacto.jsx
+│   │   ├── Contraseña.jsx
+│   │   ├── Contratos.jsx
+│   │   ├── Correo.jsx
+│   │   ├── Encabezado.jsx
+│   │   ├── Forminicio.jsx
+│   │   ├── Formnuevocliente.jsx
+│   │   ├── Formnuevoproyecto.jsx
+│   │   ├── Formularioregistro.jsx
+│   │   ├── Home.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── Navbardash.jsx
+│   │   ├── Pagos.jsx
+│   │   ├── PasswordStrengthIndicator.jsx
+│   │   ├── Perfilusuario.jsx
+│   │   ├── Piedepagina.jsx
+│   │   ├── Proyectos.jsx
+│   │   ├── Rutaprotegida.jsx
+│   │   ├── Rutasapp.jsx
+│   │   ├── Servicios.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── Tareas.jsx
+│   │   ├── TerminosYCondiciones.jsx
+│   │   └── Titulo.jsx
+│   ├── images
+│   │   ├── Contrato.png
+│   │   ├── Hello.png
+│   │   ├── Icon.png
+│   │   ├── Imagen-principal.png
+│   │   ├── Logo.png
+│   │   ├── Logo2.png
+│   │   ├── Menu.png
+│   │   ├── Pago.png
+│   │   ├── Perfil.png
+│   │   ├── Progreso.png
+│   │   ├── Recordatorio.png
+│   │   ├── Tareas.png
+│   │   └── Usuario.png
+│   ├── pages
+│   │   ├── Cambiarcontraseña.jsx
+│   │   ├── Contactanos.jsx
+│   │   ├── Dashboardpage.jsx
+│   │   ├── Dashclientes.jsx
+│   │   ├── Dashcontratos.jsx
+│   │   ├── Dashhome.jsx
+│   │   ├── Dashproyectos.jsx
+│   │   ├── Homepage.jsx
+│   │   ├── Ingresarcorreo.jsx
+│   │   ├── Login.jsx
+│   │   ├── Nuevocliente.jsx
+│   │   ├── Nuevoproyecto.jsx
+│   │   ├── Perfil.jsx
+│   │   ├── Registro.jsx
+│   │   └── Validarcodigo.jsx
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
 ├── LICENSE.md
 ├── README.md
 ├── eslint.config.js
@@ -75,4 +76,4 @@
 ├── vercel.json
 └── vite.config.js
 
-7 directories, 69 files
+7 directories, 70 files
