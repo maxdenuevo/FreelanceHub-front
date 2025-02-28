@@ -2,14 +2,17 @@
  * Utility functions for the application
  */
 
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 /**
  * Combines multiple class names into a single string
  * This is a simple implementation similar to the 'clsx' or 'classnames' libraries
  * @param  {...any} classes - Class names to be combined
  * @returns {string} - Combined class names
  */
-export function cn(...classes) {
-  return classes.filter(Boolean).join(' ')
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
 }
 
 /**

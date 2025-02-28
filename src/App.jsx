@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
+import { Button } from '@/components/ui/button';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Piedepagina';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -18,24 +19,72 @@ import NewProject from '@/features/projects/components/Formnuevoproyecto';
 import ProjectDetails from '@/features/projects/components/ProjectDetails';
 import NewClient from '@/features/clients/components/Formnuevocliente';
 import Contact from '@/components/Contacto';
-export const RecoveryContext = createContext();
+
+export const RecoveryContext = createContext({
+  email: "",
+  setEmail: () => {},
+  codigo: "",
+  setCodigo: () => {},
+  codigoVerificado: false,
+  setCodigoVerificado: () => {}
+});
+
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem('usuario_id');
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+const Landing = () => {
+  const navigate = useNavigate();
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  return (
+    <div className="container mx-auto px-4 py-16 text-center">
+      <h1 className="text-4xl font-bold mb-6">Bienvenido a FreelanceHub</h1>
+      <p className="text-xl mb-8">
+        La plataforma para gestionar tus proyectos freelance de manera eficiente
+      </p>
+      <div className="flex justify-center gap-4">
+        <Button 
+          onClick={() => navigate('/login')}
+          variant="default"
+        >
+          Iniciar Sesión
+        </Button>
+        <Button 
+          onClick={() => navigate('/registro')}
+          variant="secondary"
+        >
+          Registrarse
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const NotFound = () => {
+  const navigate = useNavigate();
   
-  return children;
+  return (
+    <div className="container mx-auto px-4 py-16 text-center">
+      <h1 className="text-4xl font-bold mb-6">404 - Página no encontrada</h1>
+      <p className="text-xl mb-8">
+        La página que estás buscando no existe o ha sido movida.
+      </p>
+      <Button 
+        onClick={() => navigate('/')}
+        variant="default"
+      >
+        Volver al inicio
+      </Button>
+    </div>
+  );
 };
 
 function App() {
-  // State for password recovery flow
   const [email, setEmail] = useState("");
   const [codigo, setCodigo] = useState("");
   const [codigoVerificado, setCodigoVerificado] = useState(false);
   
-  // Recovery context values
   const recoveryValues = {
     email,
     setEmail,
@@ -77,7 +126,9 @@ function App() {
             <Route 
               element={
                 <ProtectedRoute>
-                  <DashboardLayout />
+                  <DashboardLayout>
+                    <Outlet />
+                  </DashboardLayout>
                 </ProtectedRoute>
               }
             >
@@ -115,41 +166,5 @@ function App() {
     </RecoveryContext.Provider>
   );
 }
-
-// Landing page component
-const Landing = () => (
-  <div className="container mx-auto px-4 py-16 text-center">
-    <h1 className="text-4xl font-bold mb-6">Bienvenido a FreelanceHub</h1>
-    <p className="text-xl mb-8">La plataforma para gestionar tus proyectos freelance de manera eficiente</p>
-    <div className="flex justify-center gap-4">
-      <button 
-        onClick={() => window.location.href = '/login'} 
-        className="px-6 py-3 bg-primary text-white rounded-md"
-      >
-        Iniciar Sesión
-      </button>
-      <button 
-        onClick={() => window.location.href = '/registro'} 
-        className="px-6 py-3 bg-gray-200 text-gray-800 rounded-md"
-      >
-        Registrarse
-      </button>
-    </div>
-  </div>
-);
-
-// 404 page component
-const NotFound = () => (
-  <div className="container mx-auto px-4 py-16 text-center">
-    <h1 className="text-4xl font-bold mb-6">404 - Página no encontrada</h1>
-    <p className="text-xl mb-8">La página que estás buscando no existe o ha sido movida.</p>
-    <button 
-      onClick={() => window.location.href = '/'} 
-      className="px-6 py-3 bg-primary text-white rounded-md"
-    >
-      Volver al inicio
-    </button>
-  </div>
-);
 
 export default App;

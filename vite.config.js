@@ -6,7 +6,19 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+      '@': path.resolve(__dirname, './src'),
+    },
   },
+  optimizeDeps: {
+    include: [
+      '@radix-ui/react-toast',
+      '@radix-ui/react-label',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-tabs',
+      'class-variance-authority',
+      'clsx',
+      'lucide-react',
+      'tailwind-merge'
+    ]
+  }
 });
