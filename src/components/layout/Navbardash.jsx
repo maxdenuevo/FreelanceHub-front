@@ -17,10 +17,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import logoWhite from '@/assets/logo-white.svg';
+import { useFetch } from '@/hooks/useFetch';
 
-/**
- * Dashboard navbar component
- */
 const Navbardash = () => {
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -30,15 +28,16 @@ const Navbardash = () => {
   
   const navigate = useNavigate();
   
+  const userId = localStorage.getItem('usuario_id');
+  const { data: userData } = useFetch(`api/usuarios/${userId}`, true);
+  
   useEffect(() => {
-    // Mock user data - would be replaced with actual API call
-    setUser({
-      id: '123',
-      name: 'Juan Pérez',
-      email: 'juan@example.com',
-      avatar: 'https://i.pravatar.cc/150?img=3'
-    });
-    
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userData]);
+  
+  useEffect(() => {
     // Mock notifications - would be replaced with actual API call
     setNotifications([
       { id: 1, message: 'Nuevo comentario en tu proyecto', read: false, time: '10min' },

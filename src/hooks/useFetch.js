@@ -1,4 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+
+// Base API URL - adjust this to match your environment configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 /**
  * Custom hook for data fetching
@@ -8,73 +12,73 @@ import { useState, useEffect, useCallback } from 'react';
  * @param {boolean} immediate - Whether to fetch immediately
  * @returns {Object} Fetch state and methods
  */
-export const useFetch = (fetchFunction, dependencies = [], immediate = true) => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(immediate);
+export const useFetch = (endpoint, immediate = false, initialData = null) => {
+  const [data, setData] = useState(initialData);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  /**
-   * Execute the fetch function
-   * @param {any} params - Parameters to pass to the fetch function
-   * @returns {Promise<any>} Fetch result
-   */
-  const execute = useCallback(async (...params) => {
+  const getFullUrl = (url) => {
+    // If URL already starts with http, assume it's a full URL
+    if (url.startsWith('http')) return url;
+    // Add forward slash if endpoint doesn't start with one
+    const formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    return `${API_BASE_URL}${formattedEndpoint}`;
+  };
+
+  const execute = useCallback(async (options = {}) => {
+    const { method = 'GET', data: requestData, params, headers } = options;
+    
     setIsLoading(true);
     setError(null);
     setIsSuccess(false);
     
     try {
-      const result = await fetchFunction(...params);
-      setData(result);
+      const url = getFullUrl(endpoint);
+      const token = localStorage.getItem('token');
+      
+      const response = await axios({
+        method,
+        url,
+        data: requestData,
+        params,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+          ...headers
+        }
+      });
+      
+      setData(response.data);
       setIsSuccess(true);
-      return result;
+      return response.data;
     } catch (err) {
-      const errorMessage = err.message || 'Error al obtener los datos';
+      const errorMessage = err.response?.data?.message || err.message || 'Ocurrió un error';
       setError(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [fetchFunction]);
+  }, [endpoint]);
 
-  // Fetch data on mount if immediate=true
-  useEffect(() => {
-    if (immediate) {
-      execute();
-    }
-  }, [...dependencies, execute, immediate]);
-
-  /**
-   * Refresh data - calls execute with the same parameters
-   * @returns {Promise<any>} Fetch result
-   */
+  // Function to manually refresh data
   const refresh = useCallback(() => {
     return execute();
   }, [execute]);
 
-  /**
-   * Update data without re-fetching
-   * @param {Function} updater - Function to update data
-   */
-  const updateData = useCallback((updater) => {
-    setData(prev => {
-      if (typeof updater === 'function') {
-        return updater(prev);
-      }
-      return updater;
-    });
+  // Function to update data without re-fetching
+  const mutate = useCallback((newData) => {
+    setData(newData);
+    return newData;
   }, []);
 
-  return {
-    data,
-    isLoading,
-    error,
-    isSuccess,
-    execute,
-    refresh,
-    updateData
-  };
+  useEffect(() => {
+    if (immediate) {
+      execute();
+    }
+  }, [execute, immediate]);
+
+  return { data, isLoading, error, isSuccess, execute, refresh, mutate };
 };
 
 /**
@@ -85,84 +89,89 @@ export const useFetch = (fetchFunction, dependencies = [], immediate = true) => 
  * @param {Array} dependencies - Dependencies array for useEffect
  * @returns {Object} Paginated fetch state and methods
  */
-export const usePaginatedFetch = (
-  fetchFunction,
-  options = { initialPage: 1, pageSize: 10 },
-  dependencies = []
-) => {
-  const [page, setPage] = useState(options.initialPage);
-  const [pageSize, setPageSize] = useState(options.pageSize);
+export const usePaginatedFetch = (endpoint, immediate = false, initialData = []) => {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // Fetch function with pagination params
-  const fetchWithPagination = useCallback(async () => {
-    const result = await fetchFunction({ page, pageSize });
+  const { data, isLoading, error, isSuccess, execute, refresh } = useFetch(
+    endpoint,
+    false,
+    initialData
+  );
+
+  const fetchWithPagination = useCallback(async (options = {}) => {
+    const { page: pageArg = page, pageSize: pageSizeArg = pageSize, ...rest } = options;
     
-    // Handle different API response formats
-    if (result.totalItems !== undefined && result.totalPages !== undefined) {
-      setTotalItems(result.totalItems);
-      setTotalPages(result.totalPages);
-    } else if (Array.isArray(result)) {
-      // If the API doesn't return pagination info, calculate it
-      setTotalItems(result.length);
-      setTotalPages(Math.ceil(result.length / pageSize));
+    try {
+      const result = await execute({
+        ...rest,
+        params: {
+          ...(rest.params || {}),
+          page: pageArg,
+          pageSize: pageSizeArg
+        }
+      });
+      
+      // Update pagination state based on response
+      if (result.pagination) {
+        setTotalItems(result.pagination.totalItems || 0);
+        setTotalPages(result.pagination.totalPages || 0);
+      }
+      
+      return result;
+    } catch (error) {
+      throw error;
     }
-    
-    return result;
-  }, [fetchFunction, page, pageSize]);
+  }, [execute, page, pageSize]);
 
-  // Use the base useFetch hook
-  const {
-    data,
-    isLoading,
-    error,
-    isSuccess,
-    execute,
-    refresh,
-    updateData
-  } = useFetch(fetchWithPagination, [...dependencies, page, pageSize]);
+  const goToPage = useCallback(async (newPage) => {
+    setPage(newPage);
+    return fetchWithPagination({ page: newPage });
+  }, [fetchWithPagination]);
 
-  // Pagination methods
-  const goToPage = useCallback((newPage) => {
-    setPage(Math.max(1, Math.min(newPage, totalPages)));
-  }, [totalPages]);
-
-  const nextPage = useCallback(() => {
+  const nextPage = useCallback(async () => {
     if (page < totalPages) {
-      setPage(prev => prev + 1);
+      return goToPage(page + 1);
     }
-  }, [page, totalPages]);
+    return data;
+  }, [goToPage, page, totalPages, data]);
 
-  const prevPage = useCallback(() => {
+  const prevPage = useCallback(async () => {
     if (page > 1) {
-      setPage(prev => prev - 1);
+      return goToPage(page - 1);
     }
-  }, [page]);
+    return data;
+  }, [goToPage, page, data]);
 
-  const changePageSize = useCallback((newPageSize) => {
+  const changePageSize = useCallback(async (newPageSize) => {
     setPageSize(newPageSize);
     setPage(1); // Reset to first page when changing page size
-  }, []);
+    return fetchWithPagination({ page: 1, pageSize: newPageSize });
+  }, [fetchWithPagination]);
+
+  useEffect(() => {
+    if (immediate) {
+      fetchWithPagination();
+    }
+  }, [immediate, fetchWithPagination]);
 
   return {
     data,
     isLoading,
     error,
     isSuccess,
-    execute,
-    refresh,
-    updateData,
-    pagination: {
-      page,
-      pageSize,
-      totalItems,
-      totalPages,
-      goToPage,
-      nextPage,
-      prevPage,
-      changePageSize
-    }
+    page,
+    pageSize,
+    totalItems,
+    totalPages,
+    fetchWithPagination,
+    goToPage,
+    nextPage,
+    prevPage,
+    changePageSize,
+    refresh
   };
 };
 

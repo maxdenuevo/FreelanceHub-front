@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, logoutUser } from '@/features/auth/api';
 
 /**
  * Custom hook for authentication
@@ -9,29 +8,52 @@ import { loginUser, logoutUser } from '@/features/auth/api';
  */
 export const useAuth = () => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   const navigate = useNavigate();
+  
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   // Check if user is authenticated on mount
   useEffect(() => {
-    const checkAuth = () => {
-      const userId = localStorage.getItem('usuario_id');
-      const userEmail = localStorage.getItem('usuario_email');
+    const checkAuth = async () => {
+      setLoading(true);
       
-      if (userId && userEmail) {
-        setUser({
-          id: userId,
-          email: userEmail
+      try {
+        const userId = localStorage.getItem('usuario_id');
+        const token = localStorage.getItem('token');
+        
+        if (!userId || !token) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        
+        // Verify token and get user data
+        const response = await fetch(`${API_URL}/api/usuarios/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
+        
+        if (!response.ok) {
+          throw new Error('Session expired');
+        }
+        
+        const userData = await response.json();
+        setUser(userData);
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        setError('Your session has expired. Please log in again.');
+        localStorage.removeItem('usuario_id');
+        localStorage.removeItem('token');
+      } finally {
+        setLoading(false);
       }
-      
-      setIsLoading(false);
     };
     
     checkAuth();
-  }, []);
+  }, [API_URL]);
 
   /**
    * Login user
@@ -40,63 +62,64 @@ export const useAuth = () => {
    * @returns {Promise<Object>} Login result
    */
   const login = useCallback(async (email, password) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
     
     try {
-      const result = await loginUser(email, password);
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
       
-      if (result.success) {
-        setUser({
-          id: result.user.usuario_id,
-          email: result.user.usuario_email
-        });
-        return { success: true };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
+      
+      const data = await response.json();
+      
+      // Store auth data
+      localStorage.setItem('usuario_id', data.usuario_id);
+      localStorage.setItem('token', data.token);
+      
+      // Get full user data
+      const userResponse = await fetch(`${API_URL}/api/usuarios/${data.usuario_id}`, {
+        headers: {
+          'Authorization': `Bearer ${data.token}`
+        }
+      });
+      
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      
+      const userData = await userResponse.json();
+      setUser(userData);
+      
+      // Redirect to dashboard
+      navigate('/dashboardpage');
+      return data;
     } catch (err) {
-      const errorMessage = err.message || 'Error desconocido al iniciar sesión';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
+      setError(err.message || 'Login failed');
+      throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, []);
+  }, [API_URL, navigate]);
 
   /**
    * Logout user
    * @param {boolean} redirect - Whether to redirect after logout
    * @returns {Object} Logout result
    */
-  const logout = useCallback((redirect = true) => {
-    setIsLoading(true);
-    
-    try {
-      const result = logoutUser();
-      
-      if (result.success) {
-        setUser(null);
-        
-        if (redirect) {
-          navigate('/login', { 
-            state: { message: 'Sesión cerrada correctamente' }
-          });
-        }
-        
-        return { success: true };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      const errorMessage = err.message || 'Error al cerrar sesión';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setIsLoading(false);
-    }
+  const logout = useCallback(() => {
+    localStorage.removeItem('usuario_id');
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
   }, [navigate]);
 
   /**
@@ -104,15 +127,15 @@ export const useAuth = () => {
    * @returns {boolean} Authentication status
    */
   const isAuthenticated = useCallback(() => {
-    return !!user;
-  }, [user]);
+    return !!localStorage.getItem('usuario_id');
+  }, []);
 
   return {
     user,
+    loading,
+    error,
     login,
     logout,
-    isLoading,
-    error,
     isAuthenticated
   };
 };

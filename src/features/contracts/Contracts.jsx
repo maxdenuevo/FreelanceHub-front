@@ -1,13 +1,24 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { useFetch } from '@/hooks/useFetch';
-import { RecoveryContext } from '@/App';
+
+const statusColors = {
+  active: "bg-green-100 text-green-800",
+  pending: "bg-yellow-100 text-yellow-800",
+  completed: "bg-blue-100 text-blue-800",
+  cancelled: "bg-red-100 text-red-800",
+  draft: "bg-gray-100 text-gray-800"
+};
 
 const Contracts = () => {
   const { toast } = useToast();
-  const recoveryContext = useContext(RecoveryContext);
-  const { data: contracts, isLoading, error, refetch } = useFetch('/api/contracts', true);
+  const { data: contracts, isLoading, error, refetch } = 
+    useFetch('api/contratos', true); // Updated endpoint for contracts
+  
+  const { data: clients } = 
+    useFetch('api/clientes', true); // For reference if needed
 
   React.useEffect(() => {
     if (error) {
@@ -19,81 +30,144 @@ const Contracts = () => {
     }
   }, [error, toast]);
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-4">
-        <Card className="w-full">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-CL', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="w-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">Contratos</CardTitle>
-          <button
-            onClick={() => refetch()}
-            className="p-2 hover:bg-gray-100 rounded-full"
-            aria-label="Refrescar contratos"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5" 
-              viewBox="0 0 20 20" 
-              fill="currentColor"
-            >
-              <path 
-                fillRule="evenodd" 
-                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" 
-                clipRule="evenodd" 
-              />
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Contratos</h1>
+            <p className="text-muted-foreground mt-2">
+              Gestiona tus contratos con clientes y colaboradores
+            </p>
+          </div>
+          <Button className="mt-4 md:mt-0">
+            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-          </button>
-        </CardHeader>
-        <CardContent>
-          {contracts?.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {contracts.map((contract) => (
-                <Card key={contract.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg mb-2">{contract.title}</h3>
-                    <p className="text-sm text-gray-500 mb-4">{contract.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        contract.status === 'active' ? 'bg-green-100 text-green-800' :
-                        contract.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {contract.status}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {new Date(contract.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            Nuevo Contrato
+          </Button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <Card className="shadow-sm hover:shadow-md transition-all">
+        <CardContent className="p-4">
+          <div className="flex flex-wrap gap-2 items-center justify-between">
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" className="text-xs">Todos</Button>
+              <Button variant="outline" size="sm" className="text-xs bg-green-50 text-green-700 border-green-200">Activos</Button>
+              <Button variant="outline" size="sm" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">Pendientes</Button>
+              <Button variant="outline" size="sm" className="text-xs bg-blue-50 text-blue-700 border-blue-200">Completados</Button>
+              <Button variant="outline" size="sm" className="text-xs bg-red-50 text-red-700 border-red-200">Cancelados</Button>
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No hay contratos disponibles</p>
-              <button
-                onClick={() => refetch()}
-                className="text-primary hover:underline"
-              >
-                Intentar nuevamente
-              </button>
+            
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="Buscar contrato..." 
+                className="w-full sm:w-60 h-9 px-3 rounded-md border border-input bg-background text-sm"
+              />
+              <span className="absolute right-3 top-2.5 text-muted-foreground">🔍</span>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
+
+      {/* Contracts list */}
+      <div className="grid gap-4">
+        {isLoading ? (
+          // Loading skeleton
+          Array(3).fill(0).map((_, index) => (
+            <Card key={index} className="overflow-hidden shadow-sm hover:shadow-md transition-all">
+              <div className="p-6">
+                <div className="h-6 w-1/4 bg-muted animate-pulse rounded mb-3"></div>
+                <div className="h-4 w-3/4 bg-muted animate-pulse rounded mb-2"></div>
+                <div className="h-4 w-1/2 bg-muted animate-pulse rounded mb-4"></div>
+                <div className="flex justify-between items-center">
+                  <div className="h-6 w-20 bg-muted animate-pulse rounded"></div>
+                  <div className="h-6 w-32 bg-muted animate-pulse rounded"></div>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : contracts?.length > 0 ? (
+          contracts.map((contract) => (
+            <Card key={contract.id} className="overflow-hidden shadow-sm hover:shadow-md transition-all border-l-4 border-l-primary">
+              <div className="p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="text-lg font-semibold mb-1 sm:mb-0">{contract.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[contract.status] || statusColors.draft}`}>
+                      {contract.status}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      ID: {contract.id}
+                    </span>
+                  </div>
+                </div>
+                
+                <p className="text-sm text-muted-foreground mt-2 mb-4">{contract.description}</p>
+                
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <div className="flex flex-col text-sm">
+                    <span className="text-muted-foreground">Cliente:</span>
+                    <span className="font-medium">{contract.client}</span>
+                  </div>
+                  
+                  <div className="flex flex-col text-sm">
+                    <span className="text-muted-foreground">Monto:</span>
+                    <span className="font-medium">${contract.amount?.toLocaleString() || 0}</span>
+                  </div>
+                  
+                  <div className="flex flex-col text-sm">
+                    <span className="text-muted-foreground">Fecha Inicio:</span>
+                    <span className="font-medium">{formatDate(contract.startDate)}</span>
+                  </div>
+                  
+                  <div className="flex flex-col text-sm">
+                    <span className="text-muted-foreground">Fecha Fin:</span>
+                    <span className="font-medium">{formatDate(contract.endDate)}</span>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end mt-4">
+                  <Button variant="outline" size="sm" className="text-xs mr-2">Ver Detalles</Button>
+                  <Button variant="secondary" size="sm" className="text-xs">Descargar PDF</Button>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          // Empty state
+          <Card className="py-12 text-center">
+            <CardContent>
+              <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-muted flex items-center justify-center text-3xl">
+                📄
+              </div>
+              <CardTitle className="text-xl mb-2">No hay contratos disponibles</CardTitle>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Comienza creando tu primer contrato para gestionar tus acuerdos con clientes.
+              </p>
+              <Button>
+                <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Crear Contrato
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

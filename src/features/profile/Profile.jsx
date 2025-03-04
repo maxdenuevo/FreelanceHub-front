@@ -1,41 +1,47 @@
-import React, { useState, useContext } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useFetch } from '@/hooks/useFetch';
-import { RecoveryContext } from '@/App';
 
 const Profile = () => {
   const { toast } = useToast();
-  const recoveryContext = useContext(RecoveryContext);
-  const { data: profile, isLoading, error, mutate } = useFetch('/api/profile', true);
+  const userId = localStorage.getItem('usuario_id');
+  
+  const { 
+    data: profile, 
+    isLoading, 
+    error, 
+    execute: updateProfile 
+  } = useFetch(`api/usuarios/${userId}`, true);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    nombre: '',
     email: '',
-    phone: '',
-    company: '',
+    telefono: '',
+    empresa: '',
     rut: '',
-    address: ''
+    direccion: ''
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (profile) {
       setFormData({
-        name: profile.name || '',
+        nombre: profile.nombre || '',
         email: profile.email || '',
-        phone: profile.phone || '',
-        company: profile.company || '',
+        telefono: profile.telefono || '',
+        empresa: profile.empresa || '',
         rut: profile.rut || '',
-        address: profile.address || ''
+        direccion: profile.direccion || ''
       });
     }
   }, [profile]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       toast({
         variant: "destructive",
@@ -57,10 +63,10 @@ const Profile = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      // Add your update profile logic here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
-      
-      await mutate(formData); // Update local data
+      await updateProfile({
+        method: 'PUT',
+        data: formData
+      });
       
       toast({
         title: "Perfil actualizado",
@@ -102,11 +108,11 @@ const Profile = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Nombre completo</Label>
+                <Label htmlFor="nombre">Nombre completo</Label>
                 <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="nombre"
+                  name="nombre"
+                  value={formData.nombre}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                   required
@@ -127,22 +133,22 @@ const Profile = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono</Label>
+                <Label htmlFor="telefono">Teléfono</Label>
                 <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  id="telefono"
+                  name="telefono"
+                  value={formData.telefono}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="company">Empresa</Label>
+                <Label htmlFor="empresa">Empresa</Label>
                 <Input
-                  id="company"
-                  name="company"
-                  value={formData.company}
+                  id="empresa"
+                  name="empresa"
+                  value={formData.empresa}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                 />
@@ -160,11 +166,11 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Dirección</Label>
+                <Label htmlFor="direccion">Dirección</Label>
                 <Input
-                  id="address"
-                  name="address"
-                  value={formData.address}
+                  id="direccion"
+                  name="direccion"
+                  value={formData.direccion}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                 />

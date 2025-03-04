@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { clientsApi } from '@/services/api';
-import { useToast } from '@/components/ui/use-toast';
-import { useFetch } from '@/hooks/useFetch';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useFetch } from '@/hooks/useFetch';
 import {
   Select,
   SelectContent,
@@ -37,345 +29,309 @@ import {
  * Allows selecting an existing client or creating a new one
  */
 const Formnuevocliente = () => {
-  // State for client form
-  const [formData, setFormData] = useState({
-    clientName: '',
-    clientRut: '',
-    clientEmail: '',
-    clientPhone: ''
-  });
-  
-  const [clientSelection, setClientSelection] = useState('existing');
-  const [selectedClientId, setSelectedClientId] = useState('');
-  const [existingClients, setExistingClients] = useState([]);
-  
-  // Hooks
+  const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
-
-  // Fetch user ID (needed for API calls)
-  const { 
-    data: userData,
-    isLoading: userLoading,
-    error: userError
-  } = useFetch(async () => {
-    const userId = localStorage.getItem('usuario_id');
-    if (!userId) {
-      throw new Error('No se pudo obtener la información del usuario');
-    }
-    
-    const response = await fetch(`https://api-freelancehub.vercel.app/get-usuario/${userId}`);
-    if (!response.ok) {
-      throw new Error('Error al obtener información del usuario');
-    }
-    
-    const data = await response.json();
-    return data.usuario;
+  const userId = localStorage.getItem('usuario_id');
+  
+  // State management and other variables
+  const [activeTab, setActiveTab] = useState('new');
+  const [formData, setFormData] = useState({
+    nombre: '',
+    rut: '',
+    email: '',
+    telefono: '',
+    direccion: '',
+    empresa: '',
+    usuario_id: userId // Link to the current user
   });
-  
-  // Fetch existing clients when user data is loaded
-  const { 
-    data: clientsData,
-    isLoading: clientsLoading,
-    error: clientsError
-  } = useFetch(async () => {
-    if (!userData?.usuario_id) return [];
-    
-    const data = await clientsApi.getUserClients(userData.usuario_id);
-    return data.clientes || [];
-  }, [userData]);
-  
-  // Update existing clients when data is loaded
-  useEffect(() => {
-    if (clientsData && Array.isArray(clientsData)) {
-      setExistingClients(clientsData);
-      
-      // If there are clients, default to existing tab
-      if (clientsData.length > 0) {
-        setClientSelection('existing');
-      } else {
-        // If no clients, default to new client tab
-        setClientSelection('new');
-      }
-    }
-  }, [clientsData]);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle input changes
+  // Fetch user data
+  const { data: userInfo, isLoading: userLoading } = 
+    useFetch(`api/usuarios/${userId}`, true);
+  
+  // Fetch clients for the current user
+  const { data: clients, isLoading: clientsLoading } = 
+    useFetch(`api/clientes?usuario_id=${userId}`, true);
+
+  // Form handlers and submission
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle client selection tab change
-  const handleClientSelectionChange = (value) => {
-    setClientSelection(value);
-  };
-  
-  // Handle selection of existing client
-  const handleExistingClientSelect = (value) => {
-    setSelectedClientId(value);
-  };
-
-  // Handle form back button
-  const handleBack = () => {
-    navigate(-1);
+  const handleClientSelect = (e) => {
+    const clientId = e.target.value;
+    if (clientId === "") {
+      setSelectedClient(null);
+      return;
+    }
+    
+    const client = clients.find(c => c.id === parseInt(clientId));
+    setSelectedClient(client);
   };
 
-  // Handle form submission
-  const handleSubmit = async () => {
-    if (clientSelection === 'existing') {
-      if (!selectedClientId) {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      if (activeTab === 'new' && !formData.nombre) {
         toast({
-          title: "Error",
-          description: "Por favor selecciona un cliente existente",
           variant: "destructive",
+          title: "Error",
+          description: "Por favor ingrese al menos el nombre del cliente"
         });
+        setIsSubmitting(false);
         return;
       }
       
-      navigate('/nuevocliente/nuevoproyecto', { 
-        state: { clienteId: selectedClientId } 
-      });
-      return;
-    }
-    
-    // Validate new client form
-    if (!formData.clientName || !formData.clientEmail || !formData.clientRut) {
-      toast({
-        title: "Error",
-        description: "Por favor completa todos los campos obligatorios",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    try {
-      if (!userData?.usuario_id) {
-        throw new Error('No se pudo obtener la información del usuario');
+      if (activeTab === 'existing' && !selectedClient) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Por favor seleccione un cliente"
+        });
+        setIsSubmitting(false);
+        return;
       }
       
-      const clienteData = {
-        usuario_id: userData.usuario_id,
-        cliente_nombre: formData.clientName,
-        cliente_email: formData.clientEmail,
-        cliente_tel: formData.clientPhone,
-        cliente_rut: formData.clientRut,
-      };
+      // Create new client if needed
+      let clientToUse = selectedClient;
       
-      const response = await clientsApi.createClient(clienteData);
+      if (activeTab === 'new') {
+        // Make API call to create a new client
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/clientes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al crear el cliente');
+        }
+        
+        clientToUse = await response.json();
+      }
       
       toast({
-        title: "Cliente creado",
-        description: "El cliente se ha registrado correctamente",
-        variant: "success",
+        title: "Éxito",
+        description: activeTab === 'new' ? "Cliente creado correctamente" : "Cliente seleccionado correctamente"
       });
       
+      // Navigate to the next step (create project with this client)
       navigate('/nuevocliente/nuevoproyecto', { 
-        state: { clienteId: response.cliente_id } 
+        state: { client: clientToUse } 
       });
     } catch (error) {
-      console.error('Error al agregar cliente:', error);
       toast({
-        title: "Error",
-        description: error.message || "No se pudo agregar el cliente",
         variant: "destructive",
+        title: "Error",
+        description: error.message || "No se pudo crear/seleccionar el cliente"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Loading state
   const isLoading = userLoading || clientsLoading;
-  const error = userError || clientsError;
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      <Card className="max-w-2xl mx-auto shadow-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Cliente para el Proyecto</CardTitle>
-          <CardDescription>
-            Selecciona un cliente existente o crea uno nuevo para asociar al proyecto
-          </CardDescription>
+    <div className="container mx-auto p-4 animate-fade-in">
+      <Card className="max-w-xl mx-auto shadow-md hover:shadow-lg transition-shadow">
+        <CardHeader className="bg-primary/5 pb-4">
+          <CardTitle className="text-2xl">
+            {activeTab === 'new' ? 'Nuevo Cliente' : 'Seleccionar Cliente'}
+          </CardTitle>
+          <div className="text-sm text-muted-foreground">
+            Paso 1 de 3: Información del cliente
+          </div>
         </CardHeader>
         
-        <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
+        <div className="flex border-b">
+          <button 
+            className={`px-4 py-2 font-medium text-sm ${
+              activeTab === 'new' 
+                ? 'border-b-2 border-primary text-primary' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+            onClick={() => setActiveTab('new')}
+          >
+            Nuevo Cliente
+          </button>
+          <button 
+            className={`px-4 py-2 font-medium text-sm ${
+              activeTab === 'existing' 
+                ? 'border-b-2 border-primary text-primary' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+            onClick={() => setActiveTab('existing')}
+            disabled={clients?.length === 0}
+          >
+            Cliente Existente
+          </button>
+        </div>
+        
+        <CardContent className="pt-6">
           {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            // Loading state
+            <div className="space-y-3">
+              <div className="h-10 bg-muted animate-pulse rounded w-full"></div>
+              <div className="h-10 bg-muted animate-pulse rounded w-full"></div>
+              <div className="h-10 bg-muted animate-pulse rounded w-full"></div>
             </div>
           ) : (
-            <Tabs 
-              value={clientSelection} 
-              onValueChange={handleClientSelectionChange}
-              className="space-y-6"
-            >
-              <TabsList className="grid grid-cols-2">
-                <TabsTrigger 
-                  value="existing" 
-                  disabled={existingClients.length === 0}
-                  className="flex items-center gap-2"
-                >
-                  <Users className="h-4 w-4" />
-                  Cliente Existente
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="new"
-                  className="flex items-center gap-2"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  Nuevo Cliente
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="existing" className="space-y-4">
-                {existingClients.length > 0 ? (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="clientSelect">Selecciona un Cliente</Label>
-                      <Select onValueChange={handleExistingClientSelect} value={selectedClientId}>
-                        <SelectTrigger id="clientSelect">
-                          <SelectValue placeholder="Selecciona un cliente" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {existingClients.map(client => (
-                            <SelectItem 
-                              key={client.cliente_id} 
-                              value={client.cliente_id}
-                            >
-                              {client.cliente_nombre}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {selectedClientId && (
-                      <div className="border rounded-md p-4 bg-muted/50">
-                        {existingClients.map(client => 
-                          client.cliente_id === selectedClientId && (
-                            <div key={client.cliente_id} className="space-y-2">
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <Label className="text-muted-foreground">Nombre</Label>
-                                  <p>{client.cliente_nombre}</p>
-                                </div>
-                                <div>
-                                  <Label className="text-muted-foreground">RUT</Label>
-                                  <p>{client.cliente_rut}</p>
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <Label className="text-muted-foreground">Email</Label>
-                                  <p>{client.cliente_email}</p>
-                                </div>
-                                <div>
-                                  <Label className="text-muted-foreground">Teléfono</Label>
-                                  <p>{client.cliente_tel}</p>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <Alert>
-                    <AlertDescription>
-                      No tienes clientes registrados. Por favor crea un nuevo cliente.
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="new" className="space-y-4">
+            // Form content
+            <form onSubmit={handleSubmit}>
+              {activeTab === 'new' ? (
+                // New client form
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="clientName">Nombre del Cliente *</Label>
+                      <Label htmlFor="nombre">Nombre<span className="text-red-500">*</span></Label>
                       <Input
-                        id="clientName"
-                        value={formData.clientName}
+                        id="nombre"
+                        name="nombre"
+                        value={formData.nombre}
                         onChange={handleInputChange}
-                        placeholder="Nombre completo"
+                        placeholder="Nombre del cliente"
                         required
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="clientRut">RUT *</Label>
+                      <Label htmlFor="rut">RUT</Label>
                       <Input
-                        id="clientRut"
-                        value={formData.clientRut}
+                        id="rut"
+                        name="rut"
+                        value={formData.rut}
                         onChange={handleInputChange}
-                        placeholder="Ej: 12.345.678-9"
-                        required
+                        placeholder="12.345.678-9"
                       />
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="email@ejemplo.com"
+                    />
+                  </div>
+                  
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="clientEmail">Email *</Label>
+                      <Label htmlFor="telefono">Teléfono</Label>
                       <Input
-                        id="clientEmail"
-                        type="email"
-                        value={formData.clientEmail}
+                        id="telefono"
+                        name="telefono"
+                        value={formData.telefono}
                         onChange={handleInputChange}
-                        placeholder="ejemplo@correo.com"
-                        required
+                        placeholder="+56 9 12345678"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="clientPhone">Teléfono</Label>
+                      <Label htmlFor="empresa">Empresa</Label>
                       <Input
-                        id="clientPhone"
-                        value={formData.clientPhone}
+                        id="empresa"
+                        name="empresa"
+                        value={formData.empresa}
                         onChange={handleInputChange}
-                        placeholder="Teléfono de contacto"
+                        placeholder="Nombre de la empresa"
                       />
                     </div>
                   </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="direccion">Dirección</Label>
+                    <Input
+                      id="direccion"
+                      name="direccion"
+                      value={formData.direccion}
+                      onChange={handleInputChange}
+                      placeholder="Calle, número, comuna, ciudad"
+                    />
+                  </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              ) : (
+                // Existing client select
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="cliente">Seleccionar Cliente<span className="text-red-500">*</span></Label>
+                    <select
+                      id="cliente"
+                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+                      onChange={handleClientSelect}
+                      value={selectedClient?.id || ""}
+                    >
+                      <option value="">Seleccionar un cliente</option>
+                      {clients?.map(client => (
+                        <option key={client.id} value={client.id}>
+                          {client.nombre} {client.empresa ? `(${client.empresa})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {selectedClient && (
+                    <div className="border rounded-md p-4 bg-muted/20">
+                      <h3 className="font-medium mb-2">Información del cliente</h3>
+                      <div className="grid gap-2 grid-cols-1 md:grid-cols-2 text-sm">
+                        <div>
+                          <span className="font-medium">Nombre:</span> {selectedClient.nombre}
+                        </div>
+                        {selectedClient.empresa && (
+                          <div>
+                            <span className="font-medium">Empresa:</span> {selectedClient.empresa}
+                          </div>
+                        )}
+                        {selectedClient.email && (
+                          <div>
+                            <span className="font-medium">Email:</span> {selectedClient.email}
+                          </div>
+                        )}
+                        {selectedClient.telefono && (
+                          <div>
+                            <span className="font-medium">Teléfono:</span> {selectedClient.telefono}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </form>
           )}
         </CardContent>
         
-        <CardFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Atrás
+        <CardFooter className="flex justify-between border-t pt-6">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            Cancelar
           </Button>
-          
-          <Button
+          <Button 
+            disabled={isSubmitting || isLoading}
             onClick={handleSubmit}
-            disabled={isLoading}
-            className="flex items-center gap-2"
           >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
+            {isSubmitting ? (
               <>
-                Siguiente
-                <ArrowRight className="h-4 w-4" />
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Procesando...
               </>
+            ) : (
+              'Continuar'
             )}
           </Button>
         </CardFooter>

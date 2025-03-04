@@ -19,6 +19,8 @@ import NewProject from '@/features/projects/components/Formnuevoproyecto';
 import ProjectDetails from '@/features/projects/components/ProjectDetails';
 import NewClient from '@/features/clients/components/Formnuevocliente';
 import Contact from '@/components/Contacto';
+import "./styles/globals.css";
+import { Stack, HStack, Spacer } from "@/components/ui/spacing";
 
 export const RecoveryContext = createContext({
   email: "",
