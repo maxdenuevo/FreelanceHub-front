@@ -1,15 +1,13 @@
 import axios from 'axios';
 
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add request interceptor to include auth token
-api.interceptors.request.use(
+apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -20,309 +18,222 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Auth API services
+apiClient.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    if (error.response) {
+      // El servidor respondió con un código de estado fuera del rango 2xx
+      if (error.response.status === 401) {
+        // No autorizado - limpiar datos de autenticación
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario_id');
+      }
+      
+      // Devolver mensaje de error del servidor si está disponible
+      const message = error.response.data?.message || 'Ocurrió un error';
+      return Promise.reject(new Error(message));
+    } else if (error.request) {
+      // Se realizó la solicitud pero no se recibió una respuesta
+      return Promise.reject(new Error('No se pudo conectar con el servidor'));
+    } else {
+      // Algo sucedió al configurar la solicitud
+      return Promise.reject(error);
+    }
+  }
+);
+
+/**
+ * Servicio de autenticación API
+ */
 export const authApi = {
-  login: async (credentials) => {
-    try {
-      const response = await api.post('/auth/login', credentials);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Iniciar sesión
+  login: (credentials) => apiClient.post('/login-usuario', credentials),
   
-  register: async (userData) => {
-    try {
-      const response = await api.post('/auth/register', userData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Registrar usuario
+  register: (userData) => apiClient.post('/register-usuario', userData),
   
-  forgotPassword: async (email) => {
-    try {
-      const response = await api.post('/auth/forgot-password', { email });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener perfil de usuario
+  getUser: (userId) => apiClient.get(`/get-usuario/${userId}`),
   
-  verifyCode: async (email, code) => {
-    try {
-      const response = await api.post('/auth/verify-code', { email, code });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Actualizar perfil de usuario
+  updateProfile: (userId, userData) => apiClient.patch(`/usuario/${userId}/update`, userData),
   
-  resetPassword: async (email, code, password) => {
-    try {
-      const response = await api.post('/auth/reset-password', { email, code, password });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Actualizar contraseña de usuario (cuando el usuario conoce su contraseña actual)
+  updatePassword: (userId, passwordData) => apiClient.patch(`/usuario/${userId}/update-password`, passwordData),
   
-  checkAuth: async () => {
-    try {
-      const response = await api.get('/auth/me');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Solicitar restablecimiento de contraseña (cuando el usuario olvidó su contraseña)
+  forgotPassword: (email) => apiClient.post('/usuarios/request-reset', { usuario_email: email }),
+  
+  // Verificar código de restablecimiento
+  verifyCode: (email, code) => apiClient.post('/usuarios/verify-code', { usuario_email: email, otp: code }),
+  
+  // Restablecer contraseña con código
+  resetPassword: (email, code, newPassword) => 
+    apiClient.post('/usuarios/change-password', { 
+      usuario_email: email, 
+      otp: code, 
+      new_password: newPassword 
+    }),
+  
+  // Verificar si el usuario está autenticado
+  checkAuth: () => apiClient.get('/auth/me'),
 };
 
-// Projects API services
+/**
+ * Proyectos API 
+ */
 export const projectsApi = {
-  getAll: async (params) => {
-    try {
-      const response = await api.get('/projects', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener todos los proyectos para un usuario
+  getAllByUser: (userId) => apiClient.get(`/proyectos/${userId}`),
   
-  getById: async (id) => {
-    try {
-      const response = await api.get(`/projects/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener un proyecto específico
+  getById: (projectId) => apiClient.get(`/proyecto/${projectId}`),
   
-  create: async (project) => {
-    try {
-      const response = await api.post('/projects', project);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Crear un nuevo proyecto
+  create: (projectData) => apiClient.post('/create-proyecto', projectData),
   
-  update: async (id, project) => {
-    try {
-      const response = await api.put(`/projects/${id}`, project);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Actualizar un proyecto
+  update: (projectId, projectData) => apiClient.patch(`/proyecto/${projectId}`, projectData),
   
-  delete: async (id) => {
-    try {
-      const response = await api.delete(`/projects/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Eliminar un proyecto
+  delete: (projectId) => apiClient.delete(`/proyecto/${projectId}`),
 };
 
-// Clients API services
+/**
+ * Servicio de clientes API
+ */
 export const clientsApi = {
-  getAll: async (params) => {
-    try {
-      const response = await api.get('/clients', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener todos los clientes para un usuario
+  getAllByUser: (userId) => apiClient.get(`/clientes/${userId}`),
   
-  getById: async (id) => {
-    try {
-      const response = await api.get(`/clients/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener un cliente específico
+  getById: (clientId) => apiClient.get(`/cliente/${clientId}`),
   
-  create: async (client) => {
-    try {
-      const response = await api.post('/clients', client);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Crear un nuevo cliente
+  create: (clientData) => apiClient.post('/create-cliente', clientData),
   
-  update: async (id, client) => {
-    try {
-      const response = await api.put(`/clients/${id}`, client);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Actualizar un cliente
+  update: (clientId, clientData) => apiClient.patch(`/cliente/${clientId}`, clientData),
   
-  delete: async (id) => {
-    try {
-      const response = await api.delete(`/clients/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Eliminar un cliente
+  delete: (clientId) => apiClient.delete(`/cliente/${clientId}`),
 };
 
-// Tasks API services
+/**
+ * Servicio de tareas API
+ */
 export const tasksApi = {
-  getAll: async (params) => {
-    try {
-      const response = await api.get('/tasks', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener todas las tareas para un proyecto
+  getByProject: (projectId) => apiClient.get(`/tareas/${projectId}`),
   
-  getByProjectId: async (projectId) => {
-    try {
-      const response = await api.get(`/projects/${projectId}/tasks`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener una tarea específica
+  getById: (taskId) => apiClient.get(`/tarea/${taskId}`),
   
-  create: async (task) => {
-    try {
-      const response = await api.post('/tasks', task);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Crear una nueva tarea
+  create: (taskData) => apiClient.post('/create-tarea', taskData),
   
-  update: async (id, task) => {
-    try {
-      const response = await api.put(`/tasks/${id}`, task);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Actualizar una tarea
+  update: (taskId, taskData) => apiClient.patch(`/tarea/${taskId}`, taskData),
   
-  delete: async (id) => {
-    try {
-      const response = await api.delete(`/tasks/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Eliminar una tarea
+  delete: (taskId) => apiClient.delete(`/tarea/${taskId}`),
+  
+  // Obtener tareas con información de pagos
+  getTasksWithPayments: (projectId) => apiClient.get(`/tareas-with-pagos/${projectId}`),
 };
 
-// Payments API services
+/**
+ * Servicio de pagos API
+ */
 export const paymentsApi = {
-  getAll: async (params) => {
-    try {
-      const response = await api.get('/payments', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
+  // Obtener todos los pagos para un proyecto
+  getByProject: (projectId) => apiClient.get(`/pagos/${projectId}`),
+  
+  // Obtener un pago específico
+  getById: (paymentId) => apiClient.get(`/pago/${paymentId}`),
+  
+  // Crear un nuevo pago
+  create: (paymentData, formData = true) => {
+    // Si se está usando FormData (para subida de archivos)
+    if (formData) {
+      const form = new FormData();
+      Object.keys(paymentData).forEach(key => {
+        form.append(key, paymentData[key]);
+      });
+      
+      return apiClient.post('/create-pago', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
     }
+    
+    // Carga JSON regular
+    return apiClient.post('/create-pago', paymentData);
   },
   
-  getById: async (id) => {
-    try {
-      const response = await api.get(`/payments/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
+  // Actualizar un pago
+  update: (paymentId, paymentData, formData = true) => {
+    // Si se está usando FormData (para subida de archivos)
+    if (formData) {
+      const form = new FormData();
+      Object.keys(paymentData).forEach(key => {
+        form.append(key, paymentData[key]);
+      });
+      
+      return apiClient.patch(`/pago/${paymentId}`, form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
     }
+    
+    // Carga JSON regular
+    return apiClient.patch(`/pago/${paymentId}`, paymentData);
   },
   
-  create: async (payment) => {
-    try {
-      const response = await api.post('/payments', payment);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-  
-  update: async (id, payment) => {
-    try {
-      const response = await api.put(`/payments/${id}`, payment);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-  
-  delete: async (id) => {
-    try {
-      const response = await api.delete(`/payments/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Eliminar un pago
+  delete: (paymentId) => apiClient.delete(`/pago/${paymentId}`),
 };
 
-// Contracts API services
+/**
+ * Servicio de contratos API
+ */
 export const contractsApi = {
-  getAll: async (params) => {
-    try {
-      const response = await api.get('/contracts', { params });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener todos los contratos para un proyecto
+  getByProject: (projectId) => apiClient.get(`/contratos/${projectId}`),
   
-  getById: async (id) => {
-    try {
-      const response = await api.get(`/contracts/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener un contrato específico
+  getById: (contractId) => apiClient.get(`/get-contrato/${contractId}`),
   
-  create: async (contract) => {
-    try {
-      const response = await api.post('/contracts', contract);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Crear un nuevo contrato
+  create: (contractData) => apiClient.post('/create-contrato', contractData),
   
-  update: async (id, contract) => {
-    try {
-      const response = await api.put(`/contracts/${id}`, contract);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Obtener plantilla de contrato
+  getTemplate: (templateId) => apiClient.get(`/get-plantilla/${templateId}`),
   
-  delete: async (id) => {
-    try {
-      const response = await api.delete(`/contracts/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  // Crear plantilla de contrato
+  createTemplate: (templateData) => apiClient.post('/create-plantilla', templateData),
 };
 
-// Export all APIs
+/**
+* Servicio de correo API
+ */
+export const emailApi = {
+  // Enviar correo
+  send: (emailData) => apiClient.post('/send-email', emailData),
+  
+  // Enviar recordatorios
+  sendReminders: () => apiClient.get('/send-email-recordatorios'),
+};
+
+// Exportar todas las APIs como un solo objeto
 export default {
-  authApi,
-  projectsApi,
-  clientsApi,
-  tasksApi,
-  paymentsApi,
-  contractsApi,
-}; 
+  auth: authApi,
+  projects: projectsApi,
+  clients: clientsApi,
+  tasks: tasksApi,
+  payments: paymentsApi,
+  contracts: contractsApi,
+  email: emailApi,
+};

@@ -2,33 +2,35 @@
 ├── public
 │   └── vite.svg
 ├── src
-│   ├── assets
-│   │   ├── contrato.html
-│   │   ├── logo-color.svg
-│   │   └── logo-white.svg
 │   ├── components
 │   │   ├── layout
 │   │   ├── ui
 │   │   ├── Contacto.jsx
-│   │   ├── Encabezado.jsx
 │   │   ├── Servicios.jsx
 │   │   ├── TerminosYCondiciones.jsx
 │   │   └── Titulo.jsx
+│   ├── context
+│   │   └── AuthContext.jsx
 │   ├── features
 │   │   ├── auth
 │   │   ├── clients
-│   │   └── dashboard
+│   │   ├── contracts
+│   │   ├── dashboard
+│   │   ├── profile
+│   │   └── projects
 │   ├── hooks
-│   │   ├── useAuth.js
+│   │   ├── use-toast.js
 │   │   └── useFetch.js
-│   ├── images
 │   ├── lib
 │   │   └── utils.js
 │   ├── services
-│   │   └── api.js
+│   │   └── api
 │   ├── styles
+│   │   ├── animations.css
+│   │   ├── globals.css
 │   │   └── theme.js
 │   ├── utils
+│   │   ├── colors.js
 │   │   ├── helpers.js
 │   │   └── iconRegistry.js
 │   ├── App.css
@@ -40,9 +42,11 @@
 ├── LICENSE.md
 ├── package-lock.json
 ├── package.json
+├── postcss.config.js
 ├── README.md
 ├── structure.txt
+├── tailwind.config.js
 ├── vercel.json
 └── vite.config.js
 
-17 directories, 29 files
+20 directories, 30 files
