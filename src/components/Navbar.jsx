@@ -1,54 +1,107 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Briefcase } from 'lucide-react';
 import Navbardash from './Navbardash';
-import Menu from '../images/Menu.png'
-import Logo2 from '../images/Logo2.png'
-
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const rutasDashboard = ['/dashboardpage', '/nuevocliente', '/nuevocliente/nuevoproyecto'];
   const esRutaDashboard = rutasDashboard.some(ruta => location.pathname.startsWith(ruta));
 
   const irAInicio = () => {
     navigate('/');
+    setIsMenuOpen(false);
   };
 
   const irAInicioSesion = () => {
     navigate('/login');
+    setIsMenuOpen(false);
   };
 
   const irARegistro = () => {
     navigate('/registro');
+    setIsMenuOpen(false);
   };
 
   const irAPortal = () => {
     navigate('/dashboardpage');
+    setIsMenuOpen(false);
   };
 
   return esRutaDashboard ? <Navbardash /> : (
-    <nav id="navprincipal" className="navbar navbar-expand-lg">
-    <div className="container-fluid d-flex">
-    <img id='logo-nav' src={Logo2} alt="" />
-    <button title='Al Dashboard' className="nav-link text-light" onClick={irAPortal}>FreelanceHub</button>
-    <div className="collapse navbar-collapse d-none d-lg-flex" id="navbarNavAltMarkup">
-      <div className="navbar-nav ms-auto text-end">
-        <button className="nav-link active text-light" aria-current="page" onClick={irAInicio}>Home</button>
-        <button className="nav-link text-light" onClick={irARegistro}>Registrarse</button>
-        <button className="nav-link text-light" onClick={irAInicioSesion}>Login</button>
+    <nav className="w-full bg-[#003598] z-[101]">
+      <div className="container mx-auto px-4 flex items-center justify-between py-3">
+        {/* Logo y nombre */}
+        <div className="flex items-center gap-2">
+          <Briefcase className="w-6 h-6 text-[#fada04]" />
+          <button
+            title='Al Dashboard'
+            className="text-white font-semibold text-lg hover:text-[#fada04] transition-colors"
+            onClick={irAPortal}
+          >
+            FreelanceHub
+          </button>
+        </div>
+
+        {/* Desktop Navigation */}
+        <div className="hidden lg:flex items-center gap-1">
+          <button
+            className="px-4 py-2 text-white hover:text-[#fada04] transition-colors"
+            onClick={irAInicio}
+          >
+            Home
+          </button>
+          <button
+            className="px-4 py-2 text-white hover:text-[#fada04] transition-colors"
+            onClick={irARegistro}
+          >
+            Registrarse
+          </button>
+          <button
+            className="px-4 py-2 text-white hover:text-[#fada04] transition-colors"
+            onClick={irAInicioSesion}
+          >
+            Login
+          </button>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="lg:hidden text-white hover:text-[#fada04] transition-colors"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+
+        {/* Mobile Dropdown Menu */}
+        {isMenuOpen && (
+          <div className="absolute top-full right-0 mt-1 mr-4 bg-white rounded-lg shadow-lg py-2 min-w-[150px] lg:hidden">
+            <button
+              className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+              onClick={irAInicio}
+            >
+              Home
+            </button>
+            <button
+              className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+              onClick={irARegistro}
+            >
+              Registrarse
+            </button>
+            <button
+              className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+              onClick={irAInicioSesion}
+            >
+              Login
+            </button>
+          </div>
+        )}
       </div>
-    </div>
-    <div className="dropdown d-lg-none ms-auto">
-      <button className="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><img src={Menu} alt="" /></button>
-      <ul className="dropdown-menu dropdown-menu-end">
-        <li><button className="dropdown-item" onClick={irAInicio}>Home</button></li>
-        <li><button className="dropdown-item" onClick={irARegistro}>Registrate</button></li>
-        <li><button className="dropdown-item" onClick={irAInicioSesion}>Login</button></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+    </nav>
   );
 }
 

@@ -1,16 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
 
+/* FreelanceHub v2.0 - Modern Professional Color Palette */
 :root {
-  --primary-color: #2C3E50;   
-  --secondary-color: #E67E22; 
-  --background-color: #f8f9fa;
-  --text-color: #2C3E50;      
-  --success-color: #27AE60;
-  --info-color: #3498DB;
-  --warning-color: #F1C40F;
-  --danger-color: #E74C3C;
-  --accent-color: #9B59B6;
+  /* Primary Colors */
+  --primary-color: #0D9488;        /* Teal 600 */
+  --primary-light: #14B8A6;        /* Teal 500 */
+  --primary-dark: #0F766E;         /* Teal 700 */
+
+  /* Secondary Colors */
+  --secondary-color: #0EA5E9;      /* Sky 500 */
+  --secondary-light: #38BDF8;      /* Sky 400 */
+  --secondary-dark: #0284C7;       /* Sky 600 */
+
+  /* Accent Colors */
+  --accent-color: #F97316;         /* Orange 500 */
+  --accent-light: #FB923C;         /* Orange 400 */
+  --accent-dark: #EA580C;          /* Orange 600 */
+
+  /* Semantic Colors */
+  --success-color: #10B981;        /* Emerald 500 */
+  --warning-color: #F59E0B;        /* Amber 500 */
+  --danger-color: #EF4444;         /* Red 500 */
+  --error-color: #EF4444;          /* Red 500 */
+  --info-color: #06B6D4;           /* Cyan 500 */
+
+  /* Background Colors */
+  --background-color: #F8FAFC;     /* Gray 50 */
+  --background-dark: #0F172A;      /* Gray 900 */
+  --background-card: #1E293B;      /* Gray 800 */
+
+  /* Text Colors */
+  --text-color: #0F172A;           /* Gray 900 */
+  --text-light: #F1F5F9;           /* Gray 100 */
+  --text-muted: #64748B;           /* Gray 500 */
+
+  /* Border Colors */
+  --border-color: #E2E8F0;         /* Gray 200 */
+  --border-dark: #334155;          /* Gray 700 */
 }
 
 body {
@@ -155,13 +181,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .encabezado-container .btn {
   color: #fff;
-  background-color: var(--secondary-color);
+  background-color: var(--accent-color);
   width: 150px;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
 }
 
 .encabezado-container .btn:hover {
-  background-color: rgba(230, 126, 34, 0.9);
-  color: white;
+  background-color: var(--accent-dark);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
 }
 
 .contacto {
@@ -176,17 +205,23 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 3rem;
   color: var(--primary-color);
   text-align: center;
-  border-bottom: 2px solid var(--secondary-color);
+  border-bottom: 3px solid var(--primary-color);
+  padding-bottom: 0.5rem;
   margin-left: 3rem;
   margin-right: 3rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 #piedepagina {
-  background-color: rgba(44, 62, 80, 0.9);
+  background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
   min-height: 130px;
   display: flex;
   margin-top: 6rem;
   justify-content: space-around;
+  border-top: 2px solid rgba(13, 148, 136, 0.3);
 }
 
 .formulario {
@@ -200,9 +235,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .seccion-proyectos h1 {
   color: var(--primary-color);
-  border-bottom: 2px solid var(--secondary-color);
+  border-bottom: 3px solid var(--primary-color);
   width: 90%;
   margin: auto;
+  padding-bottom: 0.5rem;
 }
 
 .contenido-tareas {
@@ -291,8 +327,20 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
+.bg-gradient-accent {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--warning-color) 100%);
+}
+
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--warning-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

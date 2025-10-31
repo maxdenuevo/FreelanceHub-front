@@ -38,7 +38,7 @@ function Formularioregistro() {
     e.preventDefault();
 
     if (!terminosAceptados) {
-      setErrorMensaje('Debes aceptar los términos y condiciones.');
+      setErrorMensaje('Por favor, acepta los términos y condiciones para continuar.');
       return;
     }
 
@@ -67,7 +67,7 @@ function Formularioregistro() {
       })
       .catch(error => {
         console.log(error)
-        setErrorMensaje('No se pudo registrar el usuario. Verifica la informacion.');
+        setErrorMensaje('Ups, algo salió mal. Por favor verifica tu información e inténtalo de nuevo.');
       })
   }
 
@@ -78,16 +78,17 @@ function Formularioregistro() {
     const tieneSimbolo = /[!@#$%^&*(),.?":{}|<>]/.test(contraseña);
 
     if (contraseña.length >= longitudMinima && tieneMayuscula && tieneSimbolo) {
-      setPasswordMessage("La contraseña es válida.");
+      setPasswordMessage("✓ Perfecto, tu contraseña es segura.");
     } else {
-      setPasswordMessage("La contraseña debe tener al menos 8 caracteres, una mayúscula y un símbolo.");
+      setPasswordMessage("Necesitas al menos 8 caracteres, una mayúscula y un símbolo.");
     }
   };
 
   return (
     <form className='formulario mt-5 mb-5'>
-      <h2 className="form-title">Regístrate</h2>
-      {registroExitoso && <div className="alert alert-success mt-3">¡Te has registrado correctamente! Redirigiendo al inicio de sesión...</div>}
+      <h2 className="form-title">¡Bienvenido a FreelanceHub!</h2>
+      <p className="text-gray-600 mb-4">Empieza a organizar tu trabajo en minutos</p>
+      {registroExitoso && <div className="alert alert-success mt-3">🎉 ¡Genial! Ya estás listo. Te llevamos al inicio de sesión...</div>}
       {errorMensaje && <div className="alert alert-danger mt-3">{errorMensaje}</div>}
       <div className="mb-3">
         <label htmlFor="inputNombre" className="form-label">Nombre</label>
@@ -100,12 +101,12 @@ function Formularioregistro() {
       <div className="mb-3">
         <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
         <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={cambiarUsuarioEmail}/>
-        <div id="emailHelp" className="form-text">Nunca compartiremos tu email con nadie.</div>
+        <div id="emailHelp" className="form-text">Tu privacidad es importante para nosotros.</div>
       </div>
       <div className="mb-3">
         <label htmlFor="exampleInputPassword1" className="form-label">Contraseña</label>
         <input type="password" className="form-control" id="exampleInputPassword1" onInput={validarContraseña} onChange={cambiarUsuarioPassword}/>
-        <div id="passwordHelp" className="form-text" style={{ color: passwordMessage === "La contraseña es válida." ? "blue" : "red" }}>
+        <div id="passwordHelp" className="form-text" style={{ color: passwordMessage === "✓ Perfecto, tu contraseña es segura." ? "green" : "orange" }}>
           {passwordMessage}
         </div>
       </div>
@@ -115,7 +116,7 @@ function Formularioregistro() {
           Acepto los <a href="#" className="terms-link" onClick={() => setMostrarModal(true)}>términos y condiciones</a>
         </label>
       </div>
-      <button type="submit" className="btn" onClick={registrarUsuario}>Registrar</button>
+      <button type="submit" className="btn" onClick={registrarUsuario}>Crear mi cuenta</button>
       {mostrarModal && (
         <div className="modal fade show" style={{ display: 'block' }}>
            <div className="modal-dialog" style={{ position: 'fixed', bottom: '100px', right: '460px', margin: '0' }}>

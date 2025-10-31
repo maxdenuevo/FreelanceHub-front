@@ -1,11 +1,12 @@
 .
-├── public
-│   └── vite.svg
 ├── src
 │   ├── assets
 │   │   ├── contrato.html
 │   │   └── react.svg
 │   ├── components
+│   │   ├── features
+│   │   ├── layout
+│   │   ├── ui
 │   │   ├── Clientes.jsx
 │   │   ├── Codigo.jsx
 │   │   ├── Contacto.jsx
@@ -31,22 +32,15 @@
 │   │   ├── Tareas.jsx
 │   │   ├── TerminosYCondiciones.jsx
 │   │   └── Titulo.jsx
-│   ├── images
-│   │   ├── Contrato.png
-│   │   ├── Hello.png
-│   │   ├── Icon.png
-│   │   ├── Imagen-principal.png
-│   │   ├── Logo.png
-│   │   ├── Logo2.png
-│   │   ├── Menu.png
-│   │   ├── Pago.png
-│   │   ├── Perfil.png
-│   │   ├── Progreso.png
-│   │   ├── Recordatorio.png
-│   │   ├── Tareas.png
-│   │   └── Usuario.png
+│   ├── hooks
+│   │   ├── index.js
+│   │   ├── useAuth.js
+│   │   ├── useClients.js
+│   │   ├── useProjects.js
+│   │   └── useTasks.js
 │   ├── pages
 │   │   ├── Cambiarcontraseña.jsx
+│   │   ├── ComponentShowcase.jsx
 │   │   ├── Contactanos.jsx
 │   │   ├── Dashboardpage.jsx
 │   │   ├── Dashclientes.jsx
@@ -61,18 +55,39 @@
 │   │   ├── Perfil.jsx
 │   │   ├── Registro.jsx
 │   │   └── Validarcodigo.jsx
+│   ├── services
+│   │   ├── api.js
+│   │   ├── auth.service.js
+│   │   ├── clients.service.js
+│   │   ├── contracts.service.js
+│   │   ├── index.js
+│   │   ├── payments.service.js
+│   │   ├── projects.service.js
+│   │   └── tasks.service.js
+│   ├── store
+│   │   ├── authStore.js
+│   │   ├── index.js
+│   │   ├── projectsStore.js
+│   │   └── themeStore.js
+│   ├── utils
+│   │   ├── animations.js
+│   │   ├── cn.js
+│   │   └── constants.js
 │   ├── App.css
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
-├── LICENSE.md
-├── README.md
 ├── eslint.config.js
 ├── index.html
+├── jsconfig.json
+├── LICENSE.md
 ├── package-lock.json
 ├── package.json
+├── postcss.config.js
+├── README.md
 ├── structure.txt
+├── tailwind.config.js
 ├── vercel.json
 └── vite.config.js
 
-7 directories, 69 files
+12 directories, 80 files

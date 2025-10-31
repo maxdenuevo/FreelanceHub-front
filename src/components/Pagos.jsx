@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { useState, useEffect, useMemo } from 'react';
+import { format, differenceInDays, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { DollarSign, FileText, CheckCircle, Edit2, Trash2, Plus, X, Upload, Download, Search, Filter, Bell, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Input, Select, Button, Badge, Alert, Spinner, Modal } from './ui';
+import { ChartCard } from './features/dashboard/ChartCard';
+import { useTasks } from '../hooks';
+import { paymentsService } from '../services';
+import { toast } from './ui/Toast';
 
-function Pagos({ proyectoSeleccionado }) {
+/**
+ * Pagos v2.2 - Advanced payment management
+ * Features: Filtros, búsqueda, export CSV/Excel, gráficos, recordatorios
+ */
+function PagosV2({ proyectoSeleccionado }) {
   const [pagos, setPagos] = useState([]);
-  const [tareas, setTareas] = useState([]);
   const [mostrarAgregarPago, setMostrarAgregarPago] = useState(false);
   const [pagoMonto, setPagoMonto] = useState('');
   const [pagoFecha, setPagoFecha] = useState('');
@@ -12,106 +21,178 @@ function Pagos({ proyectoSeleccionado }) {
   const [pagoComprobante, setPagoComprobante] = useState(null);
   const [tareaSeleccionada, setTareaSeleccionada] = useState('');
   const [editarPagoId, setEditarPagoId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Filtros y búsqueda
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('todos'); // todos, completados, pendientes
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Usar hook de tareas para obtener la lista
+  const { tasks: tareas, loading: tareasLoading } = useTasks(proyectoSeleccionado);
 
   useEffect(() => {
     if (proyectoSeleccionado) {
       fetchPagos();
-      fetchTareas();
     } else {
       setPagos([]);
-      setTareas([]);
     }
   }, [proyectoSeleccionado]);
 
-  const fetchPagos = () => {
-    fetch(`https://api-freelancehub.vercel.app/pagos/${proyectoSeleccionado}`)
-      .then(response => {
-        if (!response.ok) throw new Error('Error al obtener los pagos');
-        return response.json();
-      })
-      .then(responseConverted => {
-        setPagos(responseConverted.pagos);
-        setError('');
-      })
-      .catch(error => {
-        setError(error.message);
-      });
+  const fetchPagos = async () => {
+    if (!proyectoSeleccionado) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await paymentsService.getByProject(proyectoSeleccionado);
+      setPagos(response.data.pagos || []);
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || 'Error al obtener los pagos';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fetchTareas = () => {
-    fetch(`https://api-freelancehub.vercel.app/tareas/${proyectoSeleccionado}`)
-      .then(response => {
-        if (!response.ok) throw new Error('Error al obtener las tareas');
-        return response.json();
-      })
-      .then(responseConverted => {
-        setTareas(responseConverted.tareas);
-        setError('');
-      })
-      .catch(error => {
-        setError(error.message);
-      });
-  };
+  // Filtrar y buscar pagos
+  const pagosFiltrados = useMemo(() => {
+    let filtered = [...pagos];
 
-  const agregarPago = (e) => {
-    e.preventDefault();
-    const url = editarPagoId ? `https://api-freelancehub.vercel.app/pago/${editarPagoId}` : 'https://api-freelancehub.vercel.app/create-pago';
-    const method = editarPagoId ? 'PATCH' : 'POST';
-
-    const formData = new FormData();
-    formData.append('proyecto_id', proyectoSeleccionado);
-    formData.append('tarea_id', tareaSeleccionada);
-    formData.append('pago_monto', pagoMonto);
-    formData.append('pago_fecha', pagoFecha);
-    formData.append('pago_completado', pagoCompletado);
-    if (pagoComprobante) {
-      formData.append('pago_comprobante', pagoComprobante);
+    // Aplicar filtro de estado
+    if (filterStatus === 'completados') {
+      filtered = filtered.filter(p => p.pago_completado);
+    } else if (filterStatus === 'pendientes') {
+      filtered = filtered.filter(p => !p.pago_completado);
     }
 
-    fetch(url, {
-      method: method,
-      body: formData,
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Error al guardar el pago');
-        return response.json();
-      })
-      .then(responseConverted => {
-        const nuevoPago = responseConverted.pago;
-        if (editarPagoId) {
-          setPagos(prevPagos => prevPagos.map(pago => pago.pago_id === editarPagoId ? nuevoPago : pago));
-          setEditarPagoId(null);
-        } else {
-          setPagos(prevPagos => [...prevPagos, nuevoPago]);
-        }
-        setMostrarAgregarPago(false);
-        resetFormulario();
-        setError('');
-        fetchPagos();
-      })
-      .catch(error => {
-        setError(error.message);
+    // Aplicar búsqueda
+    if (searchTerm) {
+      filtered = filtered.filter(pago => {
+        const tarea = tareas.find(t => t.tarea_id === pago.tarea_id);
+        const tareaNombre = tarea?.tarea_nombre?.toLowerCase() || '';
+        const pagoMontoStr = pago.pago_monto?.toString() || '';
+        const search = searchTerm.toLowerCase();
+
+        return tareaNombre.includes(search) || pagoMontoStr.includes(search);
       });
+    }
+
+    return filtered;
+  }, [pagos, filterStatus, searchTerm, tareas]);
+
+  // Calcular datos para gráficos
+  const chartData = useMemo(() => {
+    if (pagos.length === 0) return [];
+
+    // Agrupar pagos por mes (últimos 6 meses)
+    const now = new Date();
+    const sixMonthsAgo = subMonths(now, 5);
+    const months = eachMonthOfInterval({ start: sixMonthsAgo, end: now });
+
+    return months.map(month => {
+      const monthStart = startOfMonth(month);
+      const monthEnd = endOfMonth(month);
+
+      const pagosMes = pagos.filter(pago => {
+        const pagoDate = new Date(pago.pago_fecha);
+        return pagoDate >= monthStart && pagoDate <= monthEnd && pago.pago_completado;
+      });
+
+      const total = pagosMes.reduce((sum, p) => sum + parseFloat(p.pago_monto || 0), 0);
+
+      return {
+        mes: format(month, 'MMM', { locale: es }),
+        ingresos: total,
+      };
+    });
+  }, [pagos]);
+
+  // Detectar pagos próximos a vencer (pendientes con fecha cercana)
+  const pagosProximosAVencer = useMemo(() => {
+    const now = new Date();
+    return pagos.filter(pago => {
+      if (pago.pago_completado) return false;
+      const pagoDate = new Date(pago.pago_fecha);
+      const daysUntil = differenceInDays(pagoDate, now);
+      return daysUntil >= 0 && daysUntil <= 7; // Próximos 7 días
+    });
+  }, [pagos]);
+
+  const agregarPago = async (e) => {
+    e.preventDefault();
+
+    if (!tareaSeleccionada || !pagoMonto || !pagoFecha) {
+      toast.error('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('proyecto_id', proyectoSeleccionado);
+      formData.append('tarea_id', tareaSeleccionada);
+      formData.append('pago_monto', pagoMonto);
+      formData.append('pago_fecha', pagoFecha);
+      formData.append('pago_completado', pagoCompletado);
+
+      if (pagoComprobante) {
+        formData.append('pago_comprobante', pagoComprobante);
+      }
+
+      if (editarPagoId) {
+        await paymentsService.update(editarPagoId, formData);
+        toast.success('Pago actualizado correctamente');
+      } else {
+        await paymentsService.create(formData);
+        toast.success('Pago creado correctamente');
+      }
+
+      setMostrarAgregarPago(false);
+      resetFormulario();
+      await fetchPagos();
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || 'Error al guardar el pago';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const eliminarPago = (index) => {
-    const pago = pagos[index];
-    fetch(`https://api-freelancehub.vercel.app/pago/${pago.pago_id}`, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Error al eliminar el pago');
-        return response.json();
-      })
-      .then(() => {
-        console.log('¡El pago se ha eliminado correctamente!');
-        setPagos(prevPagos => prevPagos.filter((_, i) => i !== index));
-        setError('');
-      })
-      .catch(error => {
-        setError(error.message);
-      });
+  const eliminarPago = async (pago) => {
+    if (!window.confirm(`¿Estás seguro de eliminar este pago de $${pago.pago_monto}?`)) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await paymentsService.delete(pago.pago_id);
+      toast.success('Pago eliminado correctamente');
+      await fetchPagos();
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || 'Error al eliminar el pago';
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const manejarEdicionPago = (pago) => {
+    setTareaSeleccionada(pago.tarea_id || '');
+    setPagoMonto(pago.pago_monto || '');
+    setPagoFecha(pago.pago_fecha ? pago.pago_fecha.split('T')[0] : '');
+    setPagoCompletado(pago.pago_completado || false);
+    setEditarPagoId(pago.pago_id);
+    setMostrarAgregarPago(true);
   };
 
   const resetFormulario = () => {
@@ -120,15 +201,7 @@ function Pagos({ proyectoSeleccionado }) {
     setPagoFecha('');
     setPagoCompletado(false);
     setPagoComprobante(null);
-  };
-
-  const manejarEdicionPago = (pago) => {
-    setTareaSeleccionada(pago.tarea_id || '');
-    setPagoMonto(pago.pago_monto || ''); 
-    setPagoFecha(pago.pago_fecha || '');
-    setPagoCompletado(pago.pago_completado || false);
-    setEditarPagoId(pago.pago_id);
-    setMostrarAgregarPago(true);
+    setEditarPagoId(null);
   };
 
   const formatoFecha = (fecha) => {
@@ -142,110 +215,438 @@ function Pagos({ proyectoSeleccionado }) {
     }
   };
 
-  return (
-    <div className="contenido-pagos mt-5">
-      <h2>Pagos del Proyecto</h2>
-      <p className='text-center'>En esta sección podrás gestionar los pagos del proyecto: agregar, ver, eliminar y marcar pagos como completados.</p>
-      <div className="table-responsive">
-        <table className="table table-striped w-100">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Tarea</th>
-              <th scope="col">Monto</th>
-              <th scope="col">Fecha</th>
-              <th scope="col">Completado</th>
-              <th scope="col">Comprobante</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagos.length > 0 ? (
-              pagos.map((pago, index) => {
-                const tarea = tareas.find(tarea => tarea && tarea.tarea_id === (pago ? pago.tarea_id : undefined));
-                return (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{tarea ? tarea.tarea_nombre : ''}</td>
-                    <td>{pago && pago.pago_monto ? pago.pago_monto : ''}</td>
-                    <td>{pago && pago.pago_fecha ? formatoFecha(pago.pago_fecha) : ''}</td>
-                    <td>{pago && pago.pago_completado ? 'Sí' : 'No'}</td>
-                    <td>
-                      {pago && pago.pago_comprobante ? (
-                        <a href={pago.pago_comprobante} target="_blank" rel="noopener noreferrer">Ver Comprobante</a>
-                      ) : ''}
-                    </td>
-                    <td>
-                      <button onClick={() => manejarEdicionPago(pago)} className="btn btn-sm btn-primary m-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                          <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-                        </svg>
-                      </button>
-                      <button onClick={() => eliminarPago(index)} className="btn btn-sm btn-danger m-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" fill="currentColor" className="bi bi-trash3" viewBox="0 0 16 16">
-                          <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center">No hay pagos registrados para este proyecto.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+  const calcularTotal = () => {
+    return pagos.reduce((sum, pago) => sum + parseFloat(pago.pago_monto || 0), 0);
+  };
+
+  const calcularTotalCompletado = () => {
+    return pagos
+      .filter(p => p.pago_completado)
+      .reduce((sum, pago) => sum + parseFloat(pago.pago_monto || 0), 0);
+  };
+
+  // Export a CSV
+  const exportToCSV = () => {
+    if (pagosFiltrados.length === 0) {
+      toast.error('No hay pagos para exportar');
+      return;
+    }
+
+    const headers = ['#', 'Tarea', 'Monto', 'Fecha', 'Estado', 'Comprobante'];
+    const rows = pagosFiltrados.map((pago, index) => {
+      const tarea = tareas.find(t => t.tarea_id === pago.tarea_id);
+      return [
+        index + 1,
+        tarea?.tarea_nombre || 'N/A',
+        `$${parseFloat(pago.pago_monto || 0).toLocaleString()}`,
+        formatoFecha(pago.pago_fecha),
+        pago.pago_completado ? 'Completado' : 'Pendiente',
+        pago.pago_comprobante ? 'Sí' : 'No',
+      ];
+    });
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `pagos_proyecto_${proyectoSeleccionado}_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success('Archivo CSV descargado correctamente');
+  };
+
+  if (!proyectoSeleccionado) {
+    return (
+      <div className="text-center py-12">
+        <DollarSign className="mx-auto text-gray-600 mb-4" size={64} />
+        <p className="text-gray-400">Selecciona un proyecto para ver los pagos</p>
       </div>
-      <button className="btn btn-sm mb-3 mt-3" onClick={() => setMostrarAgregarPago(!mostrarAgregarPago)}>
-      {mostrarAgregarPago ? (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
-          <path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 0 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414 2.707 14.707a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/>
-        </svg>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <DollarSign size={28} className="text-success" />
+            Pagos del Proyecto
+          </h2>
+          <p className="text-gray-400 mt-1">
+            Gestiona pagos, exporta datos y visualiza estadísticas
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            leftIcon={<Download size={18} />}
+            onClick={exportToCSV}
+            disabled={loading || pagosFiltrados.length === 0}
+          >
+            Exportar CSV
+          </Button>
+          <Button
+            leftIcon={<Plus size={18} />}
+            onClick={() => setMostrarAgregarPago(true)}
+            disabled={loading}
+          >
+            Agregar Pago
+          </Button>
+        </div>
+      </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="error" dismissible onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Recordatorios de pagos próximos a vencer */}
+      {pagosProximosAVencer.length > 0 && (
+        <Alert variant="warning" icon={<Bell size={18} />}>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="font-semibold mb-1">Pagos próximos a vencer</p>
+              <p className="text-sm">
+                Tienes {pagosProximosAVencer.length} pago(s) pendiente(s) en los próximos 7 días
+              </p>
+            </div>
+          </div>
+        </Alert>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Pagos</p>
+                <p className="text-2xl font-bold text-white">{pagos.length}</p>
+              </div>
+              <FileText className="text-primary-blue" size={32} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Presupuesto</p>
+                <p className="text-2xl font-bold text-white">
+                  ${calcularTotal().toLocaleString()}
+                </p>
+              </div>
+              <DollarSign className="text-primary-yellow" size={32} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Completado</p>
+                <p className="text-2xl font-bold text-success">
+                  ${calcularTotalCompletado().toLocaleString()}
+                </p>
+              </div>
+              <CheckCircle className="text-success" size={32} />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Gráfico de pagos por mes */}
+      {chartData.length > 0 && (
+        <ChartCard
+          title="Pagos Completados por Mes"
+          subtitle="Últimos 6 meses"
+          type="bar"
+          data={chartData}
+          xKey="mes"
+          yKey="ingresos"
+          color="#b9d84d"
+          height={250}
+        />
+      )}
+
+      {/* Filtros y búsqueda */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Búsqueda */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="text"
+                  placeholder="Buscar por tarea o monto..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                />
+              </div>
+            </div>
+
+            {/* Filtro de estado */}
+            <div className="md:w-48">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-blue"
+              >
+                <option value="todos">Todos</option>
+                <option value="completados">Completados</option>
+                <option value="pendientes">Pendientes</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Resultados de búsqueda */}
+          {(searchTerm || filterStatus !== 'todos') && (
+            <div className="mt-3 text-sm text-gray-400">
+              Mostrando {pagosFiltrados.length} de {pagos.length} pagos
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Payments List */}
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Spinner size="lg" />
+        </div>
+      ) : pagosFiltrados.length > 0 ? (
+        <div className="space-y-3">
+          {pagosFiltrados.map((pago) => {
+            const tarea = tareas.find(t => t.tarea_id === pago.tarea_id);
+            const pagoDate = new Date(pago.pago_fecha);
+            const daysUntil = differenceInDays(pagoDate, new Date());
+            const isUpcoming = !pago.pago_completado && daysUntil >= 0 && daysUntil <= 7;
+
+            return (
+              <Card key={pago.pago_id} className={`hover:border-primary-blue/50 transition-colors ${isUpcoming ? 'border-yellow-500/50' : ''}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <h3 className="text-lg font-semibold text-white truncate">
+                          {tarea?.tarea_nombre || 'Tarea no encontrada'}
+                        </h3>
+                        <Badge variant={pago.pago_completado ? 'success' : 'warning'}>
+                          {pago.pago_completado ? 'Completado' : 'Pendiente'}
+                        </Badge>
+                        {isUpcoming && (
+                          <Badge variant="error" icon={<Bell size={14} />}>
+                            Vence en {daysUntil} {daysUntil === 1 ? 'día' : 'días'}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <DollarSign size={16} />
+                          ${parseFloat(pago.pago_monto || 0).toLocaleString()}
+                        </span>
+                        <span>{formatoFecha(pago.pago_fecha)}</span>
+                        {pago.pago_comprobante && (
+                          <a
+                            href={pago.pago_comprobante}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary-blue hover:text-primary-yellow transition-colors flex items-center gap-1"
+                          >
+                            <FileText size={16} />
+                            Ver Comprobante
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        leftIcon={<Edit2 size={16} />}
+                        onClick={() => manejarEdicionPago(pago)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        leftIcon={<Trash2 size={16} />}
+                        onClick={() => eliminarPago(pago)}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      ) : searchTerm || filterStatus !== 'todos' ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Search className="mx-auto text-gray-600 mb-4" size={64} />
+            <p className="text-gray-400 mb-4">No se encontraron pagos con los filtros aplicados</p>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setSearchTerm('');
+                setFilterStatus('todos');
+              }}
+            >
+              Limpiar filtros
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-plus" viewBox="0 0 16 16">
-          <path d="M8 1a1 1 0 0 1 1 1v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H1a1 1 0 0 1 0-2h6V2a1 1 0 0 1 1-1z"/>
-        </svg>
+        <Card>
+          <CardContent className="p-12 text-center">
+            <DollarSign className="mx-auto text-gray-600 mb-4" size={64} />
+            <p className="text-gray-400 mb-4">No hay pagos registrados para este proyecto</p>
+            <Button
+              leftIcon={<Plus size={18} />}
+              onClick={() => setMostrarAgregarPago(true)}
+            >
+              Agregar Primer Pago
+            </Button>
+          </CardContent>
+        </Card>
       )}
-      </button>
-      {mostrarAgregarPago && (
-        <form>
-          <div className="mb-3">
-            <label htmlFor="tareaSeleccionada" className="form-label">Tarea:</label>
-            <select id="tareaSeleccionada" className="form-control" value={tareaSeleccionada} onChange={(e) => setTareaSeleccionada(e.target.value)} required>
-              <option value="">Seleccionar tarea</option>
-              {tareas.map(tarea => (
-                <option key={tarea.tarea_id} value={tarea.tarea_id}>{tarea.tarea_nombre}</option>
-              ))}
-            </select>
+
+      {/* Add/Edit Payment Modal */}
+      <Modal
+        isOpen={mostrarAgregarPago}
+        onClose={() => {
+          setMostrarAgregarPago(false);
+          resetFormulario();
+        }}
+        title={editarPagoId ? 'Editar Pago' : 'Agregar Pago'}
+        size="md"
+      >
+        <form onSubmit={agregarPago} className="space-y-4 p-4">
+          <Select
+            label="Tarea"
+            value={tareaSeleccionada}
+            onChange={(e) => setTareaSeleccionada(e.target.value)}
+            required
+          >
+            <option value="">Seleccionar tarea...</option>
+            {tareas.map((tarea) => (
+              <option key={tarea.tarea_id} value={tarea.tarea_id}>
+                {tarea.tarea_nombre}
+              </option>
+            ))}
+          </Select>
+
+          <Input
+            label="Monto del Pago"
+            type="number"
+            step="0.01"
+            value={pagoMonto}
+            onChange={(e) => setPagoMonto(e.target.value)}
+            required
+            placeholder="0.00"
+          />
+
+          <Input
+            label="Fecha del Pago"
+            type="date"
+            value={pagoFecha}
+            onChange={(e) => setPagoFecha(e.target.value)}
+            required
+          />
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="pagoCompletado"
+              checked={pagoCompletado}
+              onChange={(e) => setPagoCompletado(e.target.checked)}
+              className="w-4 h-4 text-primary-blue bg-gray-700 border-gray-600 rounded focus:ring-primary-blue focus:ring-2"
+            />
+            <label htmlFor="pagoCompletado" className="text-sm text-gray-300">
+              Marcar como completado
+            </label>
           </div>
-          <div className="mb-3">
-            <label htmlFor="pagoMonto" className="form-label">Monto del Pago:</label>
-            <input type="number" step="0.01" className="form-control" id="pagoMonto" value={pagoMonto} onChange={(e) => setPagoMonto(e.target.value)} required />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Comprobante (opcional)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                id="pagoComprobante"
+                onChange={(e) => setPagoComprobante(e.target.files[0])}
+                className="hidden"
+                accept="image/*,application/pdf"
+              />
+              <label
+                htmlFor="pagoComprobante"
+                className="flex-1 cursor-pointer bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Upload size={16} />
+                {pagoComprobante ? pagoComprobante.name : 'Seleccionar archivo'}
+              </label>
+              {pagoComprobante && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPagoComprobante(null)}
+                  leftIcon={<X size={16} />}
+                >
+                  Quitar
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Formatos permitidos: imágenes y PDF
+            </p>
           </div>
-          <div className="mb-3">
-            <label htmlFor="pagoFecha" className="form-label">Fecha del Pago:</label>
-            <input type="date" className="form-control" id="pagoFecha" value={pagoFecha} onChange={(e) => setPagoFecha(e.target.value)} required />
+
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setMostrarAgregarPago(false);
+                resetFormulario();
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <Spinner size="sm" />
+                  Guardando...
+                </>
+              ) : (
+                <>{editarPagoId ? 'Actualizar' : 'Crear'} Pago</>
+              )}
+            </Button>
           </div>
-          <div className="mb-3 form-check">
-            <input type="checkbox" className="form-check-input" id="pagoCompletado" checked={pagoCompletado} onChange={(e) => setPagoCompletado(e.target.checked)} />
-            <label className="form-check-label" htmlFor="pagoCompletado">Pago Completado</label>
-          </div>
-          <div className="mb-3">
-            <label htmlFor="pagoComprobante" className="form-label">Comprobante:</label>
-            <input type="file" className="form-control" id="pagoComprobante" onChange={(e) => setPagoComprobante(e.target.files[0])} />
-          </div>
-          <button type="button" className="btn btn-sm" onClick={agregarPago}>
-           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" className="bi bi-floppy2" viewBox="0 0 16 16">
-             <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v3.5A1.5 1.5 0 0 1 11.5 6h-7A1.5 1.5 0 0 1 3 4.5V1H1.5a.5.5 0 0 0-.5.5m9.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
-           </svg></button>
         </form>
-      )}
-      {error && <div className="alert alert-danger mt-3">{error}</div>}
+      </Modal>
     </div>
   );
 }
 
-export default Pagos;
+export default PagosV2;

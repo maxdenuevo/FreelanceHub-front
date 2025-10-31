@@ -1,98 +1,126 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
+import { useAuth } from '../hooks';
+import { Input, Button, Alert, Spinner } from './ui';
+import { motion } from 'framer-motion';
+import { Mail, Lock } from 'lucide-react';
+
+/**
+ * Forminicio v2.0 - Login form con nueva arquitectura
+ * Usa useAuth hook y servicios centralizados
+ */
 
 function Formularioinicio() {
-  const [usuarioEmail, setUsuarioEmail] = useState('');
-  const [usuarioPassword, setUsuarioPassword] = useState('');
-  const [inicioExitoso, setInicioExitoso] = useState('');
-  const [errorMensaje, setErrorMensaje] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { login, loading, error } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await login(email, password);
+  };
 
   const irACorreo = (e) => {
     e.preventDefault();
     navigate('/ingresarcorreo');
   };
 
-  function cambiarUsuarioEmail(e) {
-    setUsuarioEmail(e.target.value);
-  }
-
-  function cambiarUsuarioPassword(e) {
-    setUsuarioPassword(e.target.value);
-  }
-
-  function ingresarUsuario(e) {
-    e.preventDefault();
-    setErrorMensaje('');
-    setInicioExitoso('');
-    console.log('Datos preparados para el ingreso 👨');
-
-    fetch("https://api-freelancehub.vercel.app/login-usuario", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        usuario_email: usuarioEmail,
-        usuario_password: usuarioPassword
-      })
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error en la autenticación');
-        }
-        return response.json();
-      })
-      .then(responseConverted => {
-        console.log("El usuario se ha autenticado correctamente! 👨‍🚀");
-        const token = responseConverted.token;
-        const decoded = jwtDecode(token);
-        localStorage.setItem('usuario_email', decoded.usuario_email);
-        localStorage.setItem('usuario_id', decoded.usuario_id);
-        setInicioExitoso('¡Inicio de sesión exitoso! Redirigiendo a tu portal...');
-        setTimeout(() => {
-          navigate('/dashboardpage');
-        }, 2000);
-      })
-      .catch(error => {
-        console.log(error);
-        setErrorMensaje('No se pudo iniciar sesión. Verifica tus datos e intenta de nuevo.');
-      });
-  }
-
   return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6">
-          <form className='formulario mt-5 mb-5 p-4 bg-white rounded shadow'>
-            <h2 className="form-title text-center mb-4">Inicio de Sesión</h2>
-            {location.state?.message && (
-              <div className="alert alert-success" role="alert">
-                {location.state.message}
-              </div>
-            )}
-            {inicioExitoso && <div className="alert alert-success">{inicioExitoso}</div>}
-            {errorMensaje && <div className="alert alert-danger">{errorMensaje}</div>}
-            <div className="mb-3">
-              <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
-              <input onChange={cambiarUsuarioEmail} type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required />
-              <div id="emailHelp" className="form-text">Nunca compartiremos tu email con nadie.</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full"
+      >
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-primary">¡Qué bueno verte de nuevo!</h2>
+            <p className="text-gray-600 mt-2">Ingresa a tu espacio y continúa donde lo dejaste</p>
+          </div>
+
+          {/* Success message from navigation */}
+          {location.state?.message && (
+            <Alert variant="success" className="mb-4">
+              {location.state.message}
+            </Alert>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <Alert variant="error" className="mb-4">
+              {error}
+            </Alert>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@email.com"
+              required
+              icon={<Mail className="w-5 h-5 text-gray-400" />}
+              helperText="Tu privacidad es importante para nosotros."
+            />
+
+            <Input
+              label="Contraseña"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              icon={<Lock className="w-5 h-5 text-gray-400" />}
+            />
+
+            {/* Forgot password link */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={irACorreo}
+                className="text-sm text-[#003598] hover:text-[#002570] font-medium transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
             </div>
-            <div className="mb-3">
-              <label htmlFor="exampleInputPassword1" className="form-label">Contraseña</label>
-              <input onChange={cambiarUsuarioPassword} type="password" className="form-control" id="exampleInputPassword1" required />
-            </div>
-            <div className="mb-3">
-              <a href="#" className="forgot-password-link" onClick={irACorreo}>¿Olvidaste tu contraseña?</a>
-            </div>
-            <div className="d-grid">
-              <button type="submit" onClick={ingresarUsuario} className="btn btn-primary">Ingresar</button>
-            </div>
+
+            {/* Submit button */}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" />
+                  Ingresando...
+                </span>
+              ) : (
+                'Ingresar'
+              )}
+            </Button>
           </form>
+
+          {/* Register link */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              ¿Primera vez por aquí?{' '}
+              <button
+                onClick={() => navigate('/registro')}
+                className="text-primary hover:text-primary-dark font-medium transition-colors"
+              >
+                Únete a FreelanceHub
+              </button>
+            </p>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

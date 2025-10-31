@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Img from '../images/Imagen-principal.png';
+import { Rocket } from 'lucide-react';
 
 const Encabezado = () => {
   const navigate = useNavigate();
@@ -9,26 +9,37 @@ const Encabezado = () => {
   const irARegistro = () => navigate('/registro');
 
   return (
-    <div className="encabezado-container container-fluid py-3 py-md-5">
-      <div className="row align-items-center">
-        <div className="col-12 col-md-6 order-2 order-md-1">
-          <h4 className="mb-3 px-3 px-md-4 ms-5 me-5 pb-4">
-            Organiza, colabora y conquista tus metas. Tu éxito, un proyecto a la vez.
+    <div className="container mx-auto px-4 py-8 md:py-16">
+      <div className="grid md:grid-cols-2 gap-8 items-center">
+        <div className="order-2 md:order-1">
+          <h4 className="text-2xl md:text-3xl font-semibold mb-6 text-primary px-4 md:px-8">
+            Tu trabajo freelance merece estar organizado. Hagámoslo realidad juntos.
           </h4>
-          <p className="mb-4 px-3 px-md-4 ms-5 me-5 pb-4">
-            Nuestra plataforma ayuda a freelancers a gestionar proyectos de manera efectiva, 
-            desde la asignación de tareas hasta la creación de contratos, con herramientas 
-            completas para mantener la organización. Es intuitiva y flexible, adaptándose a 
-            diversas áreas como diseño, programación y escritura, para llevar tus proyectos 
-            al siguiente nivel.
+          <p className="text-lg mb-8 text-gray-700 px-4 md:px-8">
+            Sabemos lo que es hacer malabares con múltiples proyectos, clientes y fechas límite.
+            Por eso creamos FreelanceHub: para que puedas enfocarte en lo que realmente amas hacer,
+            mientras nosotros te ayudamos a mantener todo en orden. Desde tu primer cliente hasta
+            tu proyecto más ambicioso, estamos aquí para ti.
           </p>
-          <div className="d-flex flex-column flex-md-row justify-content-center align-items-center">
-            <button className="btn m-2" onClick={irAContactanos}>Contáctanos</button>
-            <button className="btn m-2" onClick={irARegistro}>Únete al Hub</button>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 px-4 md:px-8">
+            <button
+              className="px-6 py-3 bg-accent text-white font-semibold rounded-lg hover:bg-accent-dark transition-all hover:shadow-glow-accent w-full md:w-auto"
+              onClick={irAContactanos}
+            >
+              Hablemos
+            </button>
+            <button
+              className="px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all hover:shadow-glow-primary w-full md:w-auto"
+              onClick={irARegistro}
+            >
+              Empieza gratis
+            </button>
           </div>
         </div>
-        <div className="col-12 col-md-6 order-1 order-md-2 mb-4 mb-md-0">
-          <img className="img-fluid" src={Img} alt="Imagen Principal" />
+        <div className="order-1 md:order-2 mb-8 md:mb-0 flex justify-center">
+          <div className="w-full max-w-md h-80 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-xl hover:shadow-2xl transition-shadow">
+            <Rocket className="w-32 h-32 text-white" />
+          </div>
         </div>
       </div>
     </div>

@@ -1,73 +1,170 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Users as UsersIcon } from 'lucide-react';
+import { ClientList } from './features/clients';
+import { Alert, Modal, Input, Button } from './ui';
+import { useClients } from '../hooks';
 
-const Clientes = () => {
-  const [clientes, setClientes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+/**
+ * Clientes v2.1 - Modern client management with useClients hook
+ * Usa la nueva arquitectura con custom hooks y servicios centralizados
+ */
+function ClientesV2() {
+  const [editingClient, setEditingClient] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  useEffect(() => {
-    const userId = localStorage.getItem('usuario_id');
+  // Usar el hook useClients en lugar de fetch manual
+  const {
+    clients: clientes,
+    loading,
+    error,
+    updateClient,
+    deleteClient,
+  } = useClients();
 
-    if (!userId) {
-      setError('No se pudo cargar la información');
-      setLoading(false);
+  const handleClientEdit = (cliente) => {
+    setEditingClient(cliente);
+    setShowEditModal(true);
+  };
+
+  const handleClientDelete = async (clienteId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este cliente?')) {
       return;
     }
 
-    fetch(`https://api-freelancehub.vercel.app/clientes/${userId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los clientes');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.clientes && Array.isArray(data.clientes)) {
-          setClientes(data.clientes);
-        } else {
-          setError('La respuesta de la API no contiene un array de clientes.');
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
-      });
-  }, []);
+    await deleteClient(clienteId);
+  };
 
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
 
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
+    if (!editingClient) return;
+
+    const clientData = {
+      cliente_nombre: editingClient.cliente_nombre,
+      cliente_email: editingClient.cliente_email,
+      cliente_tel: editingClient.cliente_tel,
+      cliente_rut: editingClient.cliente_rut,
+    };
+
+    const result = await updateClient(editingClient.cliente_id, clientData);
+
+    if (result.success) {
+      setShowEditModal(false);
+      setEditingClient(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false);
+    setEditingClient(null);
+  };
 
   return (
-    <div id='clientes-tabla' className="container">
-      <h2 className='mb-5'>Tus Clientes</h2>
-      <div className="table-responsive">
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>RUT</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clientes.map(cliente => (
-            <tr key={cliente.cliente_id}>
-              <td>{cliente.cliente_nombre}</td>
-              <td>{cliente.cliente_email}</td>
-              <td>{cliente.cliente_tel}</td>
-              <td>{cliente.cliente_rut}</td>
-              <td>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="min-h-screen bg-primary-dark p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 mb-6"
+        >
+          <UsersIcon className="text-primary-blue" size={32} />
+          <div>
+            <h1 className="text-3xl font-bold text-white">Mis Clientes</h1>
+            <p className="text-gray-400 mt-1">
+              Gestiona tu cartera de clientes y contactos
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="error" dismissible>
+            {error}
+          </Alert>
+        )}
+
+        {/* Client List */}
+        <ClientList
+          clientes={clientes}
+          loading={loading}
+          onClientEdit={handleClientEdit}
+          onClientDelete={handleClientDelete}
+        />
+
+        {/* Edit Client Modal */}
+        {showEditModal && editingClient && (
+          <Modal
+            isOpen={showEditModal}
+            onClose={handleCancelEdit}
+            title="Editar Cliente"
+            size="md"
+          >
+            <form onSubmit={handleSaveEdit} className="space-y-4 p-4">
+              <Input
+                label="Nombre del Cliente"
+                value={editingClient.cliente_nombre || ''}
+                onChange={(e) =>
+                  setEditingClient({
+                    ...editingClient,
+                    cliente_nombre: e.target.value,
+                  })
+                }
+                required
+              />
+
+              <Input
+                label="Email"
+                type="email"
+                value={editingClient.cliente_email || ''}
+                onChange={(e) =>
+                  setEditingClient({
+                    ...editingClient,
+                    cliente_email: e.target.value,
+                  })
+                }
+              />
+
+              <Input
+                label="Teléfono"
+                type="tel"
+                value={editingClient.cliente_tel || ''}
+                onChange={(e) =>
+                  setEditingClient({
+                    ...editingClient,
+                    cliente_tel: e.target.value,
+                  })
+                }
+              />
+
+              <Input
+                label="RUT"
+                value={editingClient.cliente_rut || ''}
+                onChange={(e) =>
+                  setEditingClient({
+                    ...editingClient,
+                    cliente_rut: e.target.value,
+                  })
+                }
+              />
+
+              <div className="flex gap-3 justify-end pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCancelEdit}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">Guardar Cambios</Button>
+              </div>
+            </form>
+          </Modal>
+        )}
       </div>
     </div>
   );
-};
+}
 
-export default Clientes;
+export default ClientesV2;

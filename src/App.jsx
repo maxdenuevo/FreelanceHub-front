@@ -12,9 +12,9 @@ import Registro from './pages/Registro';
 import Ingresarcorreo from './pages/Ingresarcorreo';
 import Validarcodigo from './pages/Validarcodigo';
 import Cambiarcontraseña from './pages/Cambiarcontraseña';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Rutaprotegida from './components/Rutaprotegida';
 import Rutasapp from './components/Rutasapp';
+import ComponentShowcase from './pages/ComponentShowcase';
 
 export const RecoveryContext = createContext();
 
@@ -30,7 +30,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/*" 
+        <Route path="/showcase" element={<ComponentShowcase />} />
+        <Route path="/*"
         element={
         <Rutaprotegida>
           <Rutasapp />

@@ -1,9 +1,8 @@
 import React from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const TerminosYCondiciones = () => {
   return (
-            <div>
+            <div className="max-w-4xl mx-auto px-4 py-8">
               <h1 className="text-center mb-4" style={{ color: '#138086' }}>Términos y Condiciones de FreelanceHub</h1>
               <section>
                 <h2 className="h4 mb-3" style={{ color: '#138086', borderBottom: '2px solid #DC8665', paddingBottom: '0.5rem' }}>1. Introducción</h2>
