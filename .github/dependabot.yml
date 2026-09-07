@@ -5,5 +5,14 @@ updates:
     schedule:
       interval: "weekly"
     groups:
+      # Parches y minors de todo en un solo PR
       minor-y-patch:
         update-types: ["minor", "patch"]
+      # React y sus tipos tienen que subir juntos (react, react-dom, @types/react, @types/react-dom)
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+        update-types: ["major"]
+    ignore:
+      # eslint-plugin-react (7.37.x) todavía no soporta ESLint 10; quitar cuando lo haga
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
