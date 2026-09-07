@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import api from '../services/api';
 
 function Tareas({ proyectoSeleccionado }) {
   const [tareas, setTareas] = useState([]);
@@ -23,13 +24,9 @@ function Tareas({ proyectoSeleccionado }) {
   }, [proyectoSeleccionado]);
 
   const fetchTareas = () => {
-    fetch(`https://api-freelancehub.vercel.app/tareas/${proyectoSeleccionado}`)
+    api.get(`/tareas/${proyectoSeleccionado}`)
       .then(response => {
-        if (!response.ok) throw new Error('Error al obtener las tareas');
-        return response.json();
-      })
-      .then(data => {
-        console.log('Datos recibidos:', data);
+        const data = response.data;
         if (data && Array.isArray(data.tareas)) {
           setTareas(data.tareas);
         } else {
@@ -38,36 +35,27 @@ function Tareas({ proyectoSeleccionado }) {
         }
         setError('');
       })
-      .catch(error => {
-        setError(error.message);
+      .catch(() => {
+        setError('Error al obtener las tareas');
       });
   };
 
   const agregarTarea = (e) => {
     e.preventDefault();
-    const url = editarTareaId ? `https://api-freelancehub.vercel.app/tarea/${editarTareaId}` : 'https://api-freelancehub.vercel.app/create-tarea';
-    const method = editarTareaId ? 'PATCH' : 'POST';
+    const tarea = {
+      proyecto_id: proyectoSeleccionado,
+      tarea_nombre: tareaNombre,
+      tarea_fecha: fechaLimiteTarea,
+      tarea_descripcion: descripcionTarea,
+      tarea_completada: tareaCompletada,
+      tarea_necesita_pago: pendientePagoTarea,
+    };
+    const peticion = editarTareaId
+      ? api.patch(`/tarea/${editarTareaId}`, tarea)
+      : api.post('/create-tarea', tarea);
 
-    fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        proyecto_id: proyectoSeleccionado,
-        tarea_nombre: tareaNombre,
-        tarea_fecha: fechaLimiteTarea,
-        tarea_descripcion: descripcionTarea,
-        tarea_completada: tareaCompletada,
-        tarea_necesita_pago: pendientePagoTarea,
-      }),
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('Error al guardar la tarea');
-        return response.json();
-      })
-      .then(responseConverted => {
-        console.log('Respuesta de la API:', responseConverted);
+    peticion
+      .then(() => {
         fetchTareas();
         setTareaNombre('');
         setFechaLimiteTarea('');
@@ -77,30 +65,20 @@ function Tareas({ proyectoSeleccionado }) {
         setMostrarAgregarTarea(false);
         setEditarTareaId(null);
         setError('');
-        if (!editarTareaId) {
-          enviarCorreoRecordatorio(tareaNombre, fechaLimiteTarea);
-        }
       })
-      .catch(error => {
-        setError(error.message);
+      .catch(() => {
+        setError('Error al guardar la tarea');
       });
   };
 
   const eliminarTarea = (id) => {
-    fetch(`https://api-freelancehub.vercel.app/tarea/${id}`, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (!response.ok) throw new Error('No se pudo eliminar la tarea, aun tiene pagos asociados');
-        return response.json();
-      })
+    api.delete(`/tarea/${id}`)
       .then(() => {
-        console.log('¡La tarea se ha eliminado correctamente!');
         fetchTareas();
         setError('');
       })
-      .catch(error => {
-        setError(error.message);
+      .catch(() => {
+        setError('No se pudo eliminar la tarea, aun tiene pagos asociados');
       });
   };
 
@@ -114,43 +92,8 @@ function Tareas({ proyectoSeleccionado }) {
     setMostrarAgregarTarea(true);
   };
 
-  const enviarCorreoRecordatorio = (tareaNombre, fechaLimiteTarea) => {
-    const fechaActual = new Date();
-    const fechaLimite = new Date(fechaLimiteTarea);
-  
-    const tiempoRestante = fechaLimite.getTime() - fechaActual.getTime();
-    
-    if (tiempoRestante >= 0) {
-      setTimeout(() => {
-        const email = localStorage.getItem('usuario_email');
-        fetch('https://api-freelancehub.vercel.app/send-email-recordatorios', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            subject: 'Recordatorio de Tarea Pendiente',
-            recipients: [email],
-            body: `Recordatorio: la tarea "${tareaNombre}" tiene su fecha límite hoy.
-            
-            Atentamente,
-            FreelanceHub
-            `,
-          }),
-        })
-          .then(response => {
-            if (!response.ok) throw new Error('Error al enviar el correo');
-            return response.json();
-          })
-          .then(data => {
-            console.log('Correo enviado:', data.message);
-          })
-          .catch(error => {
-            console.error('Error al enviar el correo:', error.message);
-          });
-      }, tiempoRestante);
-    }
-  };  
+  // Los recordatorios por correo los envía la API con su tarea programada
+  // (send_reminder_emails); ya no se disparan desde el navegador.
 
   const formatoFecha = (fecha) => {
     try {

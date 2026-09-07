@@ -5,8 +5,8 @@ import { FileText, Download, Eye, X, Plus, Trash2 } from 'lucide-react'
 import { Card, Input, Select, Textarea, Button, Alert, Spinner, Badge } from './ui'
 import { toast } from './ui/Toast'
 import { useProjects } from '../hooks'
+import api from '../services/api'
 
-const API_BASE_URL = 'https://api-freelancehub.vercel.app'
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -163,19 +163,11 @@ function ContratosV2() {
 
   const fetchProyectoDetails = useCallback(async (proyectoId) => {
     try {
-      const [clienteResponse, usuarioResponse, tareasResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/cliente/${selectedProyecto.cliente_id}`),
-        fetch(`${API_BASE_URL}/get-usuario/${selectedProyecto.usuario_id}`),
-        fetch(`${API_BASE_URL}/tareas-with-pagos/${proyectoId}`),
+      const [clienteData, usuarioData, tareasData] = await Promise.all([
+        api.get(`/cliente/${selectedProyecto.cliente_id}`).then((r) => r.data),
+        api.get(`/get-usuario/${selectedProyecto.usuario_id}`).then((r) => r.data),
+        api.get(`/tareas-with-pagos/${proyectoId}`).then((r) => r.data),
       ])
-
-      if (!clienteResponse.ok || !usuarioResponse.ok || !tareasResponse.ok) {
-        throw new Error('Error al obtener detalles del proyecto')
-      }
-
-      const clienteData = await clienteResponse.json()
-      const usuarioData = await usuarioResponse.json()
-      const tareasData = await tareasResponse.json()
 
       setDatosContrato((prevDatos) => ({
         ...prevDatos,

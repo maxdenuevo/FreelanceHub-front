@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 function Formnuevoproyecto() {
   const [nombre, setNombre] = useState('');
@@ -25,8 +26,8 @@ function Formnuevoproyecto() {
       setLoading(false);
       return;
     }
-    fetch(`https://api-freelancehub.vercel.app/clientes/${userId}`)
-      .then(response => response.json())
+    api.get(`/clientes/${userId}`)
+      .then(response => response.data)
       .then(data => {
         console.log(data);
         if (Array.isArray(data.clientes)) {
@@ -73,12 +74,7 @@ function Formnuevoproyecto() {
   const agregarProyecto = (e) => {
     e.preventDefault();
     let userId = localStorage.getItem('usuario_id');
-    fetch("https://api-freelancehub.vercel.app/create-proyecto", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    api.post('/create-proyecto', {
         usuario_id: userId,
         proyecto_nombre: nombre,
         proyecto_presupuesto: Number(presupuesto),
@@ -87,14 +83,8 @@ function Formnuevoproyecto() {
         proyecto_descripcion: descripcion,
         proyecto_tipo: tipo,
         cliente_id: clientId,
-      })
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Error al agregar el proyecto.');
-      }
-      return response.json();
-    })
+    .then(response => response.data)
     .then(responseConverted => {
       console.log("¡El proyecto se ha registrado correctamente!");
       console.log(responseConverted);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TerminosYCondiciones from './TerminosYCondiciones'
+import { authService } from '../services';
 
 function Formularioregistro() {
   const [usuarioRut, setUsuarioRut] = useState('');
@@ -42,20 +43,11 @@ function Formularioregistro() {
       return;
     }
 
-    fetch("https://api-freelancehub.vercel.app/register-usuario", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    authService.register({
         usuario_email: usuarioEmail,
         usuario_rut: usuarioRut,
         usuario_password: usuarioPassword,
         usuario_nombre: usuarioNombre,
-      })
-    })
-      .then(response => {
-        return response.json();
       })
       .then(responseConverted => {
         console.log("El usuario se ha registrado correctamente! 👨‍🚀");

@@ -14,6 +14,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { Card, Badge, Avatar } from '../../ui'
 import { cn } from '../../../utils/cn'
+import api from '../../../services/api'
 
 /**
  * ClientCard - Card component for displaying client information
@@ -40,10 +41,7 @@ export const ClientCard = ({
     const userId = localStorage.getItem('usuario_id')
 
     try {
-      const response = await fetch(
-        `https://api-freelancehub.vercel.app/proyectos/${userId}`
-      )
-      const data = await response.json()
+      const { data } = await api.get(`/proyectos/${userId}`)
 
       // Filter projects for this client
       const clientProjects = (data.proyectos || []).filter(

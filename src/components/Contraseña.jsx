@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RecoveryContext } from '../App';
+import { authService } from '../services';
 
 function Contraseña() {
-  const { email, codigoVerificado } = useContext(RecoveryContext);
+  const { email, codigo, codigoVerificado } = useContext(RecoveryContext);
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
   const [mensajeError, setMensajeError] = useState('');
@@ -30,32 +31,15 @@ function Contraseña() {
       return;
     }
 
-    const codigoVerificadoString = codigoVerificado ? 'true' : 'false';
-
-    fetch('https://api-freelancehub.vercel.app/usuarios/change-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        usuario_email: email,
-        otp: codigoVerificadoString,
-        new_password: nuevaContrasena,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((errorData) => {
-            throw new Error(errorData.message || 'Error al cambiar la contraseña');
-          });
-        }
-        return response.json();
-      })
+    authService.changePasswordWithCode(email, codigo, nuevaContrasena)
       .then(() => {
         setMensajeExito('Contraseña cambiada con éxito');
         setTimeout(() => navigate('/login'), 2000);
       })
       .catch((error) => {
         console.error('Error al cambiar la contraseña:', error);
-        setMensajeError(`Hubo un problema al cambiar la contraseña. Intenta nuevamente. ${error.message}`);
+        const detalle = error.response?.data?.message || error.message;
+        setMensajeError(`Hubo un problema al cambiar la contraseña. Intenta nuevamente. ${detalle}`);
       });
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 function Formnuevocliente() {
   const [esClienteNuevo, setEsClienteNuevo] = useState(false);
@@ -17,13 +18,8 @@ function Formnuevocliente() {
 
   useEffect(() => {
     const userId = localStorage.getItem('usuario_id');
-    fetch("https://api-freelancehub.vercel.app/get-usuario/" + userId)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok.');
-        }
-        return response.json();
-      })
+    api.get(`/get-usuario/${userId}`)
+      .then(response => response.data)
       .then(data => setUserId(data.usuario.usuario_id))
       .catch(error => {
         console.error('Error al obtener user_id:', error);
@@ -68,19 +64,8 @@ function Formnuevocliente() {
       cliente_rut: rutCliente,
     };
 
-    fetch('https://api-freelancehub.vercel.app/create-cliente', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(clienteData),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los datos. Intenta nuevamente');
-        }
-        return response.json();
-      })
+    api.post('/create-cliente', clienteData)
+      .then(response => response.data)
       .then(responseConverted => {
         console.log('El cliente se ha registrado correctamente!');
         console.log(responseConverted);

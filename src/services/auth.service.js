@@ -2,65 +2,72 @@ import api from './api';
 
 /**
  * Servicio de autenticación
- * Maneja login, registro, recuperación de contraseña
+ * Maneja login, registro y recuperación de contraseña.
+ * Todas las rutas corresponden a las que expone api/index.py en api-freelancehub.
  */
 
 export const authService = {
   /**
-   * Login de usuario
+   * Login de usuario. La API responde { message, token }; el usuario_id viene dentro del token.
    * @param {string} email
    * @param {string} password
    */
   login: async (email, password) => {
-    const response = await api.post('/login', {
+    const response = await api.post('/login-usuario', {
       usuario_email: email,
-      usuario_contraseña: password,
+      usuario_password: password,
     });
     return response.data;
   },
 
   /**
    * Registro de nuevo usuario
-   * @param {Object} userData
+   * @param {Object} userData - { usuario_email, usuario_rut, usuario_password, usuario_nombre }
    */
   register: async (userData) => {
-    const response = await api.post('/create-user', userData);
+    const response = await api.post('/register-usuario', userData);
     return response.data;
   },
 
   /**
-   * Solicitar código de recuperación
+   * Enviar código de recuperación por correo.
+   *
+   * ADVERTENCIA DE SEGURIDAD: hoy el código se genera en el navegador y la API
+   * (verify_otp en api/index.py) no lo valida. Este flujo NO protege la cuenta hasta
+   * que la API genere y verifique el código por su cuenta.
    * @param {string} email
+   * @param {number|string} code
    */
-  requestPasswordReset: async (email) => {
-    const response = await api.post('/send-recovery-email', {
-      recipient_email: email,
+  sendRecoveryCode: async (email, code) => {
+    const response = await api.post('/send-email', {
+      subject: 'Código de verificación para FreelanceHub',
+      recipients: [email],
+      body: `¡Gracias por usar FreelanceHub!
+
+Para completar el proceso de verificación de tu correo electrónico, utiliza el siguiente código:
+
+Código de Verificación: ${code}
+
+Este código es válido por 1 min. Si tienes algún problema o necesitas ayuda, no dudes en contactarnos.
+
+El equipo de FreelanceHub
+freelancehub.cl
+[contacto@freelancehub.cl]`,
     });
     return response.data;
   },
 
   /**
-   * Validar código de recuperación
+   * Cambiar contraseña usando el código de recuperación (ver advertencia arriba).
    * @param {string} email
-   * @param {string} code
-   */
-  validateRecoveryCode: async (email, code) => {
-    const response = await api.post('/validate-recovery', {
-      usuario_email: email,
-      codigo: code,
-    });
-    return response.data;
-  },
-
-  /**
-   * Cambiar contraseña
-   * @param {string} email
+   * @param {number|string} code
    * @param {string} newPassword
    */
-  changePassword: async (email, newPassword) => {
-    const response = await api.patch('/change-password', {
+  changePasswordWithCode: async (email, code, newPassword) => {
+    const response = await api.post('/usuarios/change-password', {
       usuario_email: email,
-      nueva_contraseña: newPassword,
+      otp: String(code),
+      new_password: newPassword,
     });
     return response.data;
   },

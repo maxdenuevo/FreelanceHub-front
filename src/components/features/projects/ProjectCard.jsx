@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { Card, Badge, Button } from '../../ui'
 import { cn } from '../../../utils/cn'
+import api from '../../../services/api'
 
 /**
  * ProjectCard - Card component for displaying project information
@@ -35,10 +36,7 @@ export const ProjectCard = ({
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch(
-        `https://api-freelancehub.vercel.app/tareas/${proyecto.proyecto_id}`
-      )
-      const data = await response.json()
+      const { data } = await api.get(`/tareas/${proyecto.proyecto_id}`)
       setTasks(data.tareas || [])
     } catch (error) {
       console.error('Error fetching tasks:', error)

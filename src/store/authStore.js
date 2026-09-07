@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { jwtDecode } from 'jwt-decode';
 import { authService } from '../services';
 
 /**
@@ -23,8 +24,21 @@ export const useAuthStore = create(
         try {
           const data = await authService.login(email, password);
 
+          // La API sólo devuelve el token; el usuario_id viene dentro de él
+          let usuarioId = data.usuario_id;
+          if (!usuarioId && data.token) {
+            try {
+              usuarioId = jwtDecode(data.token).usuario_id;
+            } catch {
+              usuarioId = null;
+            }
+          }
+          if (!usuarioId) {
+            throw new Error('La respuesta del servidor no incluye el usuario');
+          }
+
           // Guardar en localStorage
-          localStorage.setItem('usuario_id', data.usuario_id);
+          localStorage.setItem('usuario_id', usuarioId);
           localStorage.setItem('usuario_email', email);
           if (data.token) {
             localStorage.setItem('auth_token', data.token);
@@ -32,7 +46,7 @@ export const useAuthStore = create(
 
           set({
             user: {
-              id: data.usuario_id,
+              id: usuarioId,
               email: email,
             },
             token: data.token,

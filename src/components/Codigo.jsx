@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RecoveryContext } from '../App';
+import { authService } from '../services';
 
 const Codigo = () => {
   const { codigo, setCodigo, setCodigoVerificado, email } = useContext(RecoveryContext);
@@ -24,33 +25,7 @@ const Codigo = () => {
     const nuevoCodigo = Math.floor(Math.random() * 9000 + 1000);
     setCodigo(nuevoCodigo);
 
-    fetch('https://api-freelancehub.vercel.app/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject: 'Nuevo código de verificación para FreelanceHub',
-        recipients: [email],
-        body: 
-        `¡Gracias por usar FreelanceHub!
-
-        Para completar el proceso de verificación de tu correo electrónico, por favor utiliza el nuevo código:
-        
-        Código de Verificación: ${nuevoCodigo}
-        
-        Este código es válido por 1 min. Si tienes algún problema o necesitas ayuda, no dudes en contactarnos.
-        
-        El equipo de FreelanceHub
-        
-        freelancehub.cl
-        [contacto@freelancehub.cl]`
-      })
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error en la respuesta del servidor');
-        }
-        return response.json();
-      })
+    authService.sendRecoveryCode(email, nuevoCodigo)
       .then(() => {
         setMensajeExito('Nuevo código enviado.');
         setTiempoRestante(60);

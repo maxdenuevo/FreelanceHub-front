@@ -7,6 +7,7 @@ import { QuickActions } from './features/dashboard/QuickActions'
 import { ChartCard } from './features/dashboard/ChartCard'
 import { RecentActivity } from './features/dashboard/RecentActivity'
 import { Card, CardHeader, CardTitle, CardContent, Spinner, Badge } from './ui'
+import api from '../services/api'
 
 /**
  * Dashboard Home v2.0 - Modern redesign
@@ -37,17 +38,11 @@ function HomeV2() {
 
       try {
         // Fetch user data
-        const userResponse = await fetch(
-          `https://api-freelancehub.vercel.app/get-usuario/${userId}`
-        )
-        const userData = await userResponse.json()
+        const { data: userData } = await api.get(`/get-usuario/${userId}`)
         setUsuarioNombre(userData.usuario.usuario_nombre)
 
         // Fetch projects to calculate stats
-        const projectsResponse = await fetch(
-          `https://api-freelancehub.vercel.app/proyectos/${userId}`
-        )
-        const projectsData = await projectsResponse.json()
+        const { data: projectsData } = await api.get(`/proyectos/${userId}`)
 
         if (projectsData.proyectos) {
           const proyectos = projectsData.proyectos
@@ -61,10 +56,7 @@ function HomeV2() {
 
           for (const proyecto of proyectos) {
             try {
-              const tareasResponse = await fetch(
-                `https://api-freelancehub.vercel.app/tareas/${proyecto.proyecto_id}`
-              )
-              const tareasData = await tareasResponse.json()
+              const { data: tareasData } = await api.get(`/tareas/${proyecto.proyecto_id}`)
 
               if (tareasData.tareas) {
                 totalTareasPendientes += tareasData.tareas.filter(
@@ -73,10 +65,7 @@ function HomeV2() {
               }
 
               // Fetch payments
-              const pagosResponse = await fetch(
-                `https://api-freelancehub.vercel.app/pagos/${proyecto.proyecto_id}`
-              )
-              const pagosData = await pagosResponse.json()
+              const { data: pagosData } = await api.get(`/pagos/${proyecto.proyecto_id}`)
 
               if (pagosData.pagos) {
                 const ingresosProyecto = pagosData.pagos
@@ -90,10 +79,7 @@ function HomeV2() {
           }
 
           // Fetch clients
-          const clientsResponse = await fetch(
-            `https://api-freelancehub.vercel.app/clientes/${userId}`
-          )
-          const clientsData = await clientsResponse.json()
+          const { data: clientsData } = await api.get(`/clientes/${userId}`)
           const clientesActivos = clientsData.clientes?.length || 0
 
           setStats({
@@ -149,10 +135,7 @@ function HomeV2() {
       let completed = 0
       for (const proyecto of proyectos) {
         try {
-          const tareasResponse = await fetch(
-            `https://api-freelancehub.vercel.app/tareas/${proyecto.proyecto_id}`
-          )
-          const tareasData = await tareasResponse.json()
+          const { data: tareasData } = await api.get(`/tareas/${proyecto.proyecto_id}`)
           if (tareasData.tareas) {
             completed += tareasData.tareas.filter((t) => t.tarea_completada).length
           }
@@ -286,24 +269,6 @@ function HomeV2() {
           </Card>
         </div>
 
-        {/* Google Calendar (Optional) */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Calendario</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg overflow-hidden">
-              <iframe
-                src="https://calendar.google.com/calendar/embed?src=your_calendar_id&ctz=Your_Time_Zone"
-                style={{ border: 0, width: '100%', height: '400px' }}
-                frameBorder="0"
-                scrolling="no"
-                title="Google Calendar"
-                className="rounded-lg"
-              />
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )

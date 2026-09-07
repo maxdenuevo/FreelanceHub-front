@@ -8,6 +8,9 @@ import { useTasks } from '../hooks';
 import { paymentsService } from '../services';
 import { toast } from './ui/Toast';
 
+// Sólo se enlazan comprobantes http(s); evita hrefs javascript:/data: si el backend devolviera algo raro
+const esUrlSegura = (url) => /^https?:\/\//i.test(String(url || ''));
+
 /**
  * Pagos v2.2 - Advanced payment management
  * Features: Filtros, búsqueda, export CSV/Excel, gráficos, recordatorios
@@ -460,7 +463,7 @@ function PagosV2({ proyectoSeleccionado }) {
                           ${parseFloat(pago.pago_monto || 0).toLocaleString()}
                         </span>
                         <span>{formatoFecha(pago.pago_fecha)}</span>
-                        {pago.pago_comprobante && (
+                        {esUrlSegura(pago.pago_comprobante) && (
                           <a
                             href={pago.pago_comprobante}
                             target="_blank"

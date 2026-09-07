@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { User, Mail, CreditCard, Key, Shield } from 'lucide-react'
 import { Card, Input, Button, Alert, Spinner, Badge, Avatar } from './ui'
 import { toast } from './ui/Toast'
+import api from '../services/api'
 
 /**
  * Perfilusuario v2.0 - Modern user profile page
@@ -28,15 +29,7 @@ function PerfilusuarioV2() {
     }
 
     try {
-      const response = await fetch(
-        `https://api-freelancehub.vercel.app/get-usuario/${userId}`
-      )
-
-      if (!response.ok) {
-        throw new Error('Error al obtener los datos del usuario.')
-      }
-
-      const data = await response.json()
+      const { data } = await api.get(`/get-usuario/${userId}`)
       setUsuario(data.usuario)
       setError('')
     } catch (error) {
