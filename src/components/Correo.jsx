@@ -4,7 +4,7 @@ import { RecoveryContext } from '../App';
 import { authService } from '../services';
 
 const Correo = () => {
-  const { setEmail, setCodigo } = useContext(RecoveryContext);
+  const { setEmail } = useContext(RecoveryContext);
   const [correo, setCorreo] = useState('');
   const [mensajeError, setMensajeError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
@@ -19,13 +19,10 @@ const Correo = () => {
       return;
     }
 
-    const codigo = Math.floor(Math.random() * 9000 + 1000);
-    setCodigo(codigo);
-
-    authService.sendRecoveryCode(correo, codigo)
+    authService.requestPasswordReset(correo)
       .then(() => {
         setEmail(correo);
-        setMensajeExito('El código de verificación ha sido enviado a tu correo electrónico.');
+        setMensajeExito('Si el correo está registrado, recibirás un código de verificación.');
         setTimeout(() => navigate('/validarcodigo'), 2000);
       })
       .catch((error) => {

@@ -41,15 +41,17 @@ api.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // Token inválido o expirado
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('usuario_id');
-          localStorage.removeItem('usuario_email');
+          // Sólo es una sesión vencida si la petición llevaba token. Un 401 en login
+          // o en la validación del código de recuperación no debe cerrar nada.
+          if (error.config?.headers?.Authorization) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('usuario_id');
+            localStorage.removeItem('usuario_email');
 
-          // Solo redirigir si no estamos en login/registro
-          if (!window.location.pathname.includes('/login') &&
-              !window.location.pathname.includes('/registro')) {
-            window.location.href = '/login';
+            if (!window.location.pathname.includes('/login') &&
+                !window.location.pathname.includes('/registro')) {
+              window.location.href = '/login';
+            }
           }
           break;
 

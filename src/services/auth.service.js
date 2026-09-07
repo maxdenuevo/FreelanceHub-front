@@ -30,37 +30,34 @@ export const authService = {
   },
 
   /**
-   * Enviar código de recuperación por correo.
-   *
-   * ADVERTENCIA DE SEGURIDAD: hoy el código se genera en el navegador y la API
-   * (verify_otp en api/index.py) no lo valida. Este flujo NO protege la cuenta hasta
-   * que la API genere y verifique el código por su cuenta.
+   * Pedir un código de recuperación. La API lo genera, lo guarda con vencimiento
+   * y lo envía por correo. Responde igual exista o no el email.
    * @param {string} email
-   * @param {number|string} code
    */
-  sendRecoveryCode: async (email, code) => {
-    const response = await api.post('/send-email', {
-      subject: 'Código de verificación para FreelanceHub',
-      recipients: [email],
-      body: `¡Gracias por usar FreelanceHub!
-
-Para completar el proceso de verificación de tu correo electrónico, utiliza el siguiente código:
-
-Código de Verificación: ${code}
-
-Este código es válido por 1 min. Si tienes algún problema o necesitas ayuda, no dudes en contactarnos.
-
-El equipo de FreelanceHub
-freelancehub.cl
-[contacto@freelancehub.cl]`,
+  requestPasswordReset: async (email) => {
+    const response = await api.post('/solicitar-recuperacion', {
+      usuario_email: email,
     });
     return response.data;
   },
 
   /**
-   * Cambiar contraseña usando el código de recuperación (ver advertencia arriba).
+   * Validar el código recibido por correo (máximo 5 intentos, 10 minutos).
    * @param {string} email
-   * @param {number|string} code
+   * @param {string} code
+   */
+  validateRecoveryCode: async (email, code) => {
+    const response = await api.post('/validar-codigo-recuperacion', {
+      usuario_email: email,
+      otp: String(code),
+    });
+    return response.data;
+  },
+
+  /**
+   * Cambiar contraseña con el código de recuperación. La API consume el código.
+   * @param {string} email
+   * @param {string} code
    * @param {string} newPassword
    */
   changePasswordWithCode: async (email, code, newPassword) => {

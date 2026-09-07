@@ -4,7 +4,7 @@ import { RecoveryContext } from '../App';
 import { authService } from '../services';
 
 const Codigo = () => {
-  const { codigo, setCodigo, setCodigoVerificado, email } = useContext(RecoveryContext);
+  const { setCodigo, setCodigoVerificado, email } = useContext(RecoveryContext);
   const [codigoIngresado, setCodigoIngresado] = useState('');
   const [reintentar, setReintentar] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(60);
@@ -13,19 +13,25 @@ const Codigo = () => {
   const navigate = useNavigate();
 
   const verificarCodigo = () => {
-    if (isNaN(codigoIngresado) || parseInt(codigoIngresado) !== codigo) {
-      setMensajeError('El código ingresado es incorrecto. Intenta nuevamente.');
-    } else {
-      setCodigoVerificado(true);
-      navigate('/cambiarcontraseña');
+    const ingresado = codigoIngresado.trim();
+    if (!/^\d{6}$/.test(ingresado)) {
+      setMensajeError('El código debe tener 6 dígitos.');
+      return;
     }
+    authService.validateRecoveryCode(email, ingresado)
+      .then(() => {
+        setCodigo(ingresado);
+        setCodigoVerificado(true);
+        navigate('/cambiarcontraseña');
+      })
+      .catch((error) => {
+        setMensajeError(error.response?.data?.message || 'El código ingresado es incorrecto. Intenta nuevamente.');
+      });
   };
 
   const reenviarCodigo = () => {
-    const nuevoCodigo = Math.floor(Math.random() * 9000 + 1000);
-    setCodigo(nuevoCodigo);
-
-    authService.sendRecoveryCode(email, nuevoCodigo)
+    setMensajeError('');
+    authService.requestPasswordReset(email)
       .then(() => {
         setMensajeExito('Nuevo código enviado.');
         setTiempoRestante(60);
