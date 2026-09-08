@@ -21,9 +21,9 @@
     "framer-motion": "^12.23.24",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.548.0",
-    "react": "^18.3.1",
+    "react": "^19.2.8",
     "react-big-calendar": "^1.20.0",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.2.8",
     "react-error-boundary": "^6.1.4",
     "react-hook-form": "^7.87.0",
     "react-router-dom": "^6.26.1",
@@ -36,9 +36,9 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.5.5",
     "eslint": "^9.9.0",
     "eslint-plugin-react": "^7.37.5",
@@ -47,6 +47,6 @@
     "globals": "^15.9.0",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.1.16",
-    "vite": "^5.4.1"
+    "vite": "^8.2.2"
   }
 }
